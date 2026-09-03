@@ -1,0 +1,22 @@
+fastapi
+uvicorn
+sqlalchemy
+alembic
+pydantic-settings
+psycopg2-binary
+passlib
+bcrypt
+PyJWT
+
+# Pinned from ml/requirements.txt
+lightgbm==4.7.0
+scikit-learn==1.8.0
+numpy>=2.0,<3.0
+pandas>=2.2,<4.0
+
+slowapi
+pytest
+httpx
+
+email-validator
+python-multipart

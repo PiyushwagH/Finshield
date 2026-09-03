@@ -1,0 +1,239 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 4rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin: 0 0 2rem 0;
+}
+
+.statsRow {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.statCard, .statCardTotal {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.statCardTotal {
+  border-left: 4px solid var(--navy);
+  min-width: 200px;
+  margin-left: auto;
+}
+
+.statCard span, .statCardTotal span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.statCard strong, .statCardTotal strong {
+  font-size: 1.5rem;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.approvedText {
+  color: var(--teal) !important;
+}
+
+.content {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.tabsRow {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  padding: 0 1rem;
+}
+
+.tabBtn {
+  background: none;
+  border: none;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tabBtn:hover {
+  color: var(--navy);
+}
+
+.activeTab {
+  color: var(--navy);
+  border-bottom-color: var(--navy);
+}
+
+.listContainer {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.schemeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-alt);
+  transition: all 0.2s;
+}
+
+.schemeRow:hover {
+  border-color: var(--navy);
+  background: white;
+}
+
+.rowMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: white;
+  border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.dateText {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.schemeName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+  cursor: pointer;
+}
+
+.schemeName:hover {
+  text-decoration: underline;
+}
+
+.ministry {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.benefitInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.benefitLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.benefitValue {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+.statusDropdown {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+  outline: none;
+}
+
+.loading, .emptyState {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-muted);
+}
+
+.findBtn {
+  margin-top: 1rem;
+  background: var(--navy);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .schemeRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+  
+  .rowActions {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .statCardTotal {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,341 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 3rem;
+}
+
+.headerArea {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.searchBox {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.inputWrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  background: var(--bg-alt);
+}
+
+.searchIcon {
+  color: var(--text-muted);
+  margin-right: 0.75rem;
+}
+
+.inputWrapper input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 1rem;
+  color: var(--text);
+  padding: 0.5rem 0;
+}
+
+.searchBtn {
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quickChips {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.chipsLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.chip {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.4rem 1rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chip:hover {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 2rem;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.filterHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filterHeader h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  color: var(--navy);
+}
+
+.clearBtn {
+  background: none;
+  border: none;
+  color: var(--teal);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.qualifyBox {
+  background: rgba(14, 143, 134, 0.05);
+  border: 1px solid rgba(14, 143, 134, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.qualifyBox label {
+  font-size: 0.875rem;
+  color: var(--navy);
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+.checkbox {
+  accent-color: var(--navy);
+}
+
+.helpText {
+  margin: 0.5rem 0 0 1.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.filterGroup h4 {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 1rem 0;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.checkboxRow label {
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.contentHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.contentHeader span {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.contentHeader strong {
+  color: var(--navy);
+}
+
+.sortBox {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sortSelect {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.cardTags {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.categoryTag {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--teal);
+  letter-spacing: 0.5px;
+}
+
+.levelTag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.central {
+  background: var(--navy);
+  color: white;
+}
+
+.state {
+  background: #E2E8F0;
+  color: var(--text-muted);
+}
+
+.schemeName {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 0.25rem 0;
+  line-height: 1.3;
+}
+
+.ministry {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0 0 1rem 0;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: var(--text);
+  line-height: 1.5;
+  margin: 0 0 1.25rem 0;
+  flex: 1;
+}
+
+.benefitsRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.benefitPill {
+  background: rgba(14, 143, 134, 0.1);
+  color: var(--teal);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.typePill {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.statusUnknown {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.viewBtn {
+  background: none;
+  border: none;
+  color: var(--navy);
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.loading, .emptyState {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

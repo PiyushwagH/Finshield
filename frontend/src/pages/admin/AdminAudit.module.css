@@ -1,0 +1,104 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.tableCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #F8FAFC;
+}
+
+.table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.timeCell {
+  color: var(--text-muted);
+  font-size: 0.8rem !important;
+}
+
+.actionPill {
+  background: rgba(15, 42, 71, 0.05);
+  color: var(--navy);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+.entityPill {
+  background: rgba(14, 143, 134, 0.1);
+  color: var(--teal);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.monoCell {
+  font-family: monospace;
+  font-size: 0.75rem !important;
+  color: var(--text-muted);
+}
+
+.detailsCell {
+  font-family: monospace;
+  font-size: 0.75rem !important;
+  color: var(--text-muted);
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}

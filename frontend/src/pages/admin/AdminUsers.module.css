@@ -1,0 +1,142 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.tableCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #F8FAFC;
+}
+
+.table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.userCell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.roleSelect {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  outline: none;
+  background: white;
+  cursor: pointer;
+}
+
+.roleSelect:focus {
+  border-color: var(--navy);
+}
+
+.statusBadge {
+  display: inline-flex;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.active {
+  background: rgba(22, 163, 74, 0.1);
+  color: var(--risk-low);
+}
+
+.inactive {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--risk-high);
+}
+
+.actionBtn {
+  background: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+
+.suspendBtn {
+  border: 1px solid var(--risk-high);
+  color: var(--risk-high);
+}
+
+.suspendBtn:hover {
+  background: rgba(220, 38, 38, 0.05);
+}
+
+.activateBtn {
+  border: 1px solid var(--risk-low);
+  color: var(--risk-low);
+}
+
+.activateBtn:hover {
+  background: rgba(22, 163, 74, 0.05);
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+}

@@ -1,0 +1,22 @@
+# FinShield ML runtime — PINNED VERSIONS
+#
+# finshield_model.pkl was created with these versions. Inspecting the pickle
+# shows it references: lightgbm.basic, lightgbm.sklearn, numpy._core.multiarray,
+# and sklearn.preprocessing._label.
+#
+# CRITICAL: numpy must be 2.x. The pickle references `numpy._core`, which is the
+# numpy 2.x module path. Under numpy 1.x that module is `numpy.core` and
+# unpickling fails with ModuleNotFoundError. Do not downgrade numpy.
+#
+# pandas is NOT referenced by the pickle — it is only used by
+# finshield_predictor.py at runtime, so its version is flexible.
+#
+# Verify the model loads correctly:
+#     python finshield_predictor.py
+# Expected: the built-in sample prints default_probability 0.0232 and
+# risk_band "Very Low". If it prints anything else, the environment is wrong.
+
+lightgbm==4.7.0
+scikit-learn==1.8.0
+numpy>=2.0,<3.0
+pandas>=2.2,<4.0

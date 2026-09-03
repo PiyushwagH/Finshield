@@ -1,0 +1,227 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #FAFAFA; /* Very light background */
+}
+
+.logoContainer {
+  position: absolute;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: #E2E8F0; /* Slight placeholder for the logo box above the card */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.authCard {
+  margin: auto;
+  width: 100%;
+  max-width: 420px;
+  background-color: var(--bg);
+  border-radius: var(--radius-card);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  flex: 1;
+  padding: 1.25rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: none;
+  transition: color 0.2s;
+}
+
+.tab:hover {
+  color: var(--navy);
+}
+
+.activeTab {
+  color: var(--text);
+  border-bottom: 2px solid var(--text);
+  margin-bottom: -1px;
+}
+
+.formContainer {
+  padding: 2rem;
+}
+
+.formHeader {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.toast {
+  background-color: #FEE2E2;
+  color: var(--risk-high);
+  padding: 1rem;
+  border-radius: var(--radius-input);
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 0.95rem;
+  background-color: var(--bg-alt);
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input:focus {
+  border-color: var(--navy);
+  background-color: var(--bg);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(15, 42, 71, 0.1);
+}
+
+.input::placeholder {
+  color: #94A3B8;
+}
+
+.passwordContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordContainer .input {
+  padding-right: 3rem; /* Make room for eye icon */
+}
+
+.eyeBtn {
+  position: absolute;
+  right: 1rem;
+  background: none;
+  color: var(--risk-high); /* In error state it's red */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inputError .input {
+  border-color: var(--risk-high);
+  color: var(--risk-high);
+}
+
+.inputError .input::placeholder {
+  color: rgba(220, 38, 38, 0.5); /* lighter red */
+}
+
+.inputError .eyeBtn {
+  color: var(--risk-high);
+}
+
+.errorMessage {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  color: var(--risk-high);
+  font-size: 0.75rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.formOptions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.checkboxContainer input {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.forgotLink {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.forgotLink:hover {
+  text-decoration: underline;
+}
+
+.submitBtn {
+  background-color: var(--navy);
+  color: white;
+  padding: 0.875rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submitBtn:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

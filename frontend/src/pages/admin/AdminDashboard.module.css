@@ -1,0 +1,301 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-muted);
+}
+
+.alertBanner {
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--risk-high);
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.reviewBtn {
+  margin-left: auto;
+  background: var(--risk-high);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+}
+
+.statCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.statValue {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.statTrend {
+  font-size: 0.75rem;
+  color: var(--risk-low);
+  font-weight: 500;
+}
+
+.statSub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.alertIcon {
+  color: var(--risk-high);
+}
+
+.alertValue {
+  color: var(--risk-high);
+}
+
+.alertSub {
+  color: var(--risk-high);
+}
+
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.chartCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.chartCard h3, .tableCard h3, .activityCard h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+}
+
+.timeRange {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  background: var(--bg-alt);
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+}
+
+.chartWrapper {
+  margin-top: 1rem;
+}
+
+.pieWrapper {
+  position: relative;
+  margin-top: 1rem;
+}
+
+.pieCenter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.pieCenter strong {
+  display: block;
+  font-size: 1.25rem;
+  color: var(--navy);
+  font-weight: 800;
+}
+
+.pieCenter span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.legend {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.legendLabel {
+  color: var(--text);
+  flex: 1;
+}
+
+.legendValue {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.bottomGrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.tableCard, .activityCard {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+}
+
+.linkBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.linkBtn:hover {
+  color: var(--navy);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--bg-alt);
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.table td:first-child {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.categoryPill {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+.highConv {
+  color: var(--risk-low) !important;
+  font-weight: 600;
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.activityItem {
+  display: flex;
+  gap: 1rem;
+}
+
+.actIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.dangerAct {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--risk-high);
+}
+
+.actContent p {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--navy);
+}
+
+.actContent span {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

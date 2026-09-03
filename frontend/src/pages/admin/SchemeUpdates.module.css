@@ -1,0 +1,229 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.syncBtn {
+  background: var(--navy);
+  border: none;
+  color: white;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.tabs {
+  display: flex;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  padding: 0.75rem 0;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tab.active {
+  color: var(--navy);
+  border-bottom-color: var(--navy);
+}
+
+.badge {
+  background: var(--navy);
+  color: white;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 12px;
+}
+
+.updatesList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.updateCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.cardHeader {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.modifiedBadge {
+  background: rgba(14, 143, 134, 0.1);
+  color: var(--teal);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-transform: uppercase;
+}
+
+.detectedTime {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.schemeName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0 0 0.25rem 0;
+}
+
+.sourceLink {
+  font-size: 0.875rem;
+  color: var(--teal);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.diffTable {
+  padding: 1.5rem;
+  background: #F8FAFC;
+}
+
+.diffHeaderRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.diffRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+}
+
+.diffRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.diffColName {
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.diffColOld {
+  color: var(--risk-high);
+  text-decoration: line-through;
+  background: rgba(220, 38, 38, 0.05);
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin-right: 1rem;
+}
+
+.diffColNew {
+  color: var(--risk-low);
+  font-weight: 500;
+  background: rgba(22, 163, 74, 0.05);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.cardActions {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  border-top: 1px solid var(--border);
+  background: white;
+}
+
+.rejectBtn {
+  background: white;
+  border: 1px solid var(--risk-high);
+  color: var(--risk-high);
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.editBtn {
+  background: white;
+  border: 1px solid var(--navy);
+  color: var(--navy);
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.approveBtn {
+  background: var(--navy);
+  border: none;
+  color: white;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.loading, .empty {
+  text-align: center;
+  padding: 4rem 0;
+  color: var(--text-muted);
+}

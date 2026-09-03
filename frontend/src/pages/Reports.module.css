@@ -1,0 +1,155 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.btnPrimary {
+  background-color: var(--navy);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.card {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.chartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0;
+}
+
+.legend {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.legendLow {
+  color: var(--risk-low);
+}
+
+.legendMed {
+  color: var(--risk-medium);
+}
+
+.legendHigh {
+  color: var(--risk-high);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.table th {
+  padding: 0.75rem 1rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-alt);
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+}
+
+.bandBadge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.bandLow {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--risk-low);
+}
+
+.bandMedium {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--risk-medium);
+}
+
+.bandHigh {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--risk-high);
+}
+
+.gradeBadge {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: 1px solid var(--navy);
+  color: var(--navy);
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.actionBtn:hover {
+  background: var(--navy);
+  color: white;
+}
+
+.loading, .error, .emptyText {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}

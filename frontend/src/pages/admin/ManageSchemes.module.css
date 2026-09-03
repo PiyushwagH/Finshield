@@ -1,0 +1,192 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin: 0 0 0.5rem 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  margin: 0;
+  font-size: 1rem;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.importBtn {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--navy);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.importBtn:hover {
+  background: var(--bg-alt);
+}
+
+.addBtn {
+  background: var(--navy);
+  border: none;
+  color: white;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.addBtn:hover {
+  opacity: 0.9;
+}
+
+.tableCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.tableToolbar {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 1rem;
+}
+
+.searchBox {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchBox svg {
+  position: absolute;
+  left: 1rem;
+  color: var(--text-muted);
+}
+
+.searchBox input {
+  width: 100%;
+  padding: 0.6rem 1rem 0.6rem 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  outline: none;
+  background: var(--bg-alt);
+}
+
+.searchBox input:focus {
+  background: white;
+  border-color: var(--navy);
+}
+
+.filterSelect {
+  padding: 0.6rem 2rem 0.6rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: var(--text);
+  background-color: white;
+  outline: none;
+  cursor: pointer;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: #F8FAFC;
+}
+
+.table td {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+
+.nameCell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.rowNeedsReview {
+  background: rgba(245, 158, 11, 0.05);
+}
+
+.statusBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.active {
+  background: rgba(22, 163, 74, 0.1);
+  color: var(--risk-low);
+}
+
+.needs_review {
+  background: rgba(245, 158, 11, 0.15);
+  color: #B45309; /* Darker amber */
+}
+
+.draft {
+  background: var(--bg-alt);
+  color: var(--text-muted);
+}
+
+.iconBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+}
+
+.iconBtn:hover {
+  background: var(--bg-alt);
+  color: var(--navy);
+}

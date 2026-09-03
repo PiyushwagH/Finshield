@@ -1,0 +1,348 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg);
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 4rem;
+  background-color: var(--bg);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  flex: 1;
+}
+
+.navLinks {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.navLinks a:hover {
+  color: var(--text);
+}
+
+.activeLink {
+  color: var(--text) !important;
+  border-bottom: 2px solid var(--text);
+  padding-bottom: 4px;
+}
+
+.authLinks {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.loginBtn {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.registerBtn {
+  background-color: var(--navy);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-input);
+  font-weight: 600;
+  transition: opacity 0.2s;
+}
+
+.registerBtn:hover {
+  opacity: 0.9;
+}
+
+/* Hero Section */
+.main {
+  flex: 1;
+}
+
+.heroSection {
+  display: flex;
+  padding: 4rem 4rem;
+  align-items: center;
+  gap: 4rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.heroContent {
+  flex: 1;
+  max-width: 600px;
+}
+
+.heroTitle {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+
+.heroSubtitle {
+  font-size: 1.125rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+
+.heroCta {
+  display: flex;
+  gap: 1rem;
+}
+
+.primaryCta {
+  background-color: var(--navy);
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-input);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.secondaryCta {
+  background-color: white;
+  color: var(--text);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-input);
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+}
+
+.heroImageContainer {
+  flex: 1.2;
+}
+
+.heroImagePlaceholder {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background-color: #E2E8F0;
+  border-radius: var(--radius-card);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Stats Section */
+.statsSection {
+  display: flex;
+  justify-content: space-around;
+  padding: 4rem 2rem;
+  background-color: var(--bg);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.statItem {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statIcon {
+  color: var(--teal);
+  margin-bottom: 1rem;
+}
+
+.statValue {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.statLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Features Section */
+.featuresSection {
+  padding: 6rem 4rem;
+  background-color: var(--bg-alt);
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 3rem;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.featureCard {
+  background-color: var(--bg);
+  padding: 2.5rem 2rem;
+  border-radius: var(--radius-card);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+  text-align: left;
+}
+
+.featureIcon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--bg-alt);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+  margin-bottom: 1.5rem;
+}
+
+.featureTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.featureDesc {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* How It Works Section */
+.howItWorksSection {
+  padding: 6rem 4rem;
+  background-color: var(--bg);
+  text-align: center;
+}
+
+.stepsContainer {
+  display: flex;
+  justify-content: space-between;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.stepsContainer::before {
+  content: '';
+  position: absolute;
+  top: 24px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background-color: var(--border);
+  z-index: 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  padding: 0 1rem;
+}
+
+.stepCircle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background-color: var(--navy);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+}
+
+.stepLabel {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 1rem;
+}
+
+/* Footer */
+.footer {
+  background-color: var(--navy);
+  padding: 3rem 4rem;
+  color: white;
+}
+
+.footerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.footerBrand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footerLogo {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.footerCopy {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.875rem;
+}
+
+.footerLinks {
+  display: flex;
+  gap: 2rem;
+}
+
+.footerLinks a {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+}
+
+.footerLinks a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1024px) {
+  .heroSection {
+    flex-direction: column;
+    padding: 3rem 2rem;
+  }
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+  .stepsContainer {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .stepsContainer::before {
+    display: none;
+  }
+}

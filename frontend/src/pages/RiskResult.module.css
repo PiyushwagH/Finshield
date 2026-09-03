@@ -1,0 +1,352 @@
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: 4rem;
+}
+
+.printableArea {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.header {
+  margin-bottom: 0.5rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.card {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.gaugeContainer {
+  position: relative;
+  width: 240px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.gaugeSvg {
+  width: 100%;
+  height: auto;
+}
+
+.gaugeValueText {
+  position: absolute;
+  bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.scoreNumber {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.scoreMax {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.bandBadgeContainer {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.bandBadge {
+  display: inline-block;
+  padding: 0.35rem 1.25rem;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.5px;
+}
+
+.bandLow {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--risk-low);
+}
+
+.bandMedium {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--risk-medium);
+}
+
+.bandHigh {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--risk-high);
+}
+
+.sentence {
+  text-align: center;
+  font-size: 1rem;
+  color: var(--text);
+  margin-top: 1.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.percentileLine {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.twoColumnGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.cardTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0 0 1.25rem 0;
+}
+
+.cardHeaderFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.cardHeaderFlex .cardTitle {
+  margin-bottom: 0;
+}
+
+.gradeBadge {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.factorGroup {
+  margin-bottom: 1.25rem;
+}
+
+.positiveHeader, .negativeHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.75rem;
+}
+
+.positiveHeader {
+  color: var(--risk-low);
+}
+
+.negativeHeader {
+  color: var(--risk-high);
+}
+
+.factorList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.factorItemPositive, .factorItemNegative {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.875rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.factorItemPositive {
+  background: rgba(22, 163, 74, 0.06);
+}
+
+.factorItemNegative {
+  background: rgba(220, 38, 38, 0.06);
+}
+
+.tagPos {
+  color: var(--risk-low);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.tagNeg {
+  color: var(--risk-high);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.affordabilityRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.affRow {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.affRow strong {
+  color: var(--text);
+}
+
+.flagsBox {
+  margin-top: 1.25rem;
+  background: rgba(220, 38, 38, 0.05);
+  border: 1px dashed var(--risk-high);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.flagsTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--risk-high);
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.flagsBox ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text);
+  font-size: 0.8125rem;
+}
+
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.actionCard {
+  background: var(--bg-alt);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid var(--border);
+}
+
+.actionHeader {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.priorityTag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.prioHigh {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--risk-high);
+}
+
+.prioMedium {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--risk-medium);
+}
+
+.prioLow {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--risk-low);
+}
+
+.actionTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0 0 0.25rem 0;
+}
+
+.actionBody {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.disclaimerFooter {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #F1F5F9;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.actionBar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btnOutline {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--navy);
+  background: white;
+  color: var(--navy);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: var(--navy);
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .twoColumnGrid {
+    grid-template-columns: 1fr;
+  }
+}

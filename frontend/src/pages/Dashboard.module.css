@@ -1,0 +1,297 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+}
+
+.subtitle {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.btnPrimary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: var(--navy);
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.topGrid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.cardMain {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cardLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  align-self: flex-start;
+}
+
+.scoreGaugeBox {
+  display: flex;
+  align-items: baseline;
+  margin: 1rem 0 0.5rem 0;
+}
+
+.scoreBig {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1;
+}
+
+.scoreSub {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin-left: 0.25rem;
+}
+
+.bandPillWrapper {
+  margin-bottom: 0.75rem;
+}
+
+.bandPill {
+  display: inline-block;
+  padding: 0.25rem 0.875rem;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 0.75rem;
+}
+
+.bandLow {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--risk-low);
+}
+
+.bandMedium {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--risk-medium);
+}
+
+.bandHigh {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--risk-high);
+}
+
+.smallText {
+  font-size: 0.8125rem;
+  color: var(--text);
+  margin: 0.25rem 0;
+}
+
+.dateText {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.metricCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.metricCard {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.metricVal {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-top: 1rem;
+}
+
+.middleGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.sectionTitle {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--navy);
+  margin: 0 0 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardTitleFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.linkText {
+  color: var(--teal);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.actionRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-alt);
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--navy);
+  cursor: pointer;
+}
+
+.actionText {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.prioTag {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.prioHigh {
+  background: rgba(220, 38, 38, 0.15);
+  color: var(--risk-high);
+}
+
+.prioMedium {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--risk-medium);
+}
+
+.prioLow {
+  background: rgba(22, 163, 74, 0.15);
+  color: var(--risk-low);
+}
+
+.emptyStateContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.emptyStateCard {
+  background: var(--bg);
+  padding: 3rem 2rem;
+  border-radius: 16px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.emptyIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(14, 143, 134, 0.1);
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.emptyStateCard h2 {
+  color: var(--navy);
+  font-size: 1.5rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.emptyStateCard p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  margin: 0 0 1.75rem 0;
+}
+
+.loading, .emptyText {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 900px) {
+  .topGrid {
+    grid-template-columns: 1fr;
+  }
+  .middleGrid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,335 @@
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.stepIndicator {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.progressContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.progressSegmentWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.progressSegment {
+  height: 4px;
+  background-color: var(--border);
+  border-radius: 2px;
+  width: 100%;
+}
+
+.activeSegment {
+  background-color: var(--teal);
+}
+
+.progressLabel {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  text-align: center;
+}
+
+.activeLabel {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+
+.mainForm {
+  flex: 1;
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.sidebar {
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.infoCard {
+  background: var(--bg);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.infoTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--teal);
+  margin: 0 0 1rem 0;
+}
+
+.infoText {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0 0 1.5rem 0;
+}
+
+.secureBadge {
+  background-color: var(--bg-alt);
+  padding: 1rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.secureIcon {
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.secureBadge strong {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--text);
+  margin-bottom: 0.25rem;
+}
+
+.secureBadge span {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.errorFull {
+  text-align: center;
+  padding: 4rem;
+  color: var(--risk-high);
+  font-weight: 500;
+}
+
+.loading {
+  text-align: center;
+  padding: 4rem;
+  color: var(--text-muted);
+}
+
+.errorToast {
+  background: var(--risk-high);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+}
+
+/* Common Step Styles */
+.stepTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.5rem 0;
+}
+
+.stepDescription {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0 0 2rem 0;
+}
+
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.grid1 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.input, .select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  background: var(--bg);
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.input:focus, .select:focus {
+  border-color: var(--navy);
+  outline: none;
+}
+
+.toggleGroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.toggleLabel {
+  font-size: 1rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toggleIcon {
+  color: var(--text-muted);
+  cursor: help;
+}
+
+/* Basic Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .2s;
+  border-radius: 24px;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .2s;
+  border-radius: 50%;
+}
+input:checked + .slider {
+  background-color: var(--teal);
+}
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.saveExit {
+  color: var(--teal);
+  background: none;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.navButtons {
+  display: flex;
+  gap: 1rem;
+}
+
+.btnSecondary {
+  padding: 0.75rem 1.5rem;
+  border: 1px solid var(--navy);
+  background: white;
+  color: var(--navy);
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: var(--navy);
+  color: white;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnPrimary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+  }
+  .grid2 {
+    grid-template-columns: 1fr;
+  }
+}

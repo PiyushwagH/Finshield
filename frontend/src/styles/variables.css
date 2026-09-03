@@ -1,0 +1,18 @@
+:root {
+  --navy:        #0F2A47;
+  --teal:        #0E8F86;
+  --amber:       #E8A317;
+  --risk-low:    #16A34A;
+  --risk-medium: #F59E0B;
+  --risk-high:   #DC2626;
+  --bg:          #FFFFFF;
+  --bg-alt:      #F7F9FC;
+  --text:        #1A2332;
+  --text-muted:  #5B6B7F;
+  --border:      #E2E8F0;
+  
+  --radius-card: 12px;
+  --radius-input: 8px;
+  --font-base: 'Inter', sans-serif;
+  --spacing-unit: 24px;
+}

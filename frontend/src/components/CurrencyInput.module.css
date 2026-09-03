@@ -1,0 +1,62 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tooltipIcon {
+  color: var(--text-muted);
+  cursor: help;
+  display: flex;
+  align-items: center;
+}
+
+.inputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  padding: 0.75rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.inputContainer:focus-within {
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(15, 42, 71, 0.1);
+}
+
+.inputContainer.error {
+  border-color: var(--risk-high);
+}
+
+.prefix {
+  color: var(--text-muted);
+  margin-right: 0.5rem;
+  font-weight: 500;
+}
+
+.input {
+  border: none;
+  background: none;
+  outline: none;
+  width: 100%;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+.errorText {
+  color: var(--risk-high);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
