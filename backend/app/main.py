@@ -29,9 +29,15 @@ app = FastAPI(title="FinShield API", lifespan=lifespan)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+# Open to any origin.
+# Note: allow_origins=["*"] cannot be used together with allow_credentials.
+# Browsers reject a wildcard Access-Control-Allow-Origin on credentialed
+# requests, and the frontend sends the httpOnly refresh cookie with
+# withCredentials. The regex makes Starlette echo the caller's own origin
+# back instead, which browsers do accept.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:5174"],
+    allow_origin_regex=".*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
