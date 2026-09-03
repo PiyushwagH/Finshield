@@ -23,7 +23,8 @@ const Landing = () => {
           <Link to="/about">About</Link>
         </nav>
         <div className={styles.authLinks}>
-          <Link to="/login" className={styles.loginBtn}>Log In</Link>
+          <Link to="/admin/login" className={styles.adminLoginBtn}>Admin Login</Link>
+          <Link to="/login" className={styles.userLoginBtn}>User Login</Link>
           <Link to="/login?tab=register" className={styles.registerBtn}>Get Started</Link>
         </div>
       </header>

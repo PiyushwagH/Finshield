@@ -3,9 +3,11 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import styles from './Auth.module.css';
 
-const Auth = () => {
+const Auth = ({ mode = 'user' }) => {
+  const isAdmin = mode === 'admin';
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = searchParams.get('tab') === 'register' ? 'register' : 'login';
+  // The admin console has no self-service sign-up, so it is login-only.
+  const initialTab = !isAdmin && searchParams.get('tab') === 'register' ? 'register' : 'login';
   const [activeTab, setActiveTab] = useState(initialTab);
   
   const [email, setEmail] = useState('');
@@ -21,20 +23,23 @@ const Auth = () => {
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
   
-  const { login, register, user } = useAuth();
+  const { login, loginAdmin, register, user } = useAuth();
   const navigate = useNavigate();
+
+  // Where each portal lands once a session exists.
+  const landingPath = isAdmin ? '/admin/analytics' : '/dashboard';
 
   useEffect(() => {
     if (user) {
-      navigate('/dashboard', { replace: true });
+      navigate(user.role === 'admin' && isAdmin ? '/admin/analytics' : '/dashboard', { replace: true });
     }
-  }, [user, navigate]);
+  }, [user, navigate, isAdmin]);
 
   useEffect(() => {
     setErrors({});
     setToast(null);
-    setSearchParams({ tab: activeTab });
-  }, [activeTab, setSearchParams]);
+    if (!isAdmin) setSearchParams({ tab: activeTab });
+  }, [activeTab, setSearchParams, isAdmin]);
 
   const validate = () => {
     const newErrors = {};
@@ -58,14 +63,17 @@ const Auth = () => {
     setErrors({});
     try {
       if (activeTab === 'login') {
-        await login(email, password);
+        await (isAdmin ? loginAdmin(email, password) : login(email, password));
       } else {
         await register({ email, password, full_name: fullName });
       }
-      navigate('/dashboard', { replace: true });
+      navigate(landingPath, { replace: true });
     } catch (err) {
       if (err.response?.status === 401 && activeTab === 'login') {
          setErrors({ password: 'Incorrect password. Please try again.' });
+      } else if (err.response?.status === 403) {
+         // Admin endpoint accepted the credentials but the account is not an admin.
+         setToast(err.response?.data?.detail || 'This account does not have administrator access');
       } else if (err.response?.status === 422) {
          setToast('Invalid input data');
       } else {
@@ -87,30 +95,36 @@ const Auth = () => {
       </div>
 
       <div className={styles.authCard}>
-        <div className={styles.tabs}>
-          <button 
-            className={`${styles.tab} ${activeTab === 'login' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('login')}
-            type="button"
-          >
-            Log In
-          </button>
-          <button 
-            className={`${styles.tab} ${activeTab === 'register' ? styles.activeTab : ''}`}
-            onClick={() => setActiveTab('register')}
-            type="button"
-          >
-            Sign Up
-          </button>
-        </div>
+        {isAdmin ? (
+          <div className={styles.adminBadge}>Administrator Access</div>
+        ) : (
+          <div className={styles.tabs}>
+            <button
+              className={`${styles.tab} ${activeTab === 'login' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('login')}
+              type="button"
+            >
+              Log In
+            </button>
+            <button
+              className={`${styles.tab} ${activeTab === 'register' ? styles.activeTab : ''}`}
+              onClick={() => setActiveTab('register')}
+              type="button"
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
 
         <div className={styles.formContainer}>
           <div className={styles.formHeader}>
             <h1 className={styles.title}>
-              {activeTab === 'login' ? 'Welcome back' : 'Create an account'}
+              {isAdmin ? 'Admin sign in' : (activeTab === 'login' ? 'Welcome back' : 'Create an account')}
             </h1>
             <p className={styles.subtitle}>
-              {activeTab === 'login' ? 'Enter your details to access your account.' : 'Join FinShield to analyze your financial risk.'}
+              {isAdmin
+                ? 'Restricted to accounts with the administrator role.'
+                : (activeTab === 'login' ? 'Enter your details to access your account.' : 'Join FinShield to analyze your financial risk.')}
             </p>
           </div>
 
@@ -184,11 +198,21 @@ const Auth = () => {
             <button type="submit" className={styles.submitBtn} disabled={loadingState}>
               {loadingState ? (
                 <span className={styles.spinner}></span>
+              ) : isAdmin ? (
+                'Log In as Admin'
               ) : (
                 activeTab === 'login' ? 'Log In' : 'Sign Up'
               )}
             </button>
           </form>
+
+          <div className={styles.portalSwitch}>
+            {isAdmin ? (
+              <Link to="/login">Not an administrator? User log in</Link>
+            ) : (
+              <Link to="/admin/login">Administrator log in</Link>
+            )}
+          </div>
         </div>
       </div>
     </div>

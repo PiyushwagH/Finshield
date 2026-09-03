@@ -38,6 +38,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Auth />} />
+          {/* Declared outside the AdminRoute group below so it stays reachable when logged out. */}
+          <Route path="/admin/login" element={<Auth mode="admin" />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           

@@ -101,7 +101,121 @@ def test_admin_route_access():
     client.post("/api/auth/register", json={"email": "test6@example.com", "password": "Password123"})
     login_response = client.post("/api/auth/login", data={"username": "test6@example.com", "password": "Password123"})
     access_token = login_response.json()["access_token"]
-    
+
     # By default users have role='user', so it should fail
     response = client.get("/api/auth/admin-only", headers={"Authorization": f"Bearer {access_token}"})
     assert response.status_code == 403
+
+
+def _make_admin(email: str, password: str = "Password123"):
+    """Register an account and promote it to admin directly in the test DB."""
+    client.post("/api/auth/register", json={"email": email, "password": password})
+    db = TestingSessionLocal()
+    try:
+        user = db.query(User).filter(User.email == email).first()
+        user.role = "admin"
+        db.commit()
+    finally:
+        db.close()
+
+
+# --- Role-scoped login endpoints ---
+
+def test_login_user_endpoint():
+    client.post("/api/auth/register", json={"email": "portal-user@example.com", "password": "Password123"})
+    response = client.post(
+        "/api/auth/login/user",
+        data={"username": "portal-user@example.com", "password": "Password123"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert "access_token" in data
+    assert data["role"] == "user"
+    assert data["user"]["email"] == "portal-user@example.com"
+    assert "refresh_token" in response.cookies
+
+
+def test_login_user_endpoint_accepts_admin():
+    """An admin is also a user, so the customer portal must not lock them out."""
+    _make_admin("dual-role@example.com")
+    response = client.post(
+        "/api/auth/login/user",
+        data={"username": "dual-role@example.com", "password": "Password123"}
+    )
+    assert response.status_code == 200
+    assert response.json()["role"] == "admin"
+
+
+def test_login_user_endpoint_wrong_password():
+    client.post("/api/auth/register", json={"email": "portal-user2@example.com", "password": "Password123"})
+    response = client.post(
+        "/api/auth/login/user",
+        data={"username": "portal-user2@example.com", "password": "WrongPassword123"}
+    )
+    assert response.status_code == 401
+
+
+def test_login_admin_endpoint():
+    _make_admin("real-admin@example.com")
+    response = client.post(
+        "/api/auth/login/admin",
+        data={"username": "real-admin@example.com", "password": "Password123"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["role"] == "admin"
+    assert data["user"]["role"] == "admin"
+
+    # The issued token must actually open the admin surface.
+    admin_only = client.get(
+        "/api/auth/admin-only",
+        headers={"Authorization": f"Bearer {data['access_token']}"}
+    )
+    assert admin_only.status_code == 200
+
+
+def test_login_admin_endpoint_rejects_non_admin():
+    client.post("/api/auth/register", json={"email": "not-admin@example.com", "password": "Password123"})
+    response = client.post(
+        "/api/auth/login/admin",
+        data={"username": "not-admin@example.com", "password": "Password123"}
+    )
+    assert response.status_code == 403
+    # No session may be established for a rejected role.
+    assert "refresh_token" not in response.cookies
+
+
+def test_login_admin_endpoint_checks_password_before_role():
+    """A wrong password on a non-admin account must read as 401, not 403.
+
+    Otherwise the 403 would confirm that the password was correct.
+    """
+    client.post("/api/auth/register", json={"email": "not-admin2@example.com", "password": "Password123"})
+    response = client.post(
+        "/api/auth/login/admin",
+        data={"username": "not-admin2@example.com", "password": "WrongPassword123"}
+    )
+    assert response.status_code == 401
+
+
+def test_login_endpoints_reject_unknown_email():
+    for path in ("/api/auth/login/user", "/api/auth/login/admin"):
+        response = client.post(path, data={"username": "nobody@example.com", "password": "Password123"})
+        assert response.status_code == 401, path
+
+
+def test_login_endpoints_reject_inactive_user():
+    client.post("/api/auth/register", json={"email": "inactive@example.com", "password": "Password123"})
+    db = TestingSessionLocal()
+    try:
+        user = db.query(User).filter(User.email == "inactive@example.com").first()
+        user.is_active = False
+        db.commit()
+    finally:
+        db.close()
+
+    response = client.post(
+        "/api/auth/login/user",
+        data={"username": "inactive@example.com", "password": "Password123"}
+    )
+    assert response.status_code == 400

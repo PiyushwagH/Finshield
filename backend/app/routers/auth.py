@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from app.database import get_db
 from app.models.user import User, RefreshToken
-from app.schemas.auth import UserCreate, UserResponse, Token
+from app.schemas.auth import UserCreate, UserResponse, Token, LoginResponse
 from app.core.security import get_password_hash, verify_password, create_access_token, create_refresh_token, decode_token
 from app.core.deps import get_current_user
 
@@ -35,11 +35,14 @@ def register(request: Request, user_in: UserCreate, db: Session = Depends(get_db
     db.refresh(user)
     return user
 
-@router.post("/login", response_model=Token)
-@limiter.limit("5/minute")
-def login(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.password_hash):
+def _authenticate(db: Session, email: str, password: str) -> User:
+    """Verify credentials and return the user, or raise 401/400.
+
+    The same error is returned for an unknown email and a wrong password so the
+    endpoint does not reveal which accounts exist.
+    """
+    user = db.query(User).filter(User.email == email).first()
+    if not user or not verify_password(password, user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -47,14 +50,18 @@ def login(request: Request, response: Response, form_data: OAuth2PasswordRequest
         )
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+    return user
 
+
+def _issue_session(db: Session, response: Response, user: User) -> str:
+    """Mint an access token, persist the refresh token and set its cookie."""
     access_token = create_access_token(data={"sub": str(user.id)})
     refresh_token = create_refresh_token(data={"sub": str(user.id)})
-    
+
     # Store refresh token in DB
     payload = decode_token(refresh_token)
     expires_at = datetime.fromtimestamp(payload['exp'])
-    
+
     db_token = RefreshToken(token=refresh_token, user_id=user.id, expires_at=expires_at)
     db.add(db_token)
     db.commit()
@@ -69,7 +76,57 @@ def login(request: Request, response: Response, form_data: OAuth2PasswordRequest
         max_age=7 * 24 * 60 * 60 # 7 days
     )
 
+    return access_token
+
+
+@router.post("/login", response_model=Token)
+@limiter.limit("5/minute")
+def login(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Role-agnostic login. Kept as the OAuth2 token endpoint (see deps.oauth2_scheme)."""
+    user = _authenticate(db, form_data.username, form_data.password)
+    access_token = _issue_session(db, response, user)
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@router.post("/login/user", response_model=LoginResponse)
+@limiter.limit("10/minute")
+def login_user(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Login for the customer-facing portal.
+
+    Accepts any active account, admins included — an admin is also a user and
+    can use the regular dashboard.
+    """
+    user = _authenticate(db, form_data.username, form_data.password)
+    access_token = _issue_session(db, response, user)
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "role": user.role,
+        "user": user,
+    }
+
+
+@router.post("/login/admin", response_model=LoginResponse)
+@limiter.limit("10/minute")
+def login_admin(request: Request, response: Response, form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    """Login for the admin console. Rejects accounts without the admin role.
+
+    Credentials are checked before the role so a non-admin cannot tell a valid
+    password from an invalid one on this endpoint.
+    """
+    user = _authenticate(db, form_data.username, form_data.password)
+    if user.role != 'admin':
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This account does not have administrator access",
+        )
+    access_token = _issue_session(db, response, user)
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "role": user.role,
+        "user": user,
+    }
 
 @router.post("/refresh", response_model=Token)
 def refresh(response: Response, refresh_token: str = Cookie(None), db: Session = Depends(get_db)):

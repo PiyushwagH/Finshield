@@ -32,3 +32,12 @@ class UserResponse(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class LoginResponse(Token):
+    """Returned by the role-scoped login endpoints.
+
+    Carries the role and user record alongside the token so the caller can
+    route straight to the right landing page without a follow-up /auth/me.
+    """
+    role: str
+    user: UserResponse

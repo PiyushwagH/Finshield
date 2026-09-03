@@ -54,8 +54,36 @@
   margin-bottom: -1px;
 }
 
+/* Stands in for the login/signup tabs on the admin portal, which has no sign-up. */
+.adminBadge {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--bg);
+  background-color: var(--navy);
+}
+
 .formContainer {
   padding: 2rem;
+}
+
+.portalSwitch {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.portalSwitch a {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.portalSwitch a:hover {
+  color: var(--navy);
+  text-decoration: underline;
 }
 
 .formHeader {

@@ -43,13 +43,42 @@
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  gap: 1.5rem;
+  gap: 0.75rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .loginBtn {
   font-weight: 600;
   color: var(--text);
+}
+
+/* Two outlined login buttons, so neither competes with the primary Get Started CTA. */
+.userLoginBtn,
+.adminLoginBtn {
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--radius-input);
+  font-weight: 600;
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.userLoginBtn {
+  color: var(--text);
+}
+
+.userLoginBtn:hover {
+  border-color: var(--navy);
+  color: var(--navy);
+}
+
+.adminLoginBtn {
+  color: var(--text-muted);
+}
+
+.adminLoginBtn:hover {
+  border-color: var(--teal);
+  color: var(--teal);
 }
 
 .registerBtn {

@@ -36,17 +36,25 @@ export const AuthProvider = ({ children }) => {
     initAuth();
   }, []);
 
-  const login = async (email, password) => {
+  // Both portals post OAuth2 form-encoded credentials; only the path differs.
+  const loginAt = async (path, email, password) => {
     const formData = new URLSearchParams();
     formData.append('username', email);
     formData.append('password', password);
-    
-    const res = await apiClient.post('/auth/login', formData, {
+
+    const res = await apiClient.post(path, formData, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
     setAccessToken(res.data.access_token);
     await fetchMe();
+    return res.data;
   };
+
+  // User portal: accepts any active account.
+  const login = (email, password) => loginAt('/auth/login/user', email, password);
+
+  // Admin console: the endpoint rejects non-admin accounts with a 403.
+  const loginAdmin = (email, password) => loginAt('/auth/login/admin', email, password);
 
   const register = async (userData) => {
     await apiClient.post('/auth/register', userData);
@@ -69,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginAdmin, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
