@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './CurrencyInput.module.css';
+import InfoTooltip from './InfoTooltip';
 
 const formatIndianCurrency = (value) => {
   if (value === null || value === undefined || value === '') return '';
@@ -37,11 +38,7 @@ const CurrencyInput = ({ value, onChange, label, tooltip, error }) => {
     <div className={styles.wrapper}>
       <label className={styles.label}>
         {label}
-        {tooltip && (
-          <span className={styles.tooltipIcon} title={tooltip}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          </span>
-        )}
+        <InfoTooltip text={tooltip} />
       </label>
       <div className={`${styles.inputContainer} ${error ? styles.error : ''}`}>
         <span className={styles.prefix}>₹</span>

@@ -2,15 +2,29 @@ import React from 'react';
 import { useAssessment } from './AssessmentWizard';
 import styles from './AssessmentWizard.module.css';
 import CurrencyInput from '../components/CurrencyInput';
+import InfoTooltip from '../components/InfoTooltip';
 import { useNavigate } from 'react-router-dom';
 
 const Step3Finances = ({ onNext, onPrev }) => {
   const { formData, updateData } = useAssessment();
   const navigate = useNavigate();
 
-  const isValid = 
-    formData.monthly_emi !== null &&
-    formData.existing_total_debt !== null &&
+  // EMI and outstanding balance are only meaningful when the user actually
+  // has a loan running, so they're gated behind that toggle - same pattern
+  // as "prior credit history" on the next step. When toggled off they are
+  // zeroed rather than left blank, since 0 is what "no loan" means to the
+  // risk model.
+  const handleActiveLoansToggle = (checked) => {
+    updateData(
+      checked
+        ? { has_active_loans: true }
+        : { has_active_loans: false, monthly_emi: 0, existing_total_debt: 0 }
+    );
+  };
+
+  const isValid =
+    (!formData.has_active_loans ||
+      (formData.monthly_emi !== null && formData.existing_total_debt !== null)) &&
     formData.asset_value !== null &&
     formData.monthly_expenditure !== null &&
     formData.savings !== null;
@@ -22,29 +36,46 @@ const Step3Finances = ({ onNext, onPrev }) => {
         Please provide accurate details regarding your current financial standing. All amounts should be in INR (₹).
       </p>
 
-      <div className={styles.grid2}>
-        <CurrencyInput 
-          label="Total Monthly EMIs"
-          value={formData.monthly_emi}
-          onChange={val => updateData({ monthly_emi: val })}
-          tooltip="Total of all your current monthly loan or credit card payments."
-        />
-        <CurrencyInput 
-          label="Total Outstanding Loan Balance"
-          value={formData.existing_total_debt}
-          onChange={val => updateData({ existing_total_debt: val })}
-          tooltip="Total remaining principal on all your loans."
-        />
+      <div className={styles.toggleGroup}>
+        <div className={styles.toggleLabel}>
+          Do you have any active loans or EMIs?
+          <InfoTooltip text="Any ongoing home, vehicle, personal, or other loan with monthly payments." />
+        </div>
+        <label className={styles.switch}>
+          <input
+            type="checkbox"
+            checked={formData.has_active_loans}
+            onChange={e => handleActiveLoansToggle(e.target.checked)}
+          />
+          <span className={styles.slider}></span>
+        </label>
       </div>
 
-      <div className={styles.grid2}>
-        <CurrencyInput 
+      {formData.has_active_loans && (
+        <div className={styles.grid2} style={{ marginTop: '1.5rem' }}>
+          <CurrencyInput
+            label="Total Monthly EMIs"
+            value={formData.monthly_emi}
+            onChange={val => updateData({ monthly_emi: val })}
+            tooltip="Total of all your current monthly loan or credit card payments."
+          />
+          <CurrencyInput
+            label="Total Outstanding Loan Balance"
+            value={formData.existing_total_debt}
+            onChange={val => updateData({ existing_total_debt: val })}
+            tooltip="Total remaining principal on all your loans."
+          />
+        </div>
+      )}
+
+      <div className={styles.grid2} style={{ marginTop: '1.5rem' }}>
+        <CurrencyInput
           label="Approximate Total Asset Value"
           value={formData.asset_value}
           onChange={val => updateData({ asset_value: val })}
           tooltip="Estimated value of property, investments, and other liquid assets."
         />
-        <CurrencyInput 
+        <CurrencyInput
           label="Avg Monthly Household Expenditure"
           value={formData.monthly_expenditure}
           onChange={val => updateData({ monthly_expenditure: val })}
@@ -53,7 +84,7 @@ const Step3Finances = ({ onNext, onPrev }) => {
       </div>
 
       <div className={styles.grid1}>
-        <CurrencyInput 
+        <CurrencyInput
           label="Current Savings and Emergency Fund"
           value={formData.savings}
           onChange={val => updateData({ savings: val })}
@@ -64,15 +95,13 @@ const Step3Finances = ({ onNext, onPrev }) => {
       <div className={styles.toggleGroup}>
         <div className={styles.toggleLabel}>
           Do you own a vehicle?
-          <span className={styles.toggleIcon} title="Includes cars, two-wheelers, etc.">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          </span>
+          <InfoTooltip text="Includes cars, two-wheelers, etc." />
         </div>
         <label className={styles.switch}>
-          <input 
-            type="checkbox" 
-            checked={formData.owns_vehicle} 
-            onChange={e => updateData({ owns_vehicle: e.target.checked })} 
+          <input
+            type="checkbox"
+            checked={formData.owns_vehicle}
+            onChange={e => updateData({ owns_vehicle: e.target.checked })}
           />
           <span className={styles.slider}></span>
         </label>
@@ -81,15 +110,13 @@ const Step3Finances = ({ onNext, onPrev }) => {
       <div className={styles.toggleGroup}>
         <div className={styles.toggleLabel}>
           Do you own property?
-          <span className={styles.toggleIcon} title="Includes houses, land, commercial property.">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          </span>
+          <InfoTooltip text="Includes houses, land, commercial property." />
         </div>
         <label className={styles.switch}>
-          <input 
-            type="checkbox" 
-            checked={formData.owns_property} 
-            onChange={e => updateData({ owns_property: e.target.checked })} 
+          <input
+            type="checkbox"
+            checked={formData.owns_property}
+            onChange={e => updateData({ owns_property: e.target.checked })}
           />
           <span className={styles.slider}></span>
         </label>

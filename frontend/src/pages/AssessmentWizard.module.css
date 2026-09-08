@@ -229,11 +229,6 @@
   gap: 0.5rem;
 }
 
-.toggleIcon {
-  color: var(--text-muted);
-  cursor: help;
-}
-
 /* Basic Toggle Switch */
 .switch {
   position: relative;

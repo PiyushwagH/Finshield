@@ -63,11 +63,21 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    // Capture before state clears - the draft key is derived from the user id.
+    const userId = user?.id;
     try {
       await apiClient.post('/auth/logout');
     } finally {
       setAccessToken(null);
       setUser(null);
+      // Never leave one user's financial draft behind for the next person
+      // on this browser.
+      try {
+        if (userId) localStorage.removeItem(`finshield_assessment:${userId}`);
+        localStorage.removeItem('finshield_assessment');
+      } catch {
+        // Storage unavailable (private mode); nothing to clean up.
+      }
       navigate('/login');
     }
   };

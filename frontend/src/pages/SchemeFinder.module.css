@@ -318,6 +318,12 @@
   color: var(--text-muted);
 }
 
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
 .viewBtn {
   background: none;
   border: none;
@@ -326,6 +332,24 @@
   font-size: 0.875rem;
   cursor: pointer;
   padding: 0;
+}
+
+.applyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: var(--teal);
+  color: white;
+  font-weight: 700;
+  font-size: 0.8125rem;
+  text-decoration: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-input);
+  transition: opacity 0.2s;
+}
+
+.applyBtn:hover {
+  opacity: 0.9;
 }
 
 .loading, .emptyState {

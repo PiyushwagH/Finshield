@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import styles from './AssessmentWizard.module.css';
 import Step1Personal from './Step1Personal';
 import Step2Employment from './Step2Employment';
@@ -22,6 +23,7 @@ const INITIAL_DATA = {
   employment_status: '',
   years_employed: '',
   annual_income: null,
+  has_active_loans: false,
   monthly_emi: null,
   existing_total_debt: null,
   asset_value: null,
@@ -37,13 +39,40 @@ const INITIAL_DATA = {
   payment_history: ''
 };
 
+// Drafts are keyed per account. A single shared key would show one user's
+// finances to whoever logs in next on the same browser.
+export const draftKeyFor = (userId) => `finshield_assessment:${userId}`;
+const LEGACY_DRAFT_KEY = 'finshield_assessment';
+
+// FastAPI error bodies vary by failure: a plain string (auth/business errors),
+// a single {msg} object, or - on a 422 - a list of per-field validation errors.
+// Rendering any of the non-string shapes directly as a React child crashes the
+// page (React refuses to render objects), which is what produced the blank
+// screen here. This always reduces to a renderable string.
+const describeSubmitError = (err) => {
+  const detail = err.response?.data?.detail;
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) {
+    return detail
+      .map((e) => {
+        const field = Array.isArray(e?.loc) ? e.loc.at(-1) : null;
+        return field ? `${field}: ${e.msg}` : e?.msg;
+      })
+      .filter(Boolean)
+      .join('; ') || 'Failed to submit assessment.';
+  }
+  if (detail && typeof detail === 'object' && typeof detail.msg === 'string') return detail.msg;
+  return 'Failed to submit assessment.';
+};
+
 const AssessmentWizard = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const storageKey = user ? draftKeyFor(user.id) : null;
   const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState(() => {
-    const saved = localStorage.getItem('finshield_assessment');
-    return saved ? JSON.parse(saved) : INITIAL_DATA;
-  });
+  const [formData, setFormData] = useState(INITIAL_DATA);
+  // Guards the save effect so it cannot overwrite the draft before it loads.
+  const [draftLoaded, setDraftLoaded] = useState(false);
   const [schema, setSchema] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -63,9 +92,30 @@ const AssessmentWizard = () => {
     fetchSchema();
   }, []);
 
+  // Load this account's draft, and reset the form when the account changes.
   useEffect(() => {
-    localStorage.setItem('finshield_assessment', JSON.stringify(formData));
-  }, [formData]);
+    // Older builds stored drafts globally; drop any left behind.
+    localStorage.removeItem(LEGACY_DRAFT_KEY);
+    if (!storageKey) return;
+
+    setDraftLoaded(false);
+    let draft = INITIAL_DATA;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      // Merge onto INITIAL_DATA so a draft from an older field set stays valid.
+      if (saved) draft = { ...INITIAL_DATA, ...JSON.parse(saved) };
+    } catch {
+      draft = INITIAL_DATA;
+    }
+    setFormData(draft);
+    setCurrentStep(1);
+    setDraftLoaded(true);
+  }, [storageKey]);
+
+  useEffect(() => {
+    if (!storageKey || !draftLoaded) return;
+    localStorage.setItem(storageKey, JSON.stringify(formData));
+  }, [formData, storageKey, draftLoaded]);
 
   const updateData = (fields) => {
     setFormData(prev => ({ ...prev, ...fields }));
@@ -83,21 +133,33 @@ const AssessmentWizard = () => {
     setSubmitting(true);
     setError(null);
     try {
-      // Clean up credit fields if has_prior_credit is false
       const payload = { ...formData };
+
+      // has_active_loans is a UI-only toggle, not a backend field - it just
+      // decides whether the EMI/loan-balance inputs are shown. Zero those
+      // fields when it's off (covers the case where the user never touched
+      // the toggle and they're still null) and strip it before sending.
+      if (!payload.has_active_loans) {
+        payload.monthly_emi = 0;
+        payload.existing_total_debt = 0;
+      }
+      delete payload.has_active_loans;
+
+      // Clean up credit fields if has_prior_credit is false
       if (!payload.has_prior_credit) {
         payload.n_prior_credits = 0;
         payload.n_active_credits = 0;
         payload.years_credit_history = 0;
         payload.has_defaulted = false;
-        payload.payment_history = 'No History';
+        // Must match the backend's Literal value, not a display label.
+        payload.payment_history = 'no_history';
       }
       
       const res = await apiClient.post('/risk/assess', payload);
-      localStorage.removeItem('finshield_assessment');
+      if (storageKey) localStorage.removeItem(storageKey);
       navigate(`/assessment/result/${res.data.id}`);
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to submit assessment.');
+      setError(describeSubmitError(err));
       setSubmitting(false);
     }
   };

@@ -2,6 +2,7 @@ import React from 'react';
 import { useAssessment } from './AssessmentWizard';
 import styles from './AssessmentWizard.module.css';
 import { useNavigate } from 'react-router-dom';
+import InfoTooltip from '../components/InfoTooltip';
 
 const Step4Credit = ({ onSubmit, onPrev, submitting }) => {
   const { formData, updateData, schema } = useAssessment();
@@ -25,9 +26,7 @@ const Step4Credit = ({ onSubmit, onPrev, submitting }) => {
       <div className={styles.toggleGroup}>
         <div className={styles.toggleLabel}>
           Do you have prior credit history?
-          <span className={styles.toggleIcon} title="Any previous loans or credit cards.">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-          </span>
+          <InfoTooltip text="Any previous loans or credit cards." />
         </div>
         <label className={styles.switch}>
           <input 

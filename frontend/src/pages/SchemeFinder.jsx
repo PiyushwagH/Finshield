@@ -8,6 +8,9 @@ const SchemeFinder = () => {
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  // Total schemes in the database, fetched once unfiltered - the header
+  // count should reflect what's actually there, not a hardcoded guess.
+  const [totalCount, setTotalCount] = useState(null);
   
   const [filters, setFilters] = useState({
     category: [],
@@ -30,6 +33,10 @@ const SchemeFinder = () => {
     fetchSchemes();
     // eslint-disable-next-line
   }, [filters, search]);
+
+  useEffect(() => {
+    api.getSchemes({}).then(res => setTotalCount(res.data.length)).catch(() => {});
+  }, []);
 
   const fetchSchemes = async () => {
     try {
@@ -69,7 +76,9 @@ const SchemeFinder = () => {
       <div className={styles.headerArea}>
         <div>
           <h1 className={styles.title}>Scheme Finder</h1>
-          <p className={styles.subtitle}>Search 500+ central and state government welfare schemes</p>
+          <p className={styles.subtitle}>
+            Search {totalCount !== null ? totalCount : '...'} central and state government welfare schemes
+          </p>
         </div>
       </div>
 
@@ -195,12 +204,30 @@ const SchemeFinder = () => {
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                       Check Eligibility
                     </div>
-                    <button 
-                      className={styles.viewBtn} 
-                      onClick={() => navigate(`/schemes/${scheme.slug}`)}
-                    >
-                      View Details
-                    </button>
+                    <div className={styles.cardActions}>
+                      {scheme.official_url && (
+                        // Goes straight to the government's own application
+                        // page - AGENTS.md scope excludes building an actual
+                        // application flow, so linking out is the correct
+                        // integration point, not a gap to fill in-app.
+                        <a
+                          href={scheme.official_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={styles.applyBtn}
+                          onClick={e => e.stopPropagation()}
+                        >
+                          Apply
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M7 7h10v10"></path></svg>
+                        </a>
+                      )}
+                      <button 
+                        className={styles.viewBtn} 
+                        onClick={() => navigate(`/schemes/${scheme.slug}`)}
+                      >
+                        View Details
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
