@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: finshield-backend
+    runtime: python
+    plan: free
+    # No rootDir: it restricts the build to that subtree, and ml/ (the
+    # frozen model + predictor) lives as a sibling of backend/, not inside
+    # it - see app/services/risk_service.py's path resolution. Building
+    # from the repo root with --app-dir keeps ml/ in scope. Verified
+    # locally: `uvicorn app.main:app --app-dir backend` from the repo root
+    # loads the model and serves /api/health correctly.
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      # Set in the Render dashboard after the first deploy - not committed,
+      # since these are real secrets (Neon password, JWT signing key).
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
