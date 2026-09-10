@@ -4,8 +4,12 @@ sqlalchemy
 alembic
 pydantic-settings
 psycopg2-binary
-passlib
-bcrypt
+passlib==1.7.4
+# bcrypt>=4.1 raises on inputs over 72 bytes instead of truncating, which
+# breaks passlib 1.7.4's own internal self-test (detect_wrap_bug) on first
+# use - every password check fails with "password cannot be longer than 72
+# bytes". passlib is unmaintained (last release 2020), so pin bcrypt instead.
+bcrypt==4.0.1
 PyJWT
 
 # Pinned from ml/requirements.txt
