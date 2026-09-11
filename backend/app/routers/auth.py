@@ -10,6 +10,7 @@ from app.core.security import get_password_hash, verify_password, create_access_
 from app.core.deps import get_current_user
 
 from app.core.limiter import limiter
+from app.config import settings
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -71,8 +72,8 @@ def _issue_session(db: Session, response: Response, user: User) -> str:
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False, # True in production (HTTPS)
-        samesite="lax",
+        secure=settings.COOKIE_SECURE,
+        samesite=settings.COOKIE_SAMESITE,
         max_age=7 * 24 * 60 * 60 # 7 days
     )
 
@@ -163,8 +164,8 @@ def refresh(response: Response, refresh_token: str = Cookie(None), db: Session =
         key="refresh_token",
         value=new_refresh_token,
         httponly=True,
-        secure=False,
-        samesite="lax",
+        secure=settings.COOKIE_SECURE,
+        samesite=settings.COOKIE_SAMESITE,
         max_age=7 * 24 * 60 * 60
     )
     
@@ -178,7 +179,7 @@ def logout(response: Response, refresh_token: str = Cookie(None), db: Session = 
             db_token.revoked = True
             db.commit()
     
-    response.delete_cookie("refresh_token")
+    response.delete_cookie("refresh_token", secure=settings.COOKIE_SECURE, samesite=settings.COOKIE_SAMESITE)
     return {"message": "Successfully logged out"}
 
 @router.get("/me", response_model=UserResponse)
