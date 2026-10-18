@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }) => {
       } catch {
         // Storage unavailable (private mode); nothing to clean up.
       }
-      navigate('/login');
+      navigate('/');
     }
   };
 
