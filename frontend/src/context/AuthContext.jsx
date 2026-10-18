@@ -9,6 +9,13 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  // True for the brief window between clearing `user` and the explicit
+  // navigate('/') below landing. Without this, ProtectedRoute/AdminRoute
+  // see user=null while still mounted on the old protected page and fire
+  // their own <Navigate to="/login"/>, which races the explicit navigate
+  // here - and usually wins, so logout always lands on the login form
+  // instead of home regardless of which page you logged out from.
+  const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
 
   const fetchMe = async () => {
@@ -65,6 +72,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     // Capture before state clears - the draft key is derived from the user id.
     const userId = user?.id;
+    setLoggingOut(true);
     try {
       await apiClient.post('/auth/logout');
     } finally {
@@ -78,7 +86,8 @@ export const AuthProvider = ({ children }) => {
       } catch {
         // Storage unavailable (private mode); nothing to clean up.
       }
-      navigate('/');
+      navigate('/', { replace: true });
+      setLoggingOut(false);
     }
   };
 
@@ -90,7 +99,7 @@ export const AuthProvider = ({ children }) => {
   // blank "Loading..." screen for that whole window on every single visit,
   // even to pages that need no login at all.
   return (
-    <AuthContext.Provider value={{ user, loading, login, loginAdmin, register, logout, setUser }}>
+    <AuthContext.Provider value={{ user, loading, loggingOut, login, loginAdmin, register, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
@@ -103,9 +112,9 @@ const RouteLoadingFallback = () => (
 );
 
 export const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, loggingOut } = useAuth();
 
-  if (loading) return <RouteLoadingFallback />;
+  if (loading || loggingOut) return <RouteLoadingFallback />;
   if (!user) {
     return <Navigate to="/login" replace />;
   }

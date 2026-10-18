@@ -26,9 +26,9 @@ import AdminAudit from './pages/admin/AdminAudit';
 
 // AdminRoute Wrapper
 const AdminRoute = ({ children }) => {
-  const { user, loading } = useAuth();
+  const { user, loading, loggingOut } = useAuth();
 
-  if (loading) {
+  if (loading || loggingOut) {
     return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', color: 'var(--text-muted)' }}>Checking your session...</div>;
   }
   if (!user) return <Navigate to="/login" replace />;
