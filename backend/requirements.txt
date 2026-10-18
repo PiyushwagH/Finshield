@@ -1,6 +1,10 @@
 fastapi
 uvicorn
-sqlalchemy
+# SQLAlchemy 2.1 changed the default driver for a bare "postgresql://" URL
+# from psycopg2 to psycopg (v3); we only install psycopg2-binary, so an
+# unpinned install breaks with "ModuleNotFoundError: No module named
+# 'psycopg'" the moment pip resolves to >=2.1. Pin below that line.
+sqlalchemy>=2.0,<2.1
 alembic
 pydantic-settings
 psycopg2-binary
