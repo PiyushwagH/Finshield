@@ -167,9 +167,17 @@ def admin_update_user(id: uuid.UUID, user_data: UserUpdate, db: Session = Depend
     return user
 
 # ---- Updates Queue ----
+VALID_SCHEME_UPDATE_STATUSES = {'pending', 'approved', 'rejected'}
+
 @router.get("/scheme-updates")
-def admin_get_scheme_updates(db: Session = Depends(get_db), current_user: User = Depends(require_admin)):
-    updates = db.query(SchemeUpdate).filter(SchemeUpdate.status == 'pending').all()
+def admin_get_scheme_updates(
+    status: str = 'pending',
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    if status not in VALID_SCHEME_UPDATE_STATUSES:
+        raise HTTPException(status_code=400, detail=f"status must be one of {sorted(VALID_SCHEME_UPDATE_STATUSES)}")
+    updates = db.query(SchemeUpdate).filter(SchemeUpdate.status == status).all()
     # Eager load schemes or map them manually for simplicity
     result = []
     for u in updates:

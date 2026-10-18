@@ -2,19 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../api/client';
 import styles from './SchemeUpdates.module.css';
 
+const TABS = ['Pending', 'Approved', 'Rejected'];
+
 const SchemeUpdates = () => {
+  const [activeTab, setActiveTab] = useState('Pending');
   const [updates, setUpdates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pendingCount, setPendingCount] = useState(0);
 
-  useEffect(() => {
-    fetchUpdates();
-  }, []);
-
-  const fetchUpdates = async () => {
+  const fetchUpdates = async (tab) => {
     try {
       setLoading(true);
-      const res = await api.getSchemeUpdates();
+      const res = await api.getSchemeUpdates(tab.toLowerCase());
       setUpdates(res.data);
+      if (tab === 'Pending') setPendingCount(res.data.length);
     } catch (err) {
       console.error('Failed to fetch scheme updates', err);
     } finally {
@@ -22,10 +23,15 @@ const SchemeUpdates = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUpdates(activeTab);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab]);
+
   const handleAction = async (id, action) => {
     try {
       await api.handleSchemeUpdate(id, action);
-      fetchUpdates();
+      fetchUpdates(activeTab);
     } catch (err) {
       console.error(err);
       alert('Action failed');
@@ -39,23 +45,31 @@ const SchemeUpdates = () => {
           <h1 className={styles.title}>Scheme Updates</h1>
           <p className={styles.subtitle}>Changes detected from official sources</p>
         </div>
-        <button className={styles.syncBtn}>
+        <button className={styles.syncBtn} disabled title="No live source is connected yet - this will sync automatically once one is.">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.59-9.21L21.5 8"></path></svg>
           Run Sync Now
         </button>
       </div>
 
       <div className={styles.tabs}>
-        <div className={`${styles.tab} ${styles.active}`}>Pending <span className={styles.badge}>{updates.length}</span></div>
-        <div className={styles.tab}>Approved</div>
-        <div className={styles.tab}>Rejected</div>
+        {TABS.map(tab => (
+          <div
+            key={tab}
+            className={`${styles.tab} ${activeTab === tab ? styles.active : ''}`}
+            onClick={() => setActiveTab(tab)}
+            style={{ cursor: 'pointer' }}
+          >
+            {tab}
+            {tab === 'Pending' && <span className={styles.badge}>{pendingCount}</span>}
+          </div>
+        ))}
       </div>
 
       <div className={styles.updatesList}>
         {loading ? (
           <div className={styles.loading}>Loading updates...</div>
         ) : updates.length === 0 ? (
-          <div className={styles.empty}>No pending updates.</div>
+          <div className={styles.empty}>No {activeTab.toLowerCase()} updates.</div>
         ) : (
           updates.map(update => (
             <div key={update.id} className={styles.updateCard}>
@@ -91,14 +105,15 @@ const SchemeUpdates = () => {
                 ))}
               </div>
 
-              <div className={styles.cardActions}>
-                <button className={styles.rejectBtn} onClick={() => handleAction(update.id, 'reject')}>Reject</button>
-                <button className={styles.editBtn}>Edit Manually</button>
-                <button className={styles.approveBtn} onClick={() => handleAction(update.id, 'approve')}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                  Approve and Apply
-                </button>
-              </div>
+              {activeTab === 'Pending' && (
+                <div className={styles.cardActions}>
+                  <button className={styles.rejectBtn} onClick={() => handleAction(update.id, 'reject')}>Reject</button>
+                  <button className={styles.approveBtn} onClick={() => handleAction(update.id, 'approve')}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Approve and Apply
+                  </button>
+                </div>
+              )}
             </div>
           ))
         )}

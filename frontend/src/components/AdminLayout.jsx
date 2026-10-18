@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../api/client';
 import styles from './AdminLayout.module.css';
 
 const AdminLayout = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [pendingUpdates, setPendingUpdates] = useState(0);
+
+  useEffect(() => {
+    api.getAdminStats()
+      .then(res => setPendingUpdates(res.data.pending_updates))
+      .catch(() => {});
+  }, []);
 
   return (
     <div className={styles.layout}>
@@ -32,7 +40,7 @@ const AdminLayout = () => {
           <NavLink to="/admin/schemes/updates" className={({isActive}) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
             Scheme Updates
-            <span className={styles.badge}>3</span>
+            {pendingUpdates > 0 && <span className={styles.badge}>{pendingUpdates}</span>}
           </NavLink>
           <NavLink to="/admin/users" className={({isActive}) => isActive ? `${styles.navItem} ${styles.active}` : styles.navItem}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>

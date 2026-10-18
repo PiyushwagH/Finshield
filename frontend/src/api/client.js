@@ -131,8 +131,8 @@ export const api = {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
   },
-  getSchemeUpdates: async () => {
-    return apiClient.get('/admin/scheme-updates');
+  getSchemeUpdates: async (status = 'pending') => {
+    return apiClient.get(`/admin/scheme-updates?status=${status}`);
   },
   handleSchemeUpdate: async (id, action) => {
     return apiClient.post(`/admin/scheme-updates/${id}/${action}`);
