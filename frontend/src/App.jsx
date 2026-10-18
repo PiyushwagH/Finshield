@@ -24,11 +24,14 @@ import AdminAudit from './pages/admin/AdminAudit';
 
 // AdminRoute Wrapper
 const AdminRoute = ({ children }) => {
-  const { user } = useAuth();
-  
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', color: 'var(--text-muted)' }}>Checking your session...</div>;
+  }
   if (!user) return <Navigate to="/login" replace />;
   if (user.role !== 'admin') return <Navigate to="/dashboard" replace />;
-  
+
   return children;
 };
 

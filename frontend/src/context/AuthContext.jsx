@@ -82,10 +82,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>; // or a proper spinner
-  }
-
+  // Never block the whole app (including public pages like Landing) on this
+  // network round-trip - only routes that actually require a known auth
+  // state (ProtectedRoute/AdminRoute below) wait on `loading`. This matters
+  // a lot in practice: the Render backend's free tier cold-starts after
+  // idling, so this call alone can take 30-60s, and the app used to show a
+  // blank "Loading..." screen for that whole window on every single visit,
+  // even to pages that need no login at all.
   return (
     <AuthContext.Provider value={{ user, loading, login, loginAdmin, register, logout }}>
       {children}
@@ -93,12 +96,19 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+const RouteLoadingFallback = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', color: 'var(--text-muted)' }}>
+    Checking your session...
+  </div>
+);
+
 export const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
-  
+  const { user, loading } = useAuth();
+
+  if (loading) return <RouteLoadingFallback />;
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return children;
 };
