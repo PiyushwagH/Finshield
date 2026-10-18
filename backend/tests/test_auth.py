@@ -281,3 +281,82 @@ def test_reset_password_rejects_invalid_token():
         json={"token": "not-a-real-token", "new_password": "NewPassword456"}
     )
     assert response.status_code == 400
+
+
+def _login(email, password):
+    client.post("/api/auth/register", json={"email": email, "password": password, "full_name": "Profile Test"})
+    resp = client.post("/api/auth/login", data={"username": email, "password": password})
+    return resp.json()["access_token"]
+
+
+def test_update_profile():
+    token = _login("profile-update@example.com", "Password123")
+    response = client.patch(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"full_name": "New Name", "phone": "9999999999"}
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["full_name"] == "New Name"
+    assert data["phone"] == "9999999999"
+
+
+def test_update_profile_rejects_oversized_avatar():
+    token = _login("profile-avatar@example.com", "Password123")
+    response = client.patch(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"avatar_data": "data:image/png;base64," + ("A" * 800_000)}
+    )
+    assert response.status_code == 422
+
+
+def test_update_profile_rejects_non_image_data_uri():
+    token = _login("profile-avatar2@example.com", "Password123")
+    response = client.patch(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {token}"},
+        json={"avatar_data": "not-a-data-uri"}
+    )
+    assert response.status_code == 422
+
+
+def test_list_and_revoke_sessions():
+    email, password = "session-test@example.com", "Password123"
+    token = _login(email, password)
+
+    sessions = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {token}"})
+    assert sessions.status_code == 200
+    data = sessions.json()
+    assert len(data) == 1
+    assert data[0]["is_current"] is True
+
+    revoke = client.delete(f"/api/auth/sessions/{data[0]['id']}", headers={"Authorization": f"Bearer {token}"})
+    assert revoke.status_code == 200
+
+    sessions_after = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {token}"})
+    assert sessions_after.json() == []
+
+
+def test_revoke_session_rejects_unknown_id():
+    token = _login("session-test2@example.com", "Password123")
+    response = client.delete(
+        f"/api/auth/sessions/{uuid.uuid4()}",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    assert response.status_code == 404
+
+
+def test_cannot_revoke_another_users_session():
+    token_a = _login("session-owner-a@example.com", "Password123")
+    token_b = _login("session-owner-b@example.com", "Password123")
+
+    sessions_b = client.get("/api/auth/sessions", headers={"Authorization": f"Bearer {token_b}"}).json()
+    session_b_id = sessions_b[0]["id"]
+
+    response = client.delete(
+        f"/api/auth/sessions/{session_b_id}",
+        headers={"Authorization": f"Bearer {token_a}"}
+    )
+    assert response.status_code == 404

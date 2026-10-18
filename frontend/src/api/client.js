@@ -68,7 +68,18 @@ export const api = {
   submitAssessment: async (data) => {
     return apiClient.post('/risk/assess', data);
   },
-  
+
+  // Profile
+  updateProfile: async (data) => {
+    return apiClient.patch('/auth/me', data);
+  },
+  getSessions: async () => {
+    return apiClient.get('/auth/sessions');
+  },
+  revokeSession: async (id) => {
+    return apiClient.delete(`/auth/sessions/${id}`);
+  },
+
   // Scheme Endpoints
   getSchemes: async (params) => {
     const query = new URLSearchParams(params).toString();

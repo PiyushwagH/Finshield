@@ -1,5 +1,6 @@
 import hashlib
 import secrets
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
@@ -8,9 +9,11 @@ from datetime import datetime, timedelta, timezone
 
 from app.database import get_db
 from app.models.user import User, RefreshToken, PasswordResetToken
+from typing import List
+
 from app.schemas.auth import (
     UserCreate, UserResponse, Token, LoginResponse,
-    ForgotPasswordRequest, ResetPasswordRequest,
+    ForgotPasswordRequest, ResetPasswordRequest, ProfileUpdateRequest, SessionResponse,
 )
 from app.core.security import get_password_hash, verify_password, create_access_token, create_refresh_token, decode_token
 from app.core.deps import get_current_user
@@ -208,6 +211,66 @@ def logout(response: Response, refresh_token: str = Cookie(None), db: Session = 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     return current_user
+
+
+@router.patch("/me", response_model=UserResponse)
+def update_me(
+    body: ProfileUpdateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    update_data = body.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(current_user, key, value)
+    db.commit()
+    db.refresh(current_user)
+    return current_user
+
+
+@router.get("/sessions", response_model=List[SessionResponse])
+def list_sessions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    refresh_token: str = Cookie(None),
+):
+    """Active (non-revoked) sessions for the signed-in account - what the
+    frontend calls the Security Log. We only track issue/expiry time per
+    session (no user-agent/IP capture exists yet), so that's all this shows.
+    """
+    sessions = (
+        db.query(RefreshToken)
+        .filter(RefreshToken.user_id == current_user.id, RefreshToken.revoked == False)
+        .order_by(RefreshToken.created_at.desc())
+        .all()
+    )
+    return [
+        SessionResponse(
+            id=s.id,
+            created_at=s.created_at,
+            expires_at=s.expires_at,
+            is_current=(s.token == refresh_token),
+        )
+        for s in sessions
+    ]
+
+
+@router.delete("/sessions/{session_id}")
+def revoke_session(
+    session_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    session = (
+        db.query(RefreshToken)
+        .filter(RefreshToken.id == session_id, RefreshToken.user_id == current_user.id)
+        .first()
+    )
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+    session.revoked = True
+    db.commit()
+    return {"message": "Session revoked"}
+
 
 @router.post("/forgot-password")
 @limiter.limit("5/minute")

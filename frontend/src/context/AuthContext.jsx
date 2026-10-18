@@ -90,7 +90,7 @@ export const AuthProvider = ({ children }) => {
   // blank "Loading..." screen for that whole window on every single visit,
   // even to pages that need no login at all.
   return (
-    <AuthContext.Provider value={{ user, loading, login, loginAdmin, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, loginAdmin, register, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );

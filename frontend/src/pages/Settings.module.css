@@ -74,3 +74,53 @@
   border-color: var(--risk-high);
   color: var(--risk-high);
 }
+
+.toast {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.avatarRow {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.avatarPreview {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.textInput {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid var(--bg-alt);
+  font-size: 0.95rem;
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.textInput:focus {
+  outline: 2px solid var(--teal);
+  outline-offset: -1px;
+}

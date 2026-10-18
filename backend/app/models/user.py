@@ -12,6 +12,11 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     phone = Column(String, nullable=True)
     full_name = Column(String, nullable=True)
+    # A data: URI (base64), capped client-side to a small size - there's no
+    # object storage set up for this project, so the avatar lives directly
+    # in Postgres rather than adding a new infra dependency for a profile
+    # photo.
+    avatar_data = Column(String, nullable=True)
     password_hash = Column(String, nullable=False)
     role = Column(Enum('user', 'admin', name='user_roles'), default='user', nullable=False)
     is_verified = Column(Boolean, default=False)

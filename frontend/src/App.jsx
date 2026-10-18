@@ -15,6 +15,8 @@ import SchemeDetail from './pages/SchemeDetail';
 import SchemeQuickCheck from './pages/SchemeQuickCheck';
 import MySchemes from './pages/MySchemes';
 import Settings from './pages/Settings';
+import SecurityLog from './pages/SecurityLog';
+import HelpCenter from './pages/HelpCenter';
 import AdminLayout from './components/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageSchemes from './pages/admin/ManageSchemes';
@@ -57,6 +59,8 @@ function App() {
             <Route path="/schemes/:slug" element={<SchemeDetail />} />
             <Route path="/my-schemes" element={<MySchemes />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/security-log" element={<SecurityLog />} />
+            <Route path="/help" element={<HelpCenter />} />
           </Route>
 
           <Route element={<AdminRoute><AdminLayout /></AdminRoute>}>

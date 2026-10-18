@@ -1,7 +1,13 @@
 import re
+from datetime import datetime
 from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 import uuid
+
+# ~500KB of raw image data, base64-inflated (~4/3x) plus the data: URI
+# prefix - generous for a profile photo thumbnail without letting someone
+# bloat a row with a multi-MB upload.
+MAX_AVATAR_DATA_URI_LENGTH = 700_000
 
 def _validate_password_strength(v: str) -> str:
     if len(v) < 8:
@@ -42,10 +48,37 @@ class UserResponse(BaseModel):
     email: EmailStr
     role: str
     full_name: Optional[str] = None
+    phone: Optional[str] = None
+    avatar_data: Optional[str] = None
     is_active: bool
 
     class Config:
         from_attributes = True
+
+
+class ProfileUpdateRequest(BaseModel):
+    full_name: Optional[str] = None
+    phone: Optional[str] = None
+    # A data: URI, e.g. "data:image/png;base64,...". Pass an empty string to
+    # remove the current photo.
+    avatar_data: Optional[str] = None
+
+    @field_validator('avatar_data')
+    @classmethod
+    def validate_avatar_data(cls, v: Optional[str]) -> Optional[str]:
+        if v and len(v) > MAX_AVATAR_DATA_URI_LENGTH:
+            raise ValueError('Image is too large. Please use a smaller photo (under ~500KB).')
+        if v and not v.startswith('data:image/'):
+            raise ValueError('Avatar must be an image data URI.')
+        return v
+
+
+class SessionResponse(BaseModel):
+    id: uuid.UUID
+    created_at: datetime
+    expires_at: datetime
+    is_current: bool
+
 
 class Token(BaseModel):
     access_token: str
