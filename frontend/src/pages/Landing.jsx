@@ -47,7 +47,39 @@ const Landing = () => {
           </div>
           <div className={styles.heroImageContainer}>
              <div className={styles.heroImagePlaceholder}>
-               {/* Placeholder for the dashboard graphic */}
+               <svg viewBox="0 0 560 315" className={styles.heroIllustration} role="img" aria-label="Illustration of a FinShield risk assessment dashboard">
+                 <rect x="0" y="0" width="560" height="315" fill="#F7F9FC" />
+
+                 {/* Gauge card */}
+                 <rect x="28" y="28" width="230" height="259" rx="14" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" />
+                 <text x="50" y="62" fontFamily="Inter, sans-serif" fontSize="13" fontWeight="600" fill="#5B6B7F">Risk Score</text>
+                 <path d="M 70 170 A 72 72 0 0 1 214 170" fill="none" stroke="#E2E8F0" strokeWidth="14" strokeLinecap="round" />
+                 <path d="M 70 170 A 72 72 0 0 1 180 108" fill="none" stroke="#16A34A" strokeWidth="14" strokeLinecap="round" />
+                 <text x="142" y="165" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="34" fontWeight="700" fill="#0F2A47">742</text>
+                 <text x="142" y="186" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="11" fill="#5B6B7F">out of 850</text>
+                 <rect x="100" y="200" width="84" height="24" rx="12" fill="#D1FAE5" />
+                 <text x="142" y="216" textAnchor="middle" fontFamily="Inter, sans-serif" fontSize="11" fontWeight="700" fill="#16A34A">LOW RISK</text>
+                 <rect x="50" y="245" width="166" height="8" rx="4" fill="#F7F9FC" />
+                 <rect x="50" y="245" width="118" height="8" rx="4" fill="#0E8F86" />
+                 <text x="50" y="270" fontFamily="Inter, sans-serif" fontSize="11" fill="#5B6B7F">Affordability: Comfortable</text>
+
+                 {/* Scheme match card */}
+                 <rect x="276" y="28" width="256" height="118" rx="14" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" />
+                 <text x="298" y="56" fontFamily="Inter, sans-serif" fontSize="13" fontWeight="600" fill="#5B6B7F">Matched Schemes</text>
+                 <circle cx="306" cy="80" r="4" fill="#0E8F86" />
+                 <text x="318" y="84" fontFamily="Inter, sans-serif" fontSize="12" fill="#1A2332">PM-KISAN</text>
+                 <circle cx="306" cy="104" r="4" fill="#0E8F86" />
+                 <text x="318" y="108" fontFamily="Inter, sans-serif" fontSize="12" fill="#1A2332">PMAY (Urban)</text>
+                 <circle cx="306" cy="128" r="4" fill="#0E8F86" />
+                 <text x="318" y="132" fontFamily="Inter, sans-serif" fontSize="12" fill="#1A2332">Atal Pension Yojana</text>
+
+                 {/* Trend card */}
+                 <rect x="276" y="162" width="256" height="125" rx="14" fill="#FFFFFF" stroke="#E2E8F0" strokeWidth="1.5" />
+                 <text x="298" y="190" fontFamily="Inter, sans-serif" fontSize="13" fontWeight="600" fill="#5B6B7F">Risk Trend</text>
+                 <polyline points="298,250 350,235 402,255 454,210 506,222" fill="none" stroke="#0F2A47" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                 <circle cx="298" cy="250" r="4" fill="#0F2A47" />
+                 <circle cx="506" cy="222" r="4" fill="#0F2A47" />
+               </svg>
              </div>
           </div>
         </section>

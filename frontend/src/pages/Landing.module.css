@@ -159,11 +159,17 @@
 .heroImagePlaceholder {
   width: 100%;
   aspect-ratio: 16/9;
-  background-color: #E2E8F0;
+  background-color: #F7F9FC;
   border-radius: var(--radius-card);
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   position: relative;
   overflow: hidden;
+}
+
+.heroIllustration {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* Stats Section */
