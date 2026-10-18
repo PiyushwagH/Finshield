@@ -14,10 +14,11 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-from app.models.user import User, RefreshToken
+from app.models.user import User, RefreshToken, PasswordResetToken
 
 User.__table__.create(bind=engine, checkfirst=True)
 RefreshToken.__table__.create(bind=engine, checkfirst=True)
+PasswordResetToken.__table__.create(bind=engine, checkfirst=True)
 
 def override_get_db():
     try:
@@ -33,11 +34,14 @@ client = TestClient(app)
 
 @pytest.fixture(autouse=True)
 def run_around_tests():
+    PasswordResetToken.__table__.drop(bind=engine, checkfirst=True)
     User.__table__.drop(bind=engine, checkfirst=True)
     RefreshToken.__table__.drop(bind=engine, checkfirst=True)
     User.__table__.create(bind=engine, checkfirst=True)
     RefreshToken.__table__.create(bind=engine, checkfirst=True)
+    PasswordResetToken.__table__.create(bind=engine, checkfirst=True)
     yield
+    PasswordResetToken.__table__.drop(bind=engine, checkfirst=True)
     User.__table__.drop(bind=engine, checkfirst=True)
     RefreshToken.__table__.drop(bind=engine, checkfirst=True)
 
@@ -217,5 +221,63 @@ def test_login_endpoints_reject_inactive_user():
     response = client.post(
         "/api/auth/login/user",
         data={"username": "inactive@example.com", "password": "Password123"}
+    )
+    assert response.status_code == 400
+
+
+def test_forgot_password_returns_generic_message_for_unknown_email():
+    response = client.post("/api/auth/forgot-password", json={"email": "nobody@example.com"})
+    assert response.status_code == 200
+    assert "reset link has been sent" in response.json()["message"]
+
+
+def test_forgot_password_then_reset_flow(monkeypatch):
+    client.post(
+        "/api/auth/register",
+        json={"email": "resetme@example.com", "password": "OldPassword123"}
+    )
+
+    captured = {}
+
+    def fake_send(to_email, reset_link):
+        captured["to_email"] = to_email
+        captured["reset_link"] = reset_link
+
+    monkeypatch.setattr("app.routers.auth.send_password_reset_email", fake_send)
+
+    response = client.post("/api/auth/forgot-password", json={"email": "resetme@example.com"})
+    assert response.status_code == 200
+    assert captured["to_email"] == "resetme@example.com"
+    token = captured["reset_link"].split("token=")[1]
+
+    reset_response = client.post(
+        "/api/auth/reset-password",
+        json={"token": token, "new_password": "NewPassword456"}
+    )
+    assert reset_response.status_code == 200
+
+    # Old password no longer works, new one does.
+    old_login = client.post(
+        "/api/auth/login", data={"username": "resetme@example.com", "password": "OldPassword123"}
+    )
+    assert old_login.status_code == 401
+
+    new_login = client.post(
+        "/api/auth/login", data={"username": "resetme@example.com", "password": "NewPassword456"}
+    )
+    assert new_login.status_code == 200
+
+    # The token is single-use.
+    reuse_response = client.post(
+        "/api/auth/reset-password",
+        json={"token": token, "new_password": "AnotherPassword789"}
+    )
+    assert reuse_response.status_code == 400
+
+
+def test_reset_password_rejects_invalid_token():
+    response = client.post(
+        "/api/auth/reset-password",
+        json={"token": "not-a-real-token", "new_password": "NewPassword456"}
     )
     assert response.status_code == 400

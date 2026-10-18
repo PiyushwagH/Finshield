@@ -16,6 +16,7 @@ const SchemeDetail = () => {
   const [activeTab, setActiveTab] = useState('Overview');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [similarSchemes, setSimilarSchemes] = useState([]);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -23,7 +24,13 @@ const SchemeDetail = () => {
         setLoading(true);
         const res = await api.getSchemeDetail(slug);
         setScheme(res.data);
-        
+
+        if (res.data.category) {
+          api.getSchemes({ category: res.data.category, limit: 4 })
+            .then(r => setSimilarSchemes(r.data.filter(s => s.id !== res.data.id).slice(0, 2)))
+            .catch(() => setSimilarSchemes([]));
+        }
+
         if (user) {
           try {
             const eligRes = await api.checkEligibility(res.data.id);
@@ -201,9 +208,40 @@ const SchemeDetail = () => {
               </div>
             )}
             
-            {(activeTab === 'How to Apply' || activeTab === 'FAQs') && (
+            {activeTab === 'How to Apply' && (
+              <div className={styles.overviewSection}>
+                <h3>Application Mode</h3>
+                <p className={styles.fullDesc}>
+                  {scheme.application_mode || 'Application mode not specified for this scheme.'}
+                </p>
+
+                <h3>Where to Apply</h3>
+                <p className={styles.fullDesc}>
+                  FinShield links out to the scheme's official government page rather than
+                  hosting an application form itself, so your application is always
+                  submitted directly on the real government portal.
+                </p>
+                {scheme.official_url ? (
+                  <a href={scheme.official_url} target="_blank" rel="noreferrer" className={styles.primaryActionBtn}>
+                    Go to Official Application Portal
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                  </a>
+                ) : (
+                  <p className={styles.qualifyText}>No official application link is on file for this scheme yet.</p>
+                )}
+              </div>
+            )}
+
+            {activeTab === 'FAQs' && (
               <div className={styles.placeholderSection}>
-                <p>Information coming soon.</p>
+                <p>
+                  We don't maintain a separate FAQ for this scheme to avoid giving
+                  guidance that could go stale or be wrong. For authoritative
+                  answers, check the scheme's official page
+                  {scheme.official_url && (
+                    <> — <a href={scheme.official_url} target="_blank" rel="noreferrer">{scheme.official_url}</a></>
+                  )}.
+                </p>
               </div>
             )}
           </div>
@@ -254,21 +292,27 @@ const SchemeDetail = () => {
               Similar Schemes
             </h4>
             <div className={styles.similarList}>
-              <div className={styles.similarItem}>
-                <h5>Kisan Credit Card (KCC)</h5>
-                <span>Agriculture • Credit Access</span>
-              </div>
-              <div className={styles.similarItem}>
-                <h5>PM Fasal Bima Yojana</h5>
-                <span>Agriculture • Crop Insurance</span>
-              </div>
+              {similarSchemes.length > 0 ? (
+                similarSchemes.map(s => (
+                  <div
+                    key={s.id}
+                    className={styles.similarItem}
+                    onClick={() => navigate(`/schemes/${s.slug}`)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <h5>{s.name}</h5>
+                    <span>{s.category ? s.category.charAt(0).toUpperCase() + s.category.slice(1) : 'General'}{s.benefit_type ? ` • ${s.benefit_type.charAt(0).toUpperCase() + s.benefit_type.slice(1)}` : ''}</span>
+                  </div>
+                ))
+              ) : (
+                <p className={styles.qualifyText}>No other schemes in this category yet.</p>
+              )}
             </div>
           </div>
-          
+
           <div className={styles.infoCard}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
             <p>Information last verified on<br/><strong>{scheme.updated_at ? new Date(scheme.updated_at).toLocaleDateString() : 'N/A'}</strong></p>
-            <button className={styles.reportLink}>Report outdated info</button>
           </div>
         </div>
       </div>

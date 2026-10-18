@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     COOKIE_SECURE: bool = False
     COOKIE_SAMESITE: str = "lax"
 
+    # Password-reset email. If RESEND_API_KEY is unset (local dev), the reset
+    # link is logged instead of emailed - see app/services/email_service.py.
+    RESEND_API_KEY: str = ""
+    EMAIL_FROM: str = "FinShield <onboarding@resend.dev>"
+    FRONTEND_URL: str = "http://localhost:5173"
+
     class Config:
         # Resolved relative to this file so the app loads the same backend/.env
         # regardless of the directory uvicorn/alembic/pytest is launched from.

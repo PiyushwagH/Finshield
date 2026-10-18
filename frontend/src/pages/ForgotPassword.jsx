@@ -13,7 +13,6 @@ const ForgotPassword = () => {
     if (!email) return;
     setLoading(true);
     try {
-      // Stub endpoint
       await apiClient.post('/auth/forgot-password', { email });
       setStatusMsg({ type: 'success', text: 'If an account exists, a reset link has been sent.' });
     } catch (err) {

@@ -21,15 +21,21 @@ const SchemeEditorDrawer = ({ scheme, onClose }) => {
     name: '',
     slug: '',
     short_description: '',
+    full_description: '',
     ministry: '',
-    category: 'welfare',
+    category: 'education',
     level: 'central',
     benefit_type: 'cash',
     benefit_amount: '',
+    benefit_description: '',
+    official_url: '',
+    application_mode: '',
+    required_documents: '',
+    source_url: '',
     status: 'draft',
     rules: []
   });
-  
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -38,11 +44,17 @@ const SchemeEditorDrawer = ({ scheme, onClose }) => {
         name: scheme.name || '',
         slug: scheme.slug || '',
         short_description: scheme.short_description || '',
+        full_description: scheme.full_description || '',
         ministry: scheme.ministry || '',
-        category: scheme.category || 'welfare',
+        category: scheme.category || 'education',
         level: scheme.level || 'central',
         benefit_type: scheme.benefit_type || 'cash',
         benefit_amount: scheme.benefit_amount || '',
+        benefit_description: scheme.benefit_description || '',
+        official_url: scheme.official_url || '',
+        application_mode: scheme.application_mode || '',
+        required_documents: (scheme.required_documents || []).join(', '),
+        source_url: scheme.source_url || '',
         status: scheme.status || 'draft',
         rules: scheme.rules || []
       });
@@ -106,6 +118,9 @@ const SchemeEditorDrawer = ({ scheme, onClose }) => {
     const payload = {
       ...formData,
       benefit_amount: formData.benefit_amount ? Number(formData.benefit_amount) : null,
+      required_documents: formData.required_documents
+        ? formData.required_documents.split(',').map(s => s.trim()).filter(Boolean)
+        : [],
       rules: processedRules
     };
     
@@ -154,7 +169,12 @@ const SchemeEditorDrawer = ({ scheme, onClose }) => {
                 <label>Short Description</label>
                 <textarea name="short_description" rows="2" value={formData.short_description} onChange={handleChange}></textarea>
               </div>
-              
+
+              <div className={styles.inputGroup}>
+                <label>Full Description</label>
+                <textarea name="full_description" rows="4" value={formData.full_description} onChange={handleChange} placeholder="Shown on the scheme's Overview tab"></textarea>
+              </div>
+
               <div className={styles.formRow}>
                 <div className={styles.inputGroup}>
                   <label>Ministry / Department</label>
@@ -167,7 +187,6 @@ const SchemeEditorDrawer = ({ scheme, onClose }) => {
                     <option value="education">Education</option>
                     <option value="health">Health</option>
                     <option value="business">Business</option>
-                    <option value="welfare">Welfare</option>
                   </select>
                 </div>
               </div>
@@ -186,11 +205,63 @@ const SchemeEditorDrawer = ({ scheme, onClose }) => {
                     <option value="draft">Draft</option>
                     <option value="active">Active</option>
                     <option value="needs_review">Needs Review</option>
+                    <option value="archived">Archived</option>
                   </select>
                 </div>
               </div>
             </div>
-            
+
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>Benefits</h3>
+
+              <div className={styles.formRow}>
+                <div className={styles.inputGroup}>
+                  <label>Benefit Type</label>
+                  <select name="benefit_type" value={formData.benefit_type} onChange={handleChange}>
+                    <option value="cash">Cash</option>
+                    <option value="subsidy">Subsidy</option>
+                    <option value="insurance">Insurance</option>
+                    <option value="loan">Loan</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div className={styles.inputGroup}>
+                  <label>Benefit Amount (₹, optional)</label>
+                  <input type="number" name="benefit_amount" value={formData.benefit_amount} onChange={handleChange} placeholder="e.g. 500000" />
+                </div>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Benefit Description</label>
+                <textarea name="benefit_description" rows="2" value={formData.benefit_description} onChange={handleChange} placeholder="e.g. One-time grant of up to ₹2 lakh"></textarea>
+              </div>
+            </div>
+
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>Application &amp; Documentation</h3>
+
+              <div className={styles.inputGroup}>
+                <label>Official Application URL *</label>
+                <input type="url" name="official_url" required value={formData.official_url} onChange={handleChange} placeholder="https://..." />
+                <p className={styles.helpText}>Users are sent here to actually apply — FinShield never hosts its own application form.</p>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Application Mode</label>
+                <input type="text" name="application_mode" value={formData.application_mode} onChange={handleChange} placeholder="e.g. Online via portal, or Offline via CSC/bank branch" />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Required Documents</label>
+                <input type="text" name="required_documents" value={formData.required_documents} onChange={handleChange} placeholder="Comma-separated, e.g. Aadhaar Card, Income Certificate, Bank Passbook" />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label>Source URL (where this data was verified)</label>
+                <input type="url" name="source_url" value={formData.source_url} onChange={handleChange} placeholder="e.g. a pib.gov.in press release" />
+              </div>
+            </div>
+
             <div className={styles.section}>
               <div className={styles.sectionHeader}>
                 <h3 className={styles.sectionTitle}>Eligibility Rules</h3>

@@ -36,6 +36,19 @@ class UserProfile(Base):
 
     user = relationship("User", back_populates="profile")
 
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    # SHA-256 hash of the token sent to the user, never the raw token itself -
+    # mirrors how passwords are never stored in plaintext.
+    token_hash = Column(String, unique=True, index=True, nullable=False)
+    expires_at = Column(DateTime(timezone=True), nullable=False)
+    used = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class RefreshToken(Base):
     __tablename__ = "refresh_tokens"
 

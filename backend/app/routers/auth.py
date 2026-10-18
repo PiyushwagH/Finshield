@@ -1,16 +1,39 @@
+import hashlib
+import secrets
+
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.database import get_db
-from app.models.user import User, RefreshToken
-from app.schemas.auth import UserCreate, UserResponse, Token, LoginResponse
+from app.models.user import User, RefreshToken, PasswordResetToken
+from app.schemas.auth import (
+    UserCreate, UserResponse, Token, LoginResponse,
+    ForgotPasswordRequest, ResetPasswordRequest,
+)
 from app.core.security import get_password_hash, verify_password, create_access_token, create_refresh_token, decode_token
 from app.core.deps import get_current_user
 
 from app.core.limiter import limiter
 from app.config import settings
+from app.services.email_service import send_password_reset_email
+
+PASSWORD_RESET_TOKEN_TTL_MINUTES = 30
+
+
+def _hash_reset_token(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _is_expired(expires_at: datetime) -> bool:
+    """Compare against now regardless of whether the DB driver returned a
+    naive or tz-aware datetime (Postgres returns tz-aware; SQLite, used in
+    tests, returns naive) - normalize both sides to naive UTC.
+    """
+    if expires_at.tzinfo is not None:
+        expires_at = expires_at.astimezone(timezone.utc).replace(tzinfo=None)
+    return expires_at < datetime.utcnow()
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -187,11 +210,54 @@ def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 @router.post("/forgot-password")
-def forgot_password():
-    return {"message": "Password reset email sent"}
+@limiter.limit("5/minute")
+def forgot_password(request: Request, body: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    """Always returns the same generic message, whether or not the email
+    belongs to an account, so this endpoint can't be used to enumerate users.
+    """
+    generic_response = {"message": "If an account exists for that email, a reset link has been sent."}
+
+    user = db.query(User).filter(User.email == body.email).first()
+    if not user or not user.is_active:
+        return generic_response
+
+    raw_token = secrets.token_urlsafe(32)
+    expires_at = datetime.utcnow() + timedelta(minutes=PASSWORD_RESET_TOKEN_TTL_MINUTES)
+    db.add(PasswordResetToken(
+        user_id=user.id,
+        token_hash=_hash_reset_token(raw_token),
+        expires_at=expires_at,
+    ))
+    db.commit()
+
+    reset_link = f"{settings.FRONTEND_URL}/reset-password?token={raw_token}"
+    send_password_reset_email(user.email, reset_link)
+
+    return generic_response
+
 
 @router.post("/reset-password")
-def reset_password():
+@limiter.limit("5/minute")
+def reset_password(request: Request, body: ResetPasswordRequest, db: Session = Depends(get_db)):
+    token_hash = _hash_reset_token(body.token)
+    reset_token = db.query(PasswordResetToken).filter(PasswordResetToken.token_hash == token_hash).first()
+
+    if not reset_token or reset_token.used or _is_expired(reset_token.expires_at):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired reset link")
+
+    user = db.query(User).filter(User.id == reset_token.user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired reset link")
+
+    user.password_hash = get_password_hash(body.new_password)
+    reset_token.used = True
+
+    # A password reset invalidates every existing session, not just this device.
+    db.query(RefreshToken).filter(RefreshToken.user_id == user.id, RefreshToken.revoked == False).update(
+        {"revoked": True}
+    )
+    db.commit()
+
     return {"message": "Password has been reset"}
 
 from app.core.deps import require_admin

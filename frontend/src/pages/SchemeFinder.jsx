@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import styles from './SchemeFinder.module.css';
 
 const SchemeFinder = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(searchParams.get('q') || '');
   // Total schemes in the database, fetched once unfiltered - the header
   // count should reflect what's actually there, not a hardcoded guess.
   const [totalCount, setTotalCount] = useState(null);
