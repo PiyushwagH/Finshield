@@ -352,6 +352,28 @@
   opacity: 0.9;
 }
 
+.checklistBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checklistBtn:hover {
+  background: var(--bg-alt);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+
 .loading, .emptyState {
   text-align: center;
   padding: 4rem 0;

@@ -1,7 +1,7 @@
 # FinShield — Context for Review-II PPT
 
 This file summarizes the actual, verified state of the FinShield project as of
-2026-09-11, for use as reference material when drafting the Review-II
+2026-10-19, for use as reference material when drafting the Review-II
 presentation. Every claim below was checked against the running code or the
 live deployment during development — nothing here is aspirational.
 
@@ -22,6 +22,11 @@ FinShield is a full-stack web application with two functions:
 The two features are intentionally decoupled: scheme browsing works even if
 the ML service is unavailable.
 
+Beyond the two core features, the app now has a full account layer: email-based
+password reset, an editable profile with a photo, an active-sessions
+("Security Log") view with per-session revoke, and an admin console for
+managing users, schemes, and scheme-data review.
+
 ---
 
 ## 2. System Architecture
@@ -33,9 +38,10 @@ the ML service is unavailable.
 | HTTP client | Axios |
 | Charts | Recharts |
 | Backend | Python 3.11 + FastAPI + Pydantic v2 |
-| ORM / migrations | SQLAlchemy 2.0 + Alembic |
+| ORM / migrations | SQLAlchemy 2.0 (pinned `<2.1`, see Section 11) + Alembic |
 | Database | PostgreSQL 18 (hosted on **Neon**, serverless Postgres) |
 | Auth | JWT access tokens (15 min) + httpOnly refresh-token cookies (7 days), bcrypt password hashing |
+| Email | Resend (password-reset links; falls back to server-side logging if unconfigured) |
 | ML runtime | LightGBM |
 | Rate limiting | slowapi |
 
@@ -74,6 +80,54 @@ helpers in `backend/app/routers/auth.py`:
 The frontend has two separate login surfaces (`/login` and `/admin/login`)
 sharing one `Auth.jsx` component via a `mode` prop.
 
+**Admin accounts are never self-service.** There is deliberately no public
+"create admin" UI — that would let anyone on the internet grant themselves
+admin access. The real path: a person signs up as a normal user through the
+public Sign Up form, then a project owner runs
+`backend/scripts/create_admin.py <email>` against the database to promote
+that one account. This is a conscious security decision worth naming in a
+review if asked "how do you create an admin."
+
+### Password reset (added this cycle)
+
+Previously, `POST /auth/forgot-password` and `POST /auth/reset-password` were
+**complete no-op stubs** — the UI claimed success ("a reset link has been
+sent") but nothing happened server-side: no token, no email, no password
+change. This was found and fixed:
+
+- `POST /auth/forgot-password` generates a single-use, SHA-256-hashed,
+  30-minute-expiry token (`password_reset_tokens` table), and emails a reset
+  link via Resend's API. If `RESEND_API_KEY` isn't configured (e.g. local
+  dev), the link is logged server-side instead of silently failing. The
+  response message is identical whether or not the email belongs to an
+  account, so the endpoint can't be used to enumerate registered users.
+- `POST /auth/reset-password` validates the token, updates the password, and
+  **revokes every existing refresh-token session** for that account — a
+  password reset should invalidate all prior sessions, not just the current
+  device.
+- A real bug was caught during verification, not assumed fixed: Postgres
+  returns a timezone-aware datetime for the token's expiry column, but the
+  comparison code used a naive `datetime.utcnow()`, which crashed with a 500
+  — passed in the local SQLite test suite (which returns naive datetimes)
+  but failed against the real production database. Fixed with a
+  dialect-agnostic comparison, re-verified against the live database.
+
+### Profile, Photo, and Security Log (added this cycle)
+
+- `PATCH /api/auth/me` lets a user update their name, phone, and a profile
+  photo (stored as a size-capped, server-validated base64 `data:` URI —
+  there's no object-storage service set up for this project, so the photo
+  lives directly in the `users.avatar_data` column rather than adding a new
+  infra dependency).
+- `GET /api/auth/sessions` / `DELETE /api/auth/sessions/{id}` expose the
+  account's active (non-revoked) refresh-token sessions, each ownership-
+  checked so one user can never revoke another's session — this is what
+  backs the "Security Log" page.
+- The dashboard avatar used to log the user out **instantly** on click, with
+  no way to view or edit a profile at all. It now opens the Settings/profile
+  page instead. The same bug existed independently in the admin console's
+  layout and was fixed there too.
+
 ### System architecture diagram
 
 Deployment/component view — three independently hosted pieces talking over
@@ -102,16 +156,18 @@ flowchart TB
             RiskSvc["risk_service"]
             EligSvc["eligibility_service"]
             AdviceSvc["advice_service"]
+            EmailSvc["email_service (Resend)"]
         end
         Model["FinShieldPredictor\n(LightGBM, ml/finshield_model.pkl)"]
         API --> Routers
         RiskR --> RiskSvc --> Model
         SchemeR --> EligSvc
         RiskR --> AdviceSvc
+        AuthR --> EmailSvc
     end
 
     subgraph Neon["Neon (managed Postgres)"]
-        DB[("PostgreSQL 18\nusers, assessments, schemes,\naudit_logs, refresh_tokens")]
+        DB[("PostgreSQL 18\nusers, assessments, schemes,\naudit_logs, refresh_tokens,\npassword_reset_tokens")]
     end
 
     UI -- "HTTPS" --> Frontend
@@ -199,6 +255,20 @@ boot and logs a critical error if the output drifts from the expected value
 (`0.0232`), to catch a dependency version mismatch silently corrupting
 predictions.
 
+**Important, demo-relevant clarification verified this cycle:** the ML risk
+band and the separate affordability heuristic can legitimately disagree, and
+this isn't a bug. A profile with no prior credit history and no past defaults
+reads as low statistical default-risk to the model even if the person's
+current cash flow is badly stretched (which the affordability panel correctly
+flags as "Critical"). Credit-history fields (`has_prior_credit`,
+`has_defaulted`, `payment_history`) are what the model weighs most heavily —
+income/expense extremity alone does not push the risk band up. This was
+confirmed by pulling a real user's stored `input_data` from the database and
+reproducing the exact "Low risk + Critical affordability" result, then
+resubmitting the same profile with only the credit-history fields changed and
+getting `Very High` / score 300 back from the live production API. Worth a
+sentence in the paper's Discussion/Limitations section.
+
 ---
 
 ## 4. Scheme Recommendation Engine
@@ -216,35 +286,60 @@ predictions.
   URL (`official_url` field) — this app does not build a government
   application flow itself; it links out, by design.
 
-### Data status (the honest bottleneck)
+### Data status (the honest bottleneck — now meaningfully smaller)
 
 | Status | Count | Meaning |
 |---|---|---|
-| `active` (visible to users) | 8 | Real, sourced, verified schemes |
-| `needs_review` (built, not yet visible) | 11 | Real schemes sourced from official government sources (PIB press releases, ministry sites), pending admin review before going live |
-| `archived` | 17 | **Removed fabricated placeholder data** — see below |
+| `active` (visible to users) | **27** | Real, sourced, verified schemes |
+| `archived` | 17 | Removed fabricated placeholder data — see below |
+| `needs_review` | 0 | All currently-sourced schemes have been reviewed and published |
 
 **Important context for the review:** the project originally shipped with 17
 fake "State Welfare Scheme 9–25" entries — invented benefit amounts, a
 generic non-scheme URL, and descriptions that literally read "This is a
 placeholder" — live and shown to users as real schemes. These were identified
-and archived. The 11 replacement schemes were individually sourced from
-official Indian government press releases (`pib.gov.in`), not generated from
-memory, specifically to avoid repeating that mistake — each has a real
-eligibility basis and a real official application link. This is a legitimate
-data-integrity story worth including in the review: the project has an actual
-content-moderation workflow (`needs_review` → admin-approved → `active`), not
-just a static seed file.
+and archived, and have been deliberately **kept archived** rather than
+reactivated, even when asked, precisely because reactivating them would
+reintroduce fabricated financial guidance into a live product.
 
-Schemes currently active (sourced from the original seed):
-PM-KISAN, PMAY (Urban), Sukanya Samriddhi Yojana, Atal Pension Yojana,
-PM Mudra Yojana, NSP Post-Matric Scholarship, Ayushman Bharat (PM-JAY),
-Stand-Up India.
+In their place, 27 real schemes have been added across three verified
+batches, each individually researched and cross-checked against multiple
+independent sources (not generated from memory):
 
-Schemes sourced and pending review: PM Ujjwala Yojana, PMJJBY, PMSBY,
-PM Fasal Bima Yojana, PM Vishwakarma, PMEGP, PM SVANidhi, NMMSS
-(National Means-cum-Merit Scholarship), PMMVY (Matru Vandana Yojana),
-PM Jan Dhan Yojana, Pre-Matric Scholarship for SC students.
+**Central schemes (24):** PM-KISAN, PMAY (Urban), Sukanya Samriddhi Yojana,
+Atal Pension Yojana, PM Mudra Yojana, NSP Post-Matric Scholarship, Ayushman
+Bharat (PM-JAY), Stand-Up India, PM Ujjwala Yojana, PMJJBY, PMSBY, PM Fasal
+Bima Yojana, PM Vishwakarma, PMEGP, PM SVANidhi, NMMSS, PMMVY, PM Jan Dhan
+Yojana, Pre-Matric Scholarship for SC students, MGNREGA, PM Shram Yogi
+Maandhan (PM-SYM), PM Kaushal Vikas Yojana (PMKVY), PM Matsya Sampada Yojana
+(PMMSY), Startup India.
+
+**Maharashtra state schemes (3):** Mukhyamantri Majhi Ladki Bahin Yojana
+(₹1,500/month DBT for eligible women), Rajarshi Chhatrapati Shahu Maharaj
+Shikshan Shulk Shishyavrutti Yojana (tuition/exam fee waiver), Majhi Kanya
+Bhagyashree Yojana (fixed-deposit scheme for families with daughters).
+
+**Equally worth presenting: what was deliberately left out, and why.**
+During research, several well-known schemes were investigated and *not*
+added, because the available sources disagreed or the scheme's current
+status was unclear — a stronger data-integrity story than silently including
+everything found:
+- **PMAY-Gramin** — eligibility is based on a fixed 2011-census survey list
+  (SECC 2011), not criteria that can be expressed as reusable rules.
+- **PM Vaya Vandana Yojana** — sources disagreed on whether the scheme is
+  still open for new enrollment past March 2023/2026.
+- **IGNOAPS / NSAP old-age pension** — pension amounts vary wildly by state
+  (₹200 to ₹2,500/month) with no single reliable central figure, and one
+  source's date range (1995–2019) raised doubt about current status.
+- **MJPJAY (Maharashtra)** — merged into Ayushman Bharat–PMJAY in July 2024
+  (which the app already lists), so a separate entry would be a duplicate.
+- **Shiv Bhojan Thali Yojana (Maharashtra)** — no formal eligibility
+  criteria at all (anyone can walk in), and multiple 2025 news reports
+  describe unresolved funding/payment arrears casting doubt on current
+  operational status.
+- **The 2019 Maharashtra farmer loan waiver** — tied to a specific historical
+  loan window (2015–2019) and superseded by a newer 2026 scheme not yet
+  independently verified.
 
 ---
 
@@ -255,7 +350,8 @@ end-to-end, not just the model's raw JSON output.
 
 **Flow a real user goes through:**
 1. Registers/logs in (separate user and admin login portals, JWT access +
-   httpOnly refresh-token cookie session).
+   httpOnly refresh-token cookie session). Can reset a forgotten password via
+   a real emailed link, and manage an editable profile with a photo.
 2. Fills a 4-step risk assessment wizard (personal details → employment/
    assets → finances → credit history), with conditional fields (e.g. EMI/
    loan-balance inputs only appear if the user has active loans) and inline
@@ -276,9 +372,11 @@ end-to-end, not just the model's raw JSON output.
    currently eligible for, each with eligibility criteria shown and a link to
    the official government application portal (the app deliberately does not
    build its own application flow — see Out of Scope).
-6. **Reports/History**: logged-in users can revisit past assessments; an
-   admin console lets an admin manage scheme records (draft/active/archived/
-   needs_review lifecycle) independent of the ML side.
+6. **Reports/History**: logged-in users can revisit past assessments; a
+   Security Log page lists active sessions with per-session revoke; an admin
+   console lets an admin manage scheme records (draft/active/archived/
+   needs_review lifecycle), review detected scheme-data changes, and manage
+   users — independent of the ML side.
 
 **Outcome in one line for the abstract:** a single web application where a
 user gets both an ML-backed, explainable credit-risk indication and a
@@ -288,17 +386,20 @@ flow, each usable even if the other component fails (per Rule 8 in
 AGENTS.md: scheme browsing works independent of the ML service).
 
 **What to quantify in the Results section of the paper**, pulling from this
-file: model metrics (section 3's table), scheme coverage honestly (8
-active / 11 pending review, section 4), test coverage (20 pytest + 46 API
-smoke checks, section 6), and the bug-fix list (section 5) as evidence of a
-working, hardened system rather than a prototype that only runs once.
+file: model metrics (section 3's table), scheme coverage honestly (27 active,
+up from an initial 8, against India's 500+ actual schemes — see section 4),
+test coverage (29 pytest + 46 API smoke checks, section 6), and the bug-fix
+list (section 5) as evidence of a working, hardened system rather than a
+prototype that only runs once.
 
 ---
 
 ## 5. Notable Bugs Found and Fixed This Cycle
 
 Useful for a "Partial Implementation/Results" slide — shows engineering
-rigor, not just feature-building:
+rigor, not just feature-building. This list now spans two development
+cycles; the newer items (8 onward) were found and fixed in the most recent
+session:
 
 1. **Assessment submission silently failed for every user without prior
    credit history.** The frontend sent `payment_history: "No History"`; the
@@ -330,21 +431,81 @@ rigor, not just feature-building:
    logging in as a second user showed the first user's unsaved financial
    data. Fixed by scoping the draft key to the logged-in user's ID and
    clearing it on logout.
+8. **Cross-site refresh-token cookie failure after multi-domain deployment.**
+   Once the frontend (Vercel) and backend (Render) were on different
+   registrable domains, `SameSite=Lax` (correct for same-site local dev)
+   meant browsers never attached the refresh cookie to the cross-site
+   `/auth/refresh` call, surfacing as "Refresh token missing" whenever a
+   15-minute access token expired mid-session. Fixed by making the cookie's
+   `secure`/`samesite` attributes environment-driven.
+9. **An unpinned `sqlalchemy` dependency broke every Render deploy.** Render
+   builds from a fresh `pip install` on every deploy; it resolved to the
+   newly-released SQLAlchemy 2.1, which changed the default driver for a
+   bare `postgresql://` URL from `psycopg2` to `psycopg` (v3) — a driver
+   this project never installs. Local dev was unaffected because its venv
+   had an older SQLAlchemy cached from before. Reproduced the exact failure
+   in a disposable clean virtualenv before fixing it by pinning `<2.1`.
+10. **The entire app, including the public landing page, was blocked behind
+    a backend network call on every single visit.** `AuthProvider` rendered
+    nothing until `POST /auth/refresh` resolved — and Render's free tier
+    cold-starts after ~15 minutes idle, which can take 30-60+ seconds to load
+    a Python process with `pandas`/`lightgbm` in it. Fixed so only routes
+    that actually require a known login state wait on that check; public
+    pages render immediately.
+11. **Password reset was a complete no-op.** The UI showed success messages
+    ("a reset link has been sent," "password has been reset") but the
+    backend endpoints did nothing at all — see Section 2's "Password reset"
+    subsection for the full fix and the timezone bug caught during
+    verification.
+12. **The dashboard avatar instantly logged the user out on click**, with no
+    way to view or edit a profile — the same bug existed independently in
+    the admin console. Both now open a real profile/settings page instead.
+13. **Logout always landed on the login form instead of the home page,
+    regardless of which page triggered it.** Root cause: `ProtectedRoute`/
+    `AdminRoute` each declaratively redirect to `/login` the instant `user`
+    becomes `null` — which fires while the old protected page is still
+    mounted during logout, racing the explicit "go home" navigation and
+    usually winning. Fixed with a `loggingOut` flag so the route guards stay
+    neutral during a deliberate logout.
+14. **The admin "Scheme Updates" page's Pending/Approved/Rejected tabs did
+    nothing when clicked**, and its sidebar badge was a hardcoded literal
+    `3` regardless of the real count (which was actually 0). The backend
+    endpoint also always filtered to `pending` with no way to request the
+    other statuses. Fixed end-to-end: a `status` query param on the
+    endpoint, real tab-switching on the frontend, and a sidebar badge that
+    reads the actual `pending_updates` figure from `/admin/stats`.
+15. **A hardcoded `"welfare"` category option in the admin scheme editor
+    wasn't a valid value** in the backend's Postgres enum (`education`,
+    `health`, `agriculture`, `business`) — any admin saving a new scheme
+    without manually changing the default would have hit a database error.
+    Also found: the editor was missing input fields for `official_url`,
+    `application_mode`, `required_documents`, and benefit fields entirely,
+    despite the backend already supporting them — meaning no admin could
+    actually set a scheme's real application link through the UI before this
+    was fixed.
+16. **`SchemeDetail`'s "Similar Schemes" card was hardcoded** to always show
+    the same two fake scheme names ("Kisan Credit Card," "PM Fasal Bima
+    Yojana") regardless of which scheme was actually being viewed — a real
+    mock-data violation live in production. Replaced with a real
+    same-category API query.
 
 ---
 
 ## 6. Testing / Verification Infrastructure
 
-- **Backend**: pytest suite (20 tests) covering auth (registration, login —
-  all three endpoints, refresh-token rotation and revocation, role
-  enforcement) and risk assessment, run against an isolated SQLite DB.
+- **Backend**: pytest suite, now **29 tests** (grew from the original 20 —
+  new coverage added for profile updates, avatar validation, session
+  listing/revocation, and cross-user session isolation), run against an
+  isolated SQLite DB.
 - **API smoke test** (`frontend/scripts/api-smoke-test.mjs`, `npm run
   test:api`): a standalone Node script hitting every backend endpoint on a
   live server — 46 checks covering auth, risk assessment, schemes,
   user-schemes, and admin routes, including negative cases (401/403/422).
   Zero dependencies.
 - All fixes above were verified against the live production deployment
-  (Render + Neon + Vercel) with real HTTP requests, not just locally.
+  (Render + Neon + Vercel) with real HTTP requests, not just locally — this
+  discipline directly caught the production-only timezone bug in the
+  password-reset flow (Section 5, item 11) that the local test suite missed.
 
 ---
 
@@ -359,20 +520,26 @@ building its own application flow), SMS/OTP delivery, a mobile app.
 ## 8. Suggested Framing for Review-II Slides
 
 - **Objective**: two independent, functional modules — ML-based risk
-  scoring and government scheme discovery — for financial inclusion.
+  scoring and government scheme discovery — for financial inclusion, now
+  wrapped in a complete account/security layer (password reset, profile
+  management, session control).
 - **Design/System Architecture**: use section 2 above; the Vercel→Render
-  migration is a genuine, presentable architecture decision (diagnosed a
-  real constraint, chose the right tool for a Python+ML workload).
+  migration and the SQLAlchemy 2.1 incident are both genuine, presentable
+  architecture/dependency-management decisions — diagnosed real constraints,
+  chose and verified the right fix each time.
 - **Partial Implementation/Results**: use sections 3, 5, and 6 — a working
   deployed system with a real trained model (cite the AUC/Gini/KS numbers),
-  a documented bug-fixing process, and automated test coverage is stronger
-  evidence of "partial implementation" than most capstones show at this
-  stage.
+  a documented 16-item bug-fixing history across two development cycles, and
+  automated test coverage (29 unit + 46 API) is stronger evidence of
+  "partial implementation" than most capstones show at this stage.
 - **Honest gap to name explicitly** (don't let a reviewer find it first):
-  scheme data coverage is early — 8 live, 11 more sourced and pending
-  review, against an eventual goal of much broader coverage. Framing this as
-  a deliberate data-integrity choice (reviewed data only, no fabricated
-  entries) is a stronger story than hiding the gap.
+  scheme data coverage, while now at 27 real, verified schemes (more than
+  tripled from the initial 8), is still a small fraction of India's actual
+  500+ central and state schemes. Framing this as a deliberate
+  data-integrity choice — each entry individually researched and cited,
+  several well-known schemes deliberately excluded due to unclear or
+  conflicting current status — is a stronger story than claiming broader
+  coverage than is actually verified.
 
 ---
 
@@ -383,17 +550,20 @@ paper, take real screenshots of the live app yourself and drop them in
 wherever a "Fig." reference appears — don't let a downstream Claude session
 invent or describe placeholder UI. Minimum set worth capturing:
 
-1. Landing page (shows the Admin Login / User Login split).
+1. Landing page (shows the Admin Login / User Login split, and the new SVG
+   dashboard illustration replacing the old empty placeholder box).
 2. The assessment wizard — at least one step with the conditional loan
    fields visible (demonstrates the fixed mandatory-field bug).
 3. The Risk Result screen — gauge, score, band label, affordability block,
    disclaimer text all visible in one shot.
 4. The scheme match list — a card showing eligibility criteria and the
    official application link.
-5. The admin console's scheme management table (draft/active/needs_review
-   status visible) — shows the data-integrity workflow, not just the
-   end-user side.
-6. Optional: the Reports/history page, and a terminal screenshot of the
+5. The Settings page showing the profile photo upload and editable fields.
+6. The Security Log page listing active sessions.
+7. The admin console's scheme management table (draft/active/needs_review
+   status visible) and the Scheme Updates page with working tabs — shows
+   the data-integrity workflow, not just the end-user side.
+8. Optional: the Reports/history page, and a terminal screenshot of the
    pytest + API smoke-test run (see section 6) as evidence of the test
    infrastructure, if the paper's venue expects that kind of proof.
 

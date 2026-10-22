@@ -13,6 +13,6 @@
   
   --radius-card: 12px;
   --radius-input: 8px;
-  --font-base: 'Inter', sans-serif;
+  --font-base: 'Inter', 'Noto Sans Devanagari', sans-serif;
   --spacing-unit: 24px;
 }

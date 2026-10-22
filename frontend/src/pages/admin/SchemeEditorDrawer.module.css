@@ -257,3 +257,55 @@
 .saveBtn:hover {
   opacity: 0.9;
 }
+
+.saveBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.alertBox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(220, 38, 38, 0.08);
+  border: 1px solid var(--risk-high);
+  border-radius: 8px;
+  color: var(--risk-high);
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+}
+
+.warningBox {
+  padding: 0.875rem 1rem;
+  background-color: rgba(245, 158, 11, 0.08);
+  border: 1px solid var(--risk-medium);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  margin-bottom: 1.5rem;
+}
+
+.warningBox strong {
+  display: block;
+  color: #B45309;
+  margin-bottom: 0.25rem;
+}
+
+.warningBox p {
+  margin: 0;
+}
+
+.inputError {
+  border-color: var(--risk-high) !important;
+}
+
+.errorMsg {
+  color: var(--risk-high);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-top: 0.25rem;
+}
+

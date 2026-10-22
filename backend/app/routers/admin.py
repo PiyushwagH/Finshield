@@ -83,6 +83,17 @@ def admin_update_scheme(id: uuid.UUID, scheme_data: SchemeUpdateSchema, db: Sess
     for key, value in update_data.items():
         setattr(scheme, key, value)
         
+    # Server-side authoritative validation: active schemes require official_url, documents, apply_steps, last_verified_at
+    if scheme.status == 'active':
+        if not scheme.official_url or not str(scheme.official_url).strip():
+            raise HTTPException(status_code=400, detail="Active schemes must have an official_url")
+        if not scheme.documents or len(scheme.documents) == 0:
+            raise HTTPException(status_code=400, detail="Active schemes must have verified documents listed")
+        if not scheme.apply_steps or len(scheme.apply_steps) == 0:
+            raise HTTPException(status_code=400, detail="Active schemes must have apply_steps listed")
+        if scheme.last_verified_at is None:
+            raise HTTPException(status_code=400, detail="Active schemes must have a valid last_verified_at timestamp")
+
     # If rules are provided, replace existing rules
     if scheme_data.rules is not None:
         db.query(SchemeEligibilityRule).filter(SchemeEligibilityRule.scheme_id == id).delete()

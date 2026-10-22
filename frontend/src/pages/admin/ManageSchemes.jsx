@@ -148,7 +148,11 @@ const ManageSchemes = () => {
                   </div>
                 </td>
                 <td>{s.category ? s.category.charAt(0).toUpperCase() + s.category.slice(1) : '-'}</td>
-                <td>{s.benefit_amount ? `₹${s.benefit_amount.toLocaleString()}` : 'Varies'}</td>
+                <td>
+                  {(s.benefit_amount_inr || s.benefit_amount)
+                    ? `₹${Number(s.benefit_amount_inr || s.benefit_amount).toLocaleString('en-IN')}${s.benefit_period === 'monthly' ? '/mo' : s.benefit_period === 'yearly' ? '/yr' : ''}`
+                    : (s.benefit_type ? s.benefit_type.replace('_', ' ') : 'Varies')}
+                </td>
                 <td>
                   <span className={`${styles.statusBadge} ${styles[s.status]}`}>
                     {s.status === 'active' && <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>}
@@ -157,7 +161,11 @@ const ManageSchemes = () => {
                   </span>
                 </td>
                 <td>
-                  {s.last_synced_at ? new Date(s.last_synced_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric'}) : '-'}
+                  {s.last_verified_at
+                    ? new Date(s.last_verified_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
+                    : s.last_synced_at
+                      ? new Date(s.last_synced_at).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})
+                      : '-'}
                 </td>
                 <td>
                   <button className={styles.iconBtn} onClick={() => handleEdit(s.slug)}>

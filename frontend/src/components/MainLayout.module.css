@@ -144,6 +144,23 @@
   color: var(--text);
 }
 
+.langSelect {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  padding: 0.35rem 0.6rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--navy);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.langSelect:focus {
+  border-color: var(--teal);
+}
+
 .avatar {
   width: 32px;
   height: 32px;

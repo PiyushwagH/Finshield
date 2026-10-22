@@ -4,10 +4,10 @@ This file is a complete, verified reference to the FinShield project, written to
 be handed to an AI assistant (or a person) who needs to produce formal academic
 documentation — interim report, final "black book," synopsis, or any other
 report format — without inventing facts. Every technical claim below was
-checked against the actual source code, database schema, or live deployment.
-Where something is incomplete or a known limitation, it is stated honestly
-rather than rounded up, because a report that overclaims is a worse outcome
-than one that is precise about partial work.
+checked against the actual source code, database schema, or live deployment
+as of 2026-10-19. Where something is incomplete or a known limitation, it is
+stated honestly rather than rounded up, because a report that overclaims is a
+worse outcome than one that is precise about partial work.
 
 **Instruction to whichever AI is given this file**: use only the facts in this
 document. Where you need content this file doesn't contain (literature survey
@@ -26,7 +26,8 @@ titles, or screenshots — the user will supply or capture those separately.
   E-Governance.
 - **Type of project**: Full-stack web application (not a research-only ML
   notebook) — a deployed, usable system with a persistent database, real
-  authentication, and a live frontend/backend split across cloud hosts.
+  authentication (including password reset and session management), and a
+  live frontend/backend split across cloud hosts.
 - **Core idea**: one application solving two related but independent problems
   for a financially underserved user:
   1. *Opacity of credit risk* — most people have no way to see an estimate of
@@ -72,7 +73,8 @@ profile.
    a database of real government welfare schemes and ranks the matches.
 4. Implement secure authentication with separate login surfaces for regular
    users and administrators, using industry-standard JWT + refresh-token
-   session handling.
+   session handling, plus a real password-reset flow and user-manageable
+   active sessions.
 5. Give administrators a console to manage the scheme dataset's lifecycle
    (draft → needs_review → active → archived) so scheme data quality is
    maintained over time rather than being a static seed file.
@@ -83,9 +85,10 @@ profile.
 ## 4. Scope
 
 **In scope**: the ML-based risk assessment flow; the scheme discovery and
-matching flow; user and admin authentication; an admin console for scheme
-data management; automated backend tests and an API-level smoke test;
-deployment to a live, publicly reachable URL.
+matching flow; user and admin authentication (including password reset and
+session management); a user profile with an editable photo; an admin console
+for scheme data management; automated backend tests and an API-level smoke
+test; deployment to a live, publicly reachable URL.
 
 **Explicitly out of scope** (stated up front, not a late excuse):
 - Payment processing of any kind.
@@ -95,6 +98,8 @@ deployment to a live, publicly reachable URL.
 - A native mobile application (the frontend is a responsive web SPA only).
 - Retraining or modifying the ML model — the model file is treated as a
   frozen, externally-supplied artifact (see Section 8).
+- Self-service admin account creation — a deliberate security decision, see
+  Section 5.2.
 
 ---
 
@@ -108,13 +113,14 @@ deployment to a live, publicly reachable URL.
 | HTTP client | Axios 1.20 | Interceptor handles silent access-token refresh on 401 |
 | Charts | Recharts 3.10 | Used for the risk gauge / result visualizations |
 | Backend | Python 3.11, FastAPI | Async-capable REST API, Pydantic v2 for validation |
-| ORM | SQLAlchemy 2.0 | Declarative models, see Section 7 |
+| ORM | SQLAlchemy 2.0 | Pinned `<2.1` — see Section 11, item 9 for why this matters |
 | Migrations | Alembic | Schema versioning |
 | Database | PostgreSQL 18 | Hosted on **Neon** (serverless managed Postgres) |
-| Auth | JWT (PyJWT) + bcrypt | 15-minute access tokens, 7-day httpOnly refresh-token cookies, bcrypt password hashing (pinned to `bcrypt==4.0.1` — see Section 11) |
-| Rate limiting | slowapi | Per-route limits, e.g. 5/min on register, 10/min on login |
+| Auth | JWT (PyJWT) + bcrypt | 15-minute access tokens, 7-day httpOnly refresh-token cookies, bcrypt password hashing (pinned to `bcrypt==4.0.1`) |
+| Email | Resend (HTTP API via `httpx`) | Password-reset links; logs the link server-side instead of failing if unconfigured |
+| Rate limiting | slowapi | Per-route limits, e.g. 5/min on register, forgot-password, and reset-password |
 | ML runtime | LightGBM 4.7.0 | Loaded in-process inside the FastAPI app, not a separate microservice |
-| Testing | pytest + httpx (backend), a zero-dependency Node smoke-test script (API-level) | See Section 12 |
+| Testing | pytest + httpx (backend, 29 tests), a zero-dependency Node smoke-test script (46 API-level checks) | See Section 12 |
 
 ### 5.1 Deployment topology
 
@@ -140,6 +146,16 @@ long-lived container with no such artificial size ceiling. This is presented
 in the report as a diagnosed constraint and a justified tool choice, not as
 "we deployed it and it didn't work the first time."
 
+**Render's free-tier cold start is a real, ongoing constraint worth naming.**
+After ~15 minutes without traffic, Render spins the backend container down;
+the next request has to cold-boot a Python process that imports
+`pandas`/`scikit-learn`/`lightgbm`, which can take 30-60+ seconds. This isn't
+fixable with more application code — it's a hosting-tier limit. What *was*
+fixable (and was fixed) was a frontend bug that made this worse than it had
+to be: the app used to block its entire first render, including the public
+landing page, behind a network call that waited out the cold start even for
+visitors who weren't logging in at all. See Section 11, item 10.
+
 **Cross-site cookie handling.** Because the frontend (Vercel) and backend
 (Render) are different registrable domains, the refresh-token cookie's
 `SameSite` attribute matters: `SameSite=Lax` (the safe local-dev default) is
@@ -148,7 +164,7 @@ broke session refresh in production until the cookie attributes were made
 configurable (`COOKIE_SECURE=true`, `COOKIE_SAMESITE=none` in production,
 `false`/`lax` in local dev) — see Section 11, item 8.
 
-### 5.2 Authentication design
+### 5.2 Authentication, password reset, and session design
 
 Three login endpoints share two internal helpers (`_authenticate`,
 `_issue_session`) in `backend/app/routers/auth.py`:
@@ -172,9 +188,35 @@ row in `refresh_tokens` (so a token can be explicitly revoked server-side on
 logout or rotation, not just left to expire). On every refresh, the old
 token is marked `revoked=True` and a new one is issued (rotation, not reuse).
 
-The frontend exposes two separate login surfaces, `/login` and
-`/admin/login`, implemented as one shared `Auth.jsx` component switched by a
-`mode` prop — not two duplicated pages.
+**Admin accounts are never self-service, by design.** There is no public
+"create admin" button anywhere in the UI, and this is a deliberate security
+decision, not an oversight — exposing one would let any internet visitor
+grant themselves administrator access. The actual workflow: a person signs
+up as a regular user through the normal public Sign Up form, and a project
+owner with direct database/server access runs
+`backend/scripts/create_admin.py <email>` to promote that one specific
+account's `role` to `admin`. This is worth a sentence in a "Security Design"
+section — a system-level safeguard, not a missing feature.
+
+**Password reset** (`POST /auth/forgot-password`, `POST /auth/reset-password`)
+is a real, token-based flow, not a form that just looks functional:
+- A single-use, SHA-256-hashed, 30-minute-expiry token is generated and
+  stored in the `password_reset_tokens` table (never the raw token, mirroring
+  how passwords themselves are never stored in plaintext).
+- The reset link is emailed via Resend's HTTP API; if no `RESEND_API_KEY` is
+  configured (e.g. local development), the link is logged server-side
+  instead of the request silently failing.
+- The forgot-password response is identical whether or not the submitted
+  email belongs to a real account, so the endpoint cannot be used to
+  enumerate registered users.
+- A successful reset revokes **every** existing refresh-token session for
+  that account, not just the current device — a password reset is a signal
+  that prior sessions should no longer be trusted.
+
+**Active session management** ("Security Log" in the UI) is backed by
+`GET /api/auth/sessions` and `DELETE /api/auth/sessions/{id}`, both scoped to
+the authenticated user's own `refresh_tokens` rows (verified in testing that
+one user cannot revoke another user's session — see Section 12).
 
 ### 5.3 Architecture diagrams
 
@@ -203,16 +245,18 @@ flowchart TB
             EligSvc["eligibility_service"]
             AdviceSvc["advice_service"]
             SyncSvc["scheme_sync"]
+            EmailSvc["email_service (Resend)"]
         end
         Model["FinShieldPredictor\n(LightGBM, ml/finshield_model.pkl)"]
         API --> Routers
         RiskR --> RiskSvc --> Model
         SchemeR --> EligSvc
         RiskR --> AdviceSvc
+        AuthR --> EmailSvc
     end
 
     subgraph Neon["Neon (managed Postgres)"]
-        DB[("PostgreSQL 18\nusers, user_profiles, assessments,\nschemes, scheme_eligibility_rules,\nuser_schemes, scheme_updates,\nrefresh_tokens, audit_logs")]
+        DB[("PostgreSQL 18\nusers, user_profiles, assessments,\nschemes, scheme_eligibility_rules,\nuser_schemes, scheme_updates,\nrefresh_tokens, password_reset_tokens,\naudit_logs")]
     end
 
     UI -- "HTTPS" --> Frontend
@@ -242,8 +286,7 @@ sequenceDiagram
     F-->>U: Risk gauge + affordability + factors + disclaimer
 ```
 
-**Authentication / session sequence** (useful for a "Login Module" design
-diagram in the report):
+**Authentication / session sequence:**
 
 ```mermaid
 sequenceDiagram
@@ -273,6 +316,39 @@ sequenceDiagram
     B-->>F: 200 + new access_token + Set-Cookie new refresh_token
 ```
 
+**Password reset sequence:**
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant B as Backend
+    participant D as Database
+    participant E as Resend (email)
+
+    U->>F: Submit email on Forgot Password page
+    F->>B: POST /auth/forgot-password
+    B->>D: Look up user (generic response either way)
+    alt user exists and active
+        B->>B: Generate token, store SHA-256 hash + 30-min expiry
+        B->>E: Send reset link (or log it if no API key configured)
+    end
+    B-->>F: 200 "If an account exists, a reset link has been sent."
+    U->>F: Open link, submit new password + token
+    F->>B: POST /auth/reset-password {token, new_password}
+    B->>D: Validate token hash, expiry, not already used
+    B->>D: Update password_hash, mark token used,\nrevoke ALL refresh_tokens for this user
+    B-->>F: 200 "Password has been reset"
+```
+
+Why this shape, for the review: the ML model is loaded once at backend
+startup and served in-process (not as a separate microservice) — simplest
+correct choice at this scale, and it's what makes the startup self-check
+(Section 8.5) possible, since the same process that serves predictions can
+validate itself on boot. Scheme matching is a separate code path from risk
+assessment (`eligibility_service`, not `risk_service`), which is what allows
+scheme browsing to keep working independently of the ML pipeline.
+
 ---
 
 ## 6. Technology Justification (for a "System Requirements" / "Feasibility" chapter)
@@ -291,7 +367,11 @@ sequenceDiagram
   (used for `input_data`, `affordability`, `factors`, eligibility rule
   `value`, and `changes` in the audit log) and proper `UUID` primary keys.
   SQLite is used only as an isolated, fast backend for the automated test
-  suite (Section 12), never in production.
+  suite (Section 12), never in production — and this distinction mattered in
+  practice: a timezone-handling bug in the password-reset flow passed every
+  local test against SQLite but crashed against the real Postgres database,
+  because the two return differently-shaped datetime objects (see Section
+  11, item 11).
 - **Neon over a self-managed Postgres instance**: serverless, scales to
   zero, no server to patch or back up manually — appropriate for a student
   project's budget and operational capacity.
@@ -305,12 +385,17 @@ sequenceDiagram
   refresh token — the more sensitive, longer-lived credential — is
   inaccessible to any JavaScript on the page (httpOnly), mitigating XSS
   token theft.
+- **Resend over SMTP or a heavier email platform**: a simple HTTP API call
+  (no SMTP server/credentials to manage), with a sensible fallback
+  (server-side logging) when unconfigured, so the password-reset flow is
+  fully testable in local development without requiring every developer to
+  have email credentials.
 
 ---
 
 ## 7. Database Design
 
-Nine tables, all UUID-keyed. This is the actual, current SQLAlchemy schema —
+Ten tables, all UUID-keyed. This is the actual, current SQLAlchemy schema —
 suitable for direct inclusion as an ER diagram or schema table in the report.
 
 ### 7.1 Entities
@@ -322,8 +407,9 @@ suitable for direct inclusion as an ER diagram or schema table in the report.
 | email | String, unique, indexed | |
 | phone | String, nullable | |
 | full_name | String, nullable | |
+| avatar_data | String, nullable | A `data:image/...;base64,...` URI, size-capped and server-validated; no object storage is set up for this project, so the photo lives directly in this column |
 | password_hash | String | bcrypt hash, never the plaintext |
-| role | Enum(`user`, `admin`) | default `user` |
+| role | Enum(`user`, `admin`) | default `user`; never set to `admin` by any public-facing endpoint |
 | is_verified | Boolean | |
 | is_active | Boolean | default True; `_authenticate` rejects login if False |
 | created_at / updated_at | DateTime (tz-aware) | |
@@ -346,7 +432,17 @@ suitable for direct inclusion as an ER diagram or schema table in the report.
 | token | String, unique, indexed | the JWT string itself |
 | user_id | UUID, FK → users.id | |
 | expires_at | DateTime (tz-aware) | |
-| revoked | Boolean | flipped True on rotation/logout |
+| revoked | Boolean | flipped True on rotation/logout/password reset |
+| created_at | DateTime | surfaced to the user as session "start time" on the Security Log page |
+
+**`password_reset_tokens`**
+| Column | Type | Notes |
+|---|---|---|
+| id | UUID, PK | |
+| user_id | UUID, FK → users.id | |
+| token_hash | String, unique, indexed | SHA-256 hash of the emailed token — the raw token is never stored, mirroring password handling |
+| expires_at | DateTime (tz-aware) | 30 minutes from issuance |
+| used | Boolean | single-use enforcement |
 | created_at | DateTime | |
 
 **`assessments`**
@@ -371,7 +467,7 @@ suitable for direct inclusion as an ER diagram or schema table in the report.
 | name / slug | String | slug is unique, used in the scheme-detail URL |
 | short_description / full_description | String / Text | |
 | ministry | String, nullable | |
-| category | Enum(`education`, `health`, `agriculture`, `business`) | |
+| category | Enum(`education`, `health`, `agriculture`, `business`), nullable | nullable because several real schemes (e.g. direct cash-transfer or girl-child savings schemes) don't cleanly fit any of the four categories |
 | level | Enum(`central`, `state`) | |
 | state | String, nullable | only set for state-level schemes |
 | benefit_type | Enum(`cash`, `subsidy`, `insurance`, `loan`, `other`) | |
@@ -429,6 +525,7 @@ suitable for direct inclusion as an ER diagram or schema table in the report.
 - `users` 1—1 `user_profiles`
 - `users` 1—N `assessments`
 - `users` 1—N `refresh_tokens`
+- `users` 1—N `password_reset_tokens`
 - `users` 1—N `user_schemes` N—1 `schemes` (many-to-many between users and
   schemes via the `user_schemes` join table, which also carries per-user
   state)
@@ -545,14 +642,23 @@ frontend renders these fields and no invented ones:
   or stored differently — an explicit project rule.
 - `affordability`: a **separate, deterministic heuristic** (not part of the
   ML model's output) computed from the same inputs — monthly surplus,
-  surplus ratio, EMI-to-income ratio, emergency-fund-months, and flags. It
-  is important in the report to describe this as a distinct signal from the
-  ML risk band: a user can have a "Low" ML risk band (low modeled default
-  probability) while still showing a "Stretched" affordability grade, because
-  the two measure different things (statistical default likelihood vs.
-  simple cash-flow headroom). This is intentional, not a bug — worth a
-  sentence in a "Discussion" or "Limitations" section to pre-empt a reviewer
-  reading it as an inconsistency.
+  surplus ratio, EMI-to-income ratio, emergency-fund-months, and flags.
+
+  **This distinction was empirically confirmed during this development
+  cycle, not just asserted.** A real user's assessment showed `risk_band:
+  "Low"` (score 775, probability 6.9%) alongside an `affordability.grade:
+  "Critical"` with a negative monthly surplus — which looked like a
+  contradiction. Investigation pulled the actual stored `input_data` from
+  the database: the profile had no prior credit, no defaults, and
+  `payment_history: "no_history"`. Resubmitting the *exact same* profile
+  against the live production API with only those three credit-history
+  fields changed to risky values (`has_prior_credit: true, has_defaulted:
+  true, payment_history: "poor"`) returned `risk_band: "Very High"`,
+  `risk_score: 300`. This confirms the model weighs credit-history behavior
+  far more heavily than raw income/expenditure numbers — which the
+  affordability panel captures separately and correctly. Worth a sentence in
+  the paper's Discussion or Limitations section to pre-empt a reader seeing
+  this as inconsistent output.
 
 ### 8.5 Integrity safeguard
 
@@ -563,7 +669,10 @@ mismatch (e.g. a different LightGBM version loaded, which can silently
 change prediction outputs without raising any exception) corrupting live
 predictions — worth including in a report as evidence of production
 engineering discipline around a third-party ML artifact, not just "the model
-works."
+works." The same category of problem (an unpinned dependency silently
+changing behavior on a fresh install) also broke the backend's database
+driver entirely at one point — see Section 11, item 9 — reinforcing why this
+kind of defensive check matters for the whole stack, not just the model.
 
 ---
 
@@ -583,7 +692,8 @@ works."
 
 ### 9.2 Endpoints
 
-- `GET /api/schemes` — list active schemes (filterable).
+- `GET /api/schemes` — list active schemes (filterable by category, level,
+  state, benefit_type, and free-text search via `q`).
 - `GET /api/schemes/{slug}` — scheme detail.
 - `POST /api/schemes/match` — full-profile matching for logged-in users
   (uses assessment data for richer matching).
@@ -598,52 +708,72 @@ works."
   track their own application status (`saved` → `documents_ready` →
   `applied` → `under_review` → `approved`/`rejected`).
 - Admin router: `GET/POST/PUT/DELETE /api/admin/schemes`,
-  `POST /api/admin/schemes/import`, `GET /api/admin/scheme-updates`,
-  `POST /api/admin/scheme-updates/{id}/{action}`, `GET /api/admin/users`,
-  `PATCH /api/admin/users/{id}`, `GET /api/admin/audit-logs`,
-  `GET /api/admin/analytics`, `GET /api/admin/stats`.
+  `POST /api/admin/schemes/import`, `GET /api/admin/scheme-updates?status=
+  pending|approved|rejected`, `POST /api/admin/scheme-updates/{id}/{action}`,
+  `GET /api/admin/users`, `PATCH /api/admin/users/{id}`,
+  `GET /api/admin/audit-logs`, `GET /api/admin/analytics`,
+  `GET /api/admin/stats`.
 
 Every scheme card links directly to the scheme's real `official_url` — the
 application itself always happens on the actual government portal, by
 design (see Section 4, Out of Scope).
 
-### 9.3 Data integrity status — the honest, current bottleneck
+### 9.3 Data integrity status — now meaningfully improved, still an honest gap
 
 | Status | Count | Meaning |
 |---|---|---|
-| `active` (visible to users) | 8 | Real, individually sourced and verified schemes |
-| `needs_review` (built, not yet visible) | 11 | Real schemes sourced from official government sources (PIB press releases, ministry sites), pending admin review before being set `active` |
-| `archived` | 17 | **Removed fabricated placeholder data** — see below |
+| `active` (visible to users) | **27** | Real, individually sourced and verified schemes |
+| `archived` | 17 | **Removed fabricated placeholder data** — see below; deliberately kept archived rather than reactivated |
+| `needs_review` | 0 | Everything currently sourced has been reviewed and published |
 
 **This is a genuine and important part of the project's story, not a gap to
 hide.** The project originally shipped with 17 fake "State Welfare Scheme
 9–25" entries: invented benefit amounts, a generic placeholder URL, and
 descriptions that literally read "This is a placeholder," live in production
 and shown to real users as if they were real schemes. These were identified
-during this development cycle and archived (status flipped to `archived`,
-not deleted, preserving the audit trail). Eleven replacement schemes were
-then individually sourced from official Indian government press releases
-(pib.gov.in) rather than generated from memory, specifically to avoid
-repeating the same mistake — each has a real eligibility basis and a real
-official application link, held at `needs_review` pending admin sign-off
-before going live.
+during development and archived (status flipped to `archived`, not deleted,
+preserving the audit trail). When later asked to reactivate these same
+entries to quickly inflate the visible scheme count, that request was
+declined and explained — reactivating known-fabricated financial guidance
+would reintroduce the exact problem the project had already fixed. This is
+worth including in a report precisely because it demonstrates a maintained
+data-integrity standard under pressure, not just an initial cleanup.
 
-Currently **active** (sourced from the original, legitimate part of the seed
-data): PM-KISAN, PMAY (Urban), Sukanya Samriddhi Yojana, Atal Pension Yojana,
-PM Mudra Yojana, NSP Post-Matric Scholarship, Ayushman Bharat (PM-JAY),
-Stand-Up India.
+In their place, **27 real schemes** have been added across three
+individually-researched, cross-sourced batches:
 
-Currently **sourced, pending review**: PM Ujjwala Yojana, PMJJBY, PMSBY, PM
-Fasal Bima Yojana, PM Vishwakarma, PMEGP, PM SVANidhi, NMMSS (National
-Means-cum-Merit Scholarship), PMMVY (Matru Vandana Yojana), PM Jan Dhan
-Yojana, Pre-Matric Scholarship for SC students.
+**Central government schemes (24):** PM-KISAN, PMAY (Urban), Sukanya
+Samriddhi Yojana, Atal Pension Yojana, PM Mudra Yojana, NSP Post-Matric
+Scholarship, Ayushman Bharat (PM-JAY), Stand-Up India, PM Ujjwala Yojana,
+PMJJBY, PMSBY, PM Fasal Bima Yojana, PM Vishwakarma, PMEGP, PM SVANidhi,
+NMMSS, PMMVY, PM Jan Dhan Yojana, Pre-Matric Scholarship for SC students,
+MGNREGA, PM Shram Yogi Maandhan (PM-SYM), PM Kaushal Vikas Yojana (PMKVY), PM
+Matsya Sampada Yojana (PMMSY), Startup India.
+
+**Maharashtra state schemes (3):** Mukhyamantri Majhi Ladki Bahin Yojana,
+Rajarshi Chhatrapati Shahu Maharaj Shikshan Shulk Shishyavrutti Yojana, Majhi
+Kanya Bhagyashree Yojana.
+
+**Schemes investigated and deliberately excluded** (a stronger data-integrity
+story than silently including everything found): PMAY-Gramin (eligibility is
+a fixed 2011-census survey list, not expressible as reusable rules); PM Vaya
+Vandana Yojana (unclear whether still open for enrollment); IGNOAPS/NSAP
+old-age pension (amounts vary ₹200–₹2,500/month by state with no reliable
+single figure); MJPJAY (merged into Ayushman Bharat–PMJAY in July 2024,
+already represented); Shiv Bhojan Thali Yojana (no formal eligibility
+criteria, and 2025 reports describe unresolved funding issues); a 2019
+Maharashtra farmer loan waiver (superseded by a newer, not-yet-verified 2026
+scheme).
 
 **For the report**: present the `draft → needs_review → active → archived`
 lifecycle itself (enforced via the `status` enum and only `active` ever being
-served to end users) as the actual deliverable here — a data governance
-workflow, not just a static JSON seed file — and name the 8-vs-11-vs-hundreds
-coverage gap explicitly as current, known, in-progress scope rather than
-letting a reviewer discover the number is small on their own.
+served to end users), the admin's Scheme Updates review queue (Pending/
+Approved/Rejected, each individually reviewable per-field diff), and the
+deliberate exclusion list above as the actual deliverable here — a data
+governance workflow under active use, not a static JSON seed file — and name
+the 27-vs-hundreds coverage gap explicitly as current, known, in-progress
+scope rather than letting a reviewer discover the number is small on their
+own.
 
 ---
 
@@ -651,43 +781,49 @@ letting a reviewer discover the number is small on their own.
 
 1. **Registration/Login**: a user registers or logs in via `/login` (regular
    portal) or an administrator via `/admin/login` — two distinct pages built
-   from one shared `Auth.jsx` component.
-2. **Assessment wizard**: a 4-step form —
+   from one shared `Auth.jsx` component. A forgotten password can be reset
+   via a real emailed link (`/forgot-password` → `/reset-password?token=…`).
+2. **Profile**: a user can edit their name, phone, and upload a profile
+   photo via Settings, and review/revoke their own active login sessions via
+   the Security Log page.
+3. **Assessment wizard**: a 4-step form —
    (1) Personal details → (2) Employment & assets → (3) Finances
    (conditional: EMI/loan-balance fields only appear if the user indicates
    they have active loans) → (4) Credit history. Inline client-side
    validation and hover/focus tooltips explain less-obvious fields; all
    validation is re-checked server-side regardless (client validation is a
    convenience only, per project rules).
-3. **Submission**: `POST /api/risk/assess` sends the validated payload with a
+4. **Submission**: `POST /api/risk/assess` sends the validated payload with a
    JWT bearer token. The backend validates with Pydantic, runs the frozen
    LightGBM model, persists an `assessments` row (with `model_version` for
    traceability), and returns the full prediction payload in the same
    response.
-4. **Risk Result screen**: a 300–850 gauge visualization with a collapsed
+5. **Risk Result screen**: a 300–850 gauge visualization with a collapsed
    3-band color label (Low/Medium/High), the raw default probability and
    population percentile ("safer than X% of a reference population of
    307,511 applicants"), the affordability breakdown, plain-language
    positive/negative factors, and a mandatory disclaimer naming FinShield's
    trained ML model and stating the result is an indicative estimate, not a
    credit decision or licensed financial advice.
-5. **Scheme matches**: in the same flow (or independently, via quick-match
+6. **Scheme matches**: in the same flow (or independently, via quick-match
    without login), a ranked list of schemes the user currently qualifies
    for, each showing its eligibility basis and a link to the real official
    application portal.
-6. **Reports/history**: a logged-in user can revisit past assessments
+7. **Reports/history**: a logged-in user can revisit past assessments
    (`GET /api/risk/assessments`, with a compare endpoint for viewing two
    side by side).
-7. **Admin console**: a separate authenticated area where an admin manages
-   the scheme dataset's lifecycle, reviews pending scheme-data-drift updates,
+8. **Admin console**: a separate authenticated area where an admin manages
+   the scheme dataset's lifecycle, reviews pending scheme-data-drift updates
+   (with real Pending/Approved/Rejected tabs and an accurate pending count),
    manages user accounts, and can view audit logs and basic analytics/stats.
 
 **One-line outcome statement for an abstract**: a single deployed web
 application in which a user receives both an ML-backed, explainable
 credit-risk indication and a personalized, linked list of government welfare
 schemes they currently qualify for — two problems (credit opacity and
-welfare-scheme under-discovery) addressed in one flow, each independently
-usable even if the other component is unavailable.
+welfare-scheme under-discovery) addressed in one flow, backed by a complete,
+independently-verified account and security layer, each independently usable
+even if the other component is unavailable.
 
 ---
 
@@ -696,7 +832,8 @@ usable even if the other component is unavailable.
 A strong "Implementation" or "Testing" chapter benefits from documenting real
 engineering problems and how they were diagnosed and fixed, not just listing
 features built. These are all real, verified issues from this project's
-actual development history:
+actual development history, spanning two development cycles — the later
+items (9 onward) are from the most recent cycle:
 
 1. **Form/API field-value mismatch silently rejected valid submissions.**
    The frontend sent `payment_history: "No History"`; the backend's enum
@@ -723,9 +860,7 @@ actual development history:
    `.local`-domain email address could authenticate with correct
    credentials but every response then crashed with a 500, because
    Pydantic's `EmailStr` validator rejects reserved TLDs (`.local`, `.test`,
-   `.example`) even during output serialization, not just input. Fixed by
-   using real-domain emails and validating `ADMIN_EMAIL` explicitly before
-   seeding.
+   `.example`) even during output serialization, not just input.
 6. **A `bcrypt`/`passlib` version incompatibility broke all logins** on a
    fresh production deployment. `bcrypt>=4.1` raises an exception on inputs
    over 72 bytes instead of silently truncating them (its previous
@@ -746,28 +881,115 @@ actual development history:
    registrable domains, the refresh-token cookie's `SameSite=Lax` attribute
    (correct for same-site local development) meant browsers would never
    attach it to the cross-site `POST /api/auth/refresh` call the frontend's
-   axios interceptor makes automatically on a 401. This surfaced as a raw
-   "Refresh token missing" error to users whose 15-minute access token
-   expired mid-session (e.g., partway through the 4-step wizard). Fixed by
-   making the cookie's `secure`/`samesite` attributes environment-driven
-   (`COOKIE_SECURE`, `COOKIE_SAMESITE` settings), set to `true`/`none` in
-   production and left at the safe `false`/`lax` defaults for local
-   development — verified by inspecting the actual `Set-Cookie` response
-   header after the production environment variables were applied.
-9. **Vercel's 250MB function size cap** — covered in Section 5.1 — was
-   diagnosed *before* a failed deploy attempt would have wasted more time,
-   by reading Vercel's own documented limits against the measured size of
-   the ML dependency stack.
+   axios interceptor makes automatically on a 401. Fixed by making the
+   cookie's `secure`/`samesite` attributes environment-driven.
+9. **An unpinned `sqlalchemy` dependency silently broke every Render
+   deploy.** Render builds from a fresh `pip install` on every deploy — it
+   resolved to the newly-released SQLAlchemy 2.1, which changed the default
+   driver for a bare `postgresql://` connection string from `psycopg2` to
+   `psycopg` (v3). This backend only installs `psycopg2-binary`, so the app
+   crashed on startup with `ModuleNotFoundError: No module named 'psycopg'`.
+   Local development was unaffected because its virtual environment had an
+   older SQLAlchemy version cached from before, which is exactly why this
+   kind of bug doesn't show up until a genuinely clean install happens.
+   Reproduced the precise failure in a disposable virtual environment before
+   fixing it with a version pin (`sqlalchemy>=2.0,<2.1`), then re-ran the
+   full test suite under that same clean environment to confirm the fix.
+10. **The entire application was blocked behind a single backend network
+    call on every page load — including the public landing page.** The root
+    `AuthProvider` component rendered nothing (`<div>Loading...</div>`)
+    until a `POST /auth/refresh` call resolved. Combined with Render's
+    free-tier cold start (30-60+ seconds after ~15 minutes idle), this made
+    every fresh visit, including to pages that need no login at all, hang on
+    a blank loading screen for that entire window. Fixed so public routes
+    render immediately; only routes that actually require a known
+    authentication state wait on that check.
+11. **Password reset was a complete no-op, not a partially-working
+    feature.** The `/auth/forgot-password` and `/auth/reset-password`
+    endpoints returned static success messages ("a reset link has been
+    sent," "password has been reset") without doing anything at all — no
+    token, no email, no password change in the database. Rebuilt as a real
+    token-based flow (Section 5.2). During end-to-end verification against
+    the live production database (not just the local test suite, which
+    passed the whole time), a genuine bug surfaced: Postgres returns a
+    timezone-*aware* datetime for the token's expiry column, but the
+    comparison code used a naive `datetime.utcnow()`, crashing with a 500
+    the moment a real reset was attempted. The local SQLite test database
+    returns naive datetimes regardless of the column's declared type, which
+    is exactly why the bug was invisible in automated tests and only
+    appeared against the real database — a concrete illustration of why
+    "tests pass locally" is not the same claim as "verified in production."
+    Fixed with a dialect-agnostic comparison and re-verified live.
+12. **The dashboard avatar logged the user out instantly on click**, with no
+    way to view or edit a profile at all — and the identical bug existed
+    independently in the admin console's layout, since the two header
+    components were implemented separately rather than shared. Both now open
+    a real profile/settings page; the admin console's "Settings" sidebar
+    link was also found to point at a route (`/admin/settings`) that didn't
+    exist anywhere in the router and was fixed to point at the real shared
+    settings page.
+13. **Logout always redirected to the login form instead of the home page,
+    regardless of which page it was triggered from.** The root cause was a
+    genuine race between two independent navigation sources: the logout
+    function's explicit "go to the home page" call, and the route guard
+    (`ProtectedRoute`/`AdminRoute`) wrapping *every* authenticated page, which
+    declaratively redirects to `/login` the instant it sees the user become
+    logged-out — and that guard was still mounted on the old page at the
+    exact moment the user state cleared, so its redirect fired and won the
+    race almost every time. Fixed by adding a `loggingOut` flag to the auth
+    context so both route guards render a neutral loading state instead of
+    issuing their own competing redirect while a deliberate logout is in
+    flight.
+14. **An admin review screen's tabs did nothing, and its sidebar badge was
+    a fabricated number.** The "Scheme Updates" page's Pending/Approved/
+    Rejected tabs were plain, unwired page elements — clicking "Approved"
+    or "Rejected" changed nothing on screen. The backend endpoint behind it
+    also always filtered to `pending` only, with no way to even request the
+    other two statuses. Separately, the sidebar navigation showed a literal,
+    hardcoded digit (`3`) next to "Scheme Updates" regardless of the real
+    pending count (which was actually zero at the time it was reported).
+    Fixed end-to-end: a `status` query parameter added to the backend
+    endpoint (rejecting any value outside `pending`/`approved`/`rejected`
+    with a 400), real tab-switching state on the frontend, and the sidebar
+    badge wired to the real count from the existing `/admin/stats`
+    endpoint — verified against the live production backend with real admin
+    credentials before being considered fixed.
+15. **The admin scheme editor could not actually set a scheme's real
+    application link.** Despite the backend fully supporting
+    `official_url`, `application_mode`, `required_documents`, and several
+    benefit-related fields, the admin-facing form simply had no input
+    elements for any of them — meaning an administrator creating or editing
+    a scheme through the UI had no way to attach the real government
+    application URL that the rest of the product (and this report's own
+    "no mock data" standard) depends on. A second, more acute bug was found
+    in the same form: its category dropdown defaulted to `"welfare"`, a
+    value that does not exist in the backend's Postgres enum
+    (`education`/`health`/`agriculture`/`business`) — saving any new scheme
+    without manually overriding that default would have failed with a
+    database error. Both were fixed in the same pass, and verified by
+    creating a real scheme through the live production API with every field
+    populated and confirming each one round-tripped correctly on read-back.
+16. **A scheme detail page's "Similar Schemes" card was hardcoded fake
+    data**, live in production — it always displayed the same two scheme
+    names ("Kisan Credit Card," "PM Fasal Bima Yojana") regardless of which
+    scheme a user was actually viewing, a direct violation of the project's
+    own "no mock data in production paths" rule. Replaced with a real
+    same-category database query, with an honest empty state ("No other
+    schemes in this category yet") when there genuinely are none to show.
 
 ---
 
 ## 12. Testing
 
-- **Backend unit/integration tests**: a pytest suite of **20 tests**,
-  covering registration, all three login endpoints, refresh-token rotation
-  and revocation, role enforcement (admin vs. user), and risk-assessment
-  submission — run against an isolated SQLite database so tests never touch
-  production data.
+- **Backend unit/integration tests**: a pytest suite that grew from **20 to
+  29 tests** across this project's two development cycles — covering
+  registration, all three login endpoints, refresh-token rotation and
+  revocation, role enforcement (admin vs. user), risk-assessment submission,
+  the full forgot-password/reset-password flow (including single-use token
+  enforcement and that a reset invalidates all prior sessions), profile
+  updates and avatar validation, and session listing/revocation including a
+  specific test that one user cannot revoke another user's session — run
+  against an isolated SQLite database so tests never touch production data.
 - **API-level smoke test**: a standalone, zero-dependency Node.js script
   (`frontend/scripts/api-smoke-test.mjs`, run via `npm run test:api`) that
   issues real HTTP requests against a live backend URL (configurable via
@@ -777,12 +999,16 @@ actual development history:
 - **Verification discipline**: every bug fix listed in Section 11 was
   verified against the actual live production deployment (Render + Neon +
   Vercel) using real HTTP requests matching real request headers/cookies —
-  not only a local reproduction — before being considered resolved.
+  not only a local reproduction — before being considered resolved. This
+  discipline directly caught at least one bug (item 11's timezone handling)
+  that the automated local test suite could not have caught on its own,
+  because SQLite and Postgres disagree on how a timezone-aware column value
+  is returned to application code.
 - **If asked to show evidence**: a terminal screenshot of a clean run of
   both suites together (pytest's pass count + the smoke test's pass count
   visible in one screen) is a reasonable "Testing" chapter artifact; capture
-  it fresh rather than reusing an old one, since the exact counts can change
-  as the test suite grows.
+  it fresh rather than reusing an old one, since the exact counts have grown
+  across this project (20→29 backend tests) and may grow further.
 
 ---
 
@@ -793,12 +1019,19 @@ actual development history:
 - Explainable output: every risk result includes plain-language positive/
   negative factors and a disclaimer, rather than a bare opaque number.
 - A real content-governance workflow for scheme data (`needs_review` →
-  `active`), not a static, unaudited seed file.
+  `active`, with a working admin review queue), not a static, unaudited
+  seed file — and a demonstrated willingness to keep known-fabricated data
+  archived even under pressure to reactivate it for a quick count boost.
 - Session design limits token exposure (short-lived access token in memory,
-  httpOnly refresh cookie, server-side revocation on rotation/logout).
-- Verified, not assumed: the project's test suite and bug-fix history show
-  genuine engineering verification against a live deployment, not just local
-  demos.
+  httpOnly refresh cookie, server-side revocation on rotation/logout/
+  password reset) and gives users direct visibility and control over their
+  own active sessions.
+- A genuinely functional account-recovery flow (not a cosmetic form) with
+  its own test coverage and a production-only bug caught and fixed during
+  verification.
+- Verified, not assumed: the project's test suite and 16-item bug-fix
+  history show sustained engineering verification against a live
+  deployment across two development cycles, not just local demos.
 
 ## 14. Limitations
 
@@ -808,26 +1041,40 @@ actual development history:
 - The model's training dataset is a public proxy dataset (307,511 rows),
   not an India-specific credit dataset — a limitation worth naming directly
   rather than implying Indian-market specificity.
-- Scheme coverage is currently small relative to the stated goal (8 active,
-  11 pending review, against India's 500+ actual central/state schemes).
+- Scheme coverage, while now at 27 verified schemes (more than tripled from
+  the initial 8), is still a small fraction relative to India's actual 500+
+  central and state schemes.
 - No real government portal API integration — users are linked out to apply,
   by design, not as a shortcut.
 - The model is a frozen artifact; this project could not retrain or validate
   it against fresh data within this environment.
+- Render's free-hosting-tier cold start (30-60+ seconds after idling) is a
+  known, currently-unresolved latency issue for the first request after a
+  quiet period — a hosting-tier constraint, not something fixable with more
+  application code, requiring either a paid hosting tier or an external
+  keep-alive mechanism to fully resolve.
 
 ## 15. Future Scope
 
-- Expand verified scheme coverage well beyond the current 8/11, continuing
-  the sourced-from-official-sources discipline rather than reverting to
+- Expand verified scheme coverage well beyond the current 27, continuing
+  the sourced-from-official-sources discipline (and the willingness to
+  exclude schemes with unclear current status) rather than reverting to
   placeholder data.
 - If a suitable India-specific labeled credit dataset becomes available,
   evaluate retraining (as a distinct, explicitly-scoped future project phase
   — not silently inside this one, per the frozen-model constraint).
 - Add a UI-level clarifying note distinguishing the ML risk band from the
-  separate affordability heuristic, since the two can legitimately diverge
-  (Section 8.4) and a user without context could read that as a bug.
-- Add more eligibility fields / profile richness to improve match precision
-  for schemes with complex, multi-group eligibility logic.
+  separate affordability heuristic directly on the Risk Result page itself
+  (currently explained only in the Help Center FAQ), since the two can
+  legitimately diverge (Section 8.4) and a user without context could read
+  that as a bug.
+- Build a real scheme-change detection source (the admin "Run Sync Now"
+  control exists in the UI but is currently disabled with an honest tooltip,
+  since there is no live scraping/diffing pipeline against official
+  government sites wired up to it yet).
+- Resolve the Render free-tier cold-start limitation via a paid hosting tier
+  or a scheduled keep-alive ping, to make backend response time consistent
+  regardless of recent traffic.
 
 ## 16. Conclusion
 
@@ -835,14 +1082,17 @@ FinShield is a deployed, tested, full-stack web application that combines an
 ML-based financial risk assessment with a government welfare scheme
 discovery engine, built on a conventional and well-justified technology
 stack (React/Vite frontend, FastAPI backend, PostgreSQL via Neon, a
-pre-trained LightGBM model). The project demonstrates not only feature
-construction but a real development and hardening process — nine
-substantive, independently diagnosed and fixed engineering problems (Section
-11), automated test coverage at both the unit and live-API level (Section
-12), and an honest, explicit accounting of current limitations (Section 14)
-rather than overstated completeness. The two core modules are functionally
-complete and independently usable; the primary remaining work is breadth —
-expanding verified scheme coverage — rather than depth of engineering.
+pre-trained LightGBM model), wrapped in a complete and independently-verified
+account layer — registration, login, password recovery, profile management,
+and session control. The project demonstrates not only feature construction
+but a sustained development and hardening process across two development
+cycles — sixteen substantive, independently diagnosed and fixed engineering
+problems (Section 11), automated test coverage that grew from 20 to 29 unit
+tests plus 46 live-API checks (Section 12), and an honest, explicit
+accounting of current limitations (Section 14) rather than overstated
+completeness. The two core modules are functionally complete and
+independently usable; the primary remaining work is breadth — expanding
+verified scheme coverage — rather than depth of engineering.
 
 ---
 
@@ -861,7 +1111,8 @@ expanding verified scheme coverage — rather than depth of engineering.
   per the project's own "never log financial values" rule): the landing
   page, the assessment wizard (showing the conditional loan fields), the
   Risk Result screen (gauge + disclaimer visible), a scheme match card
-  (eligibility + official link visible), and the admin scheme-management
-  table (status lifecycle visible).
+  (eligibility + official link visible), the Settings/profile page, the
+  Security Log page, and the admin scheme-management and Scheme Updates
+  tables (status lifecycle and working tabs visible).
 - Any citation-style requirement (IEEE/APA/other) your department mandates
   for the References section.

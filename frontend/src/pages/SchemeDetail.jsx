@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import ChecklistDrawer from '../components/ChecklistDrawer';
 import styles from './SchemeDetail.module.css';
 
 const SchemeDetail = () => {
@@ -17,6 +18,7 @@ const SchemeDetail = () => {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [similarSchemes, setSimilarSchemes] = useState([]);
+  const [checklistOpen, setChecklistOpen] = useState(false);
 
   useEffect(() => {
     const fetchDetail = async () => {
@@ -95,12 +97,13 @@ const SchemeDetail = () => {
             </span>
             {scheme.benefit_type && (
               <span className={styles.typeTag}>
-                {scheme.benefit_type.charAt(0).toUpperCase() + scheme.benefit_type.slice(1)}
+                {scheme.benefit_type.replace('_', ' ').charAt(0).toUpperCase() + scheme.benefit_type.replace('_', ' ').slice(1)}
               </span>
             )}
-            {scheme.benefit_amount && (
+            {(scheme.benefit_amount_inr || scheme.benefit_amount) && (
               <span className={styles.amountTag}>
-                ₹{scheme.benefit_amount.toLocaleString('en-IN')}
+                ₹{Number(scheme.benefit_amount_inr || scheme.benefit_amount).toLocaleString('en-IN')}
+                {scheme.benefit_period === 'monthly' ? '/mo' : scheme.benefit_period === 'yearly' ? '/yr' : ''}
               </span>
             )}
           </div>
@@ -269,6 +272,15 @@ const SchemeDetail = () => {
                 Apply on Official Portal
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
               </a>
+
+              <button 
+                className={styles.secondaryActionBtn} 
+                onClick={() => setChecklistOpen(true)}
+                style={{ marginBottom: '0.75rem' }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                View Checklist &amp; Steps
+              </button>
               
               <button 
                 className={styles.secondaryActionBtn} 
@@ -283,6 +295,14 @@ const SchemeDetail = () => {
              <div className={styles.actionCard}>
                 <p className={styles.qualifyText}>Log in to check eligibility instantly.</p>
                 <button className={styles.primaryActionBtn} onClick={() => navigate('/login')}>Log In</button>
+                <button 
+                  className={styles.secondaryActionBtn} 
+                  onClick={() => setChecklistOpen(true)}
+                  style={{ marginTop: '0.75rem' }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                  View Checklist &amp; Steps
+                </button>
              </div>
           )}
 
@@ -312,10 +332,17 @@ const SchemeDetail = () => {
 
           <div className={styles.infoCard}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <p>Information last verified on<br/><strong>{scheme.updated_at ? new Date(scheme.updated_at).toLocaleDateString() : 'N/A'}</strong></p>
+            <p>Information last verified on<br/><strong>{scheme.last_verified_at ? new Date(scheme.last_verified_at).toLocaleDateString() : scheme.updated_at ? new Date(scheme.updated_at).toLocaleDateString() : 'N/A'}</strong></p>
           </div>
         </div>
       </div>
+
+      <ChecklistDrawer
+        schemeId={scheme.id}
+        schemeName={scheme.name}
+        isOpen={checklistOpen}
+        onClose={() => setChecklistOpen(false)}
+      />
     </div>
   );
 };

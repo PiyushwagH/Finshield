@@ -1,11 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from typing import Optional, List, Dict, Any, Union
 from datetime import datetime
 from uuid import UUID
 from decimal import Decimal
-
-# --- Enums ---
-# These must match the SQLAlchemy enums from models/scheme.py
 
 # --- Rules ---
 class EligibilityRuleBase(BaseModel):
@@ -34,6 +31,15 @@ class SchemeBase(BaseModel):
     benefit_type: Optional[str] = None
     benefit_amount: Optional[Decimal] = None
     benefit_description: Optional[str] = None
+    
+    # Extended fields
+    benefit_amount_inr: Optional[Decimal] = None
+    benefit_period: Optional[str] = None  # monthly, yearly, one_time
+    driver_tags: Optional[List[str]] = []
+    documents: Optional[List[str]] = []
+    apply_steps: Optional[List[str]] = []
+    last_verified_at: Optional[datetime] = None
+
     official_url: Optional[str] = None
     application_mode: Optional[str] = None
     required_documents: Optional[List[str]] = None
@@ -42,6 +48,19 @@ class SchemeBase(BaseModel):
 
 class SchemeCreate(SchemeBase):
     rules: Optional[List[EligibilityRuleBase]] = []
+
+    @model_validator(mode="after")
+    def validate_active_scheme(self):
+        if self.status == "active":
+            if not self.official_url or not str(self.official_url).strip():
+                raise ValueError("Active schemes must have an official_url")
+            if not self.documents or len(self.documents) == 0:
+                raise ValueError("Active schemes must have verified documents listed")
+            if not self.apply_steps or len(self.apply_steps) == 0:
+                raise ValueError("Active schemes must have apply_steps listed")
+            if self.last_verified_at is None:
+                raise ValueError("Active schemes must have a valid last_verified_at timestamp")
+        return self
 
 class SchemeUpdate(BaseModel):
     name: Optional[str] = None
@@ -55,12 +74,32 @@ class SchemeUpdate(BaseModel):
     benefit_type: Optional[str] = None
     benefit_amount: Optional[Decimal] = None
     benefit_description: Optional[str] = None
+    
+    # Extended fields
+    benefit_amount_inr: Optional[Decimal] = None
+    benefit_period: Optional[str] = None
+    driver_tags: Optional[List[str]] = None
+    documents: Optional[List[str]] = None
+    apply_steps: Optional[List[str]] = None
+    last_verified_at: Optional[datetime] = None
+
     official_url: Optional[str] = None
     application_mode: Optional[str] = None
     required_documents: Optional[List[str]] = None
     status: Optional[str] = None
     source_url: Optional[str] = None
     rules: Optional[List[EligibilityRuleBase]] = None
+
+    @model_validator(mode="after")
+    def validate_active_update(self):
+        if self.status == "active":
+            if self.official_url is not None and not str(self.official_url).strip():
+                raise ValueError("Active schemes must have an official_url")
+            if self.documents is not None and len(self.documents) == 0:
+                raise ValueError("Active schemes must have verified documents listed")
+            if self.apply_steps is not None and len(self.apply_steps) == 0:
+                raise ValueError("Active schemes must have apply_steps listed")
+        return self
 
 class SchemeResponse(SchemeBase):
     id: UUID
@@ -77,6 +116,30 @@ class SchemeDetailResponse(SchemeResponse):
     class Config:
         from_attributes = True
 
+# --- Scheme Checklist ---
+class SchemeChecklistResponse(BaseModel):
+    scheme_id: UUID
+    documents: List[str] = []
+    steps: List[str] = []
+    official_url: Optional[str] = None
+    last_verified_at: Optional[datetime] = None
+
+# --- User Scheme Status (Already using / Not using) ---
+class SchemeMyStatusRequest(BaseModel):
+    status: str
+
+    @model_validator(mode="after")
+    def validate_status(self):
+        s = (self.status or "").strip().lower()
+        if s not in ["using", "not_using"]:
+            raise ValueError("status must be either 'using' or 'not_using'")
+        self.status = s
+        return self
+
+class SchemeMyStatusResponse(BaseModel):
+    scheme_id: UUID
+    status: str
+
 # --- Match Profiles ---
 class QuickMatchProfile(BaseModel):
     age: int
@@ -87,7 +150,6 @@ class QuickMatchProfile(BaseModel):
     gender: Optional[str] = None
 
 class MatchProfile(BaseModel):
-    # Used for matching full assessment profiles
     age: int
     gender: str
     education: str
@@ -125,8 +187,6 @@ class UserSchemeResponse(BaseModel):
     application_number: Optional[str] = None
     saved_at: datetime
     updated_at: Optional[datetime] = None
-    
-    # Optional nested scheme for list views
     scheme: Optional[SchemeResponse] = None
 
     class Config:

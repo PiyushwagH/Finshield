@@ -1,1125 +1,1694 @@
 [
- {
-  "name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
-  "slug": "pm-kisan",
-  "short_description": "Income support of ₹6,000 per year to all land-holding farmer families.",
-  "full_description": "Under the scheme, an income support of ₹6,000 per year in three equal installments will be provided to all land-holding farmer families. The fund will be directly transferred to the bank accounts of the beneficiaries.",
-  "ministry": "Ministry of Agriculture and Farmers Welfare",
-  "category": "agriculture",
-  "level": "central",
-  "benefit_type": "cash",
-  "benefit_amount": 6000,
-  "benefit_description": "₹6,000 per year in 3 equal installments",
-  "official_url": "https://pmkisan.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Land holding documents",
-   "Bank account details"
-  ],
-  "status": "active",
-  "rules": [
-   {
-    "field": "occupation_tags",
-    "operator": "in",
-    "value": [
-     "farmer",
-     "agriculture"
+  {
+    "name": "Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)",
+    "slug": "pm-kisan",
+    "short_description": "\u20b96,000 annual direct income support for landholding farmer families across India.",
+    "full_description": "A central sector scheme with 100% funding from Government of India providing income support of \u20b96,000 per year in three equal instalments of \u20b92,000 directly into the bank accounts of farmer families having cultivable land.",
+    "ministry": "Ministry of Agriculture and Farmers Welfare",
+    "category": "agriculture",
+    "level": "central",
+    "benefit_type": "cash",
+    "benefit_amount": 6000.0,
+    "benefit_amount_inr": 6000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "income",
+      "emi_burden"
     ],
-    "logic_group": 1
-   },
-   {
-    "field": "owns_property",
-    "operator": "eq",
-    "value": true,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pradhan Mantri Awas Yojana (PMAY - Urban)",
-  "slug": "pmay-urban",
-  "short_description": "Housing for All in urban areas.",
-  "full_description": "Provides central assistance to Urban Local Bodies (ULBs) and other implementing agencies for providing pucca houses to all eligible families/beneficiaries.",
-  "ministry": "Ministry of Housing and Urban Affairs",
-  "category": null,
-  "level": "central",
-  "benefit_type": "subsidy",
-  "benefit_amount": 267000,
-  "benefit_description": "Interest subsidy up to ₹2.67 lakh",
-  "official_url": "https://pmaymis.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Income Proof",
-   "Property Documents"
-  ],
-  "status": "active",
-  "rules": [
-   {
-    "field": "area_type",
-    "operator": "eq",
-    "value": "urban",
-    "logic_group": 1
-   },
-   {
-    "field": "owns_property",
-    "operator": "eq",
-    "value": false,
-    "logic_group": 1
-   },
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 1800000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Sukanya Samriddhi Yojana (SSY)",
-  "slug": "sukanya-samriddhi",
-  "short_description": "Small deposit scheme for the girl child.",
-  "full_description": "Aimed at the betterment of girl children in the country, currently provides a high interest rate and tax benefits under section 80C.",
-  "ministry": "Ministry of Women and Child Development",
-  "category": "education",
-  "level": "central",
-  "benefit_type": "other",
-  "benefit_description": "High interest savings with tax benefits",
-  "official_url": "https://www.indiapost.gov.in/",
-  "required_documents": [
-   "Birth certificate of girl child",
-   "Parent/Guardian ID",
-   "Address Proof"
-  ],
-  "status": "active",
-  "rules": [
-   {
-    "field": "dependents",
-    "operator": "gte",
-    "value": 1,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Atal Pension Yojana (APY)",
-  "slug": "atal-pension-yojana",
-  "short_description": "Guaranteed minimum pension scheme.",
-  "full_description": "Primarily focused on the unorganized sector workers, providing a guaranteed minimum pension of Rs. 1,000 to Rs. 5,000 per month after 60 years of age.",
-  "ministry": "Ministry of Finance",
-  "category": null,
-  "level": "central",
-  "benefit_type": "cash",
-  "benefit_description": "Pension of ₹1,000 to ₹5,000 per month",
-  "official_url": "https://npscra.nsdl.co.in/nsdl/scheme-details/apy/",
-  "required_documents": [
-   "Aadhaar",
-   "Bank Account",
-   "Mobile Number"
-  ],
-  "status": "active",
-  "rules": [
-   {
-    "field": "age",
-    "operator": "between",
-    "value": [
-     18,
-     40
+    "documents": [
+      "Aadhaar Card",
+      "Land ownership record / Khatauni",
+      "Aadhaar-linked Bank Account Passbook",
+      "Citizenship proof"
     ],
-    "logic_group": 1
-   },
-   {
-    "field": "employment_status",
-    "operator": "not_in",
-    "value": [
-     "salaried_government"
+    "apply_steps": [
+      "Visit the official portal at pmkisan.gov.in",
+      "Click on 'New Farmer Registration' under Farmers Corner",
+      "Enter your Aadhaar number and captcha for authentication",
+      "Select your State, District, Sub-District, Block and Village",
+      "Enter land details (Survey/Khata number) and bank account details",
+      "Submit the registration and save the reference number for tracking"
     ],
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pradhan Mantri Mudra Yojana (PMMY)",
-  "slug": "pm-mudra-yojana",
-  "short_description": "Loans up to 10 Lakhs for non-corporate, non-farm small/micro enterprises.",
-  "full_description": "Provides loans up to ₹ 10 lakh to the non-corporate, non-farm small/micro enterprises. These loans are classified as MUDRA loans under PMMY.",
-  "ministry": "Ministry of Finance",
-  "category": "business",
-  "level": "central",
-  "benefit_type": "loan",
-  "benefit_amount": 1000000,
-  "benefit_description": "Loan up to ₹10 Lakhs",
-  "official_url": "https://www.mudra.org.in/",
-  "required_documents": [
-   "Identity Proof",
-   "Address Proof",
-   "Business Proof"
-  ],
-  "status": "active",
-  "rules": [
-   {
-    "field": "employment_status",
-    "operator": "in",
-    "value": [
-     "self_employed",
-     "business_owner"
+    "official_url": "https://pmkisan.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "in",
+        "value": [
+          "self_employed",
+          "unemployed",
+          "salaried_private"
+        ],
+        "logic_group": 1
+      },
+      {
+        "field": "owns_property",
+        "operator": "eq",
+        "value": true,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Awas Yojana (PMAY - Urban)",
+    "slug": "pmay-urban",
+    "short_description": "Up to \u20b92.67 Lakh interest subsidy on home loans for eligible urban homebuyers.",
+    "full_description": "Credit Linked Subsidy Scheme (CLSS) under PMAY-U provides an upfront interest subsidy of up to \u20b92.67 Lakh for EWS, LIG, and MIG categories acquiring or constructing their first pucca house.",
+    "ministry": "Ministry of Housing and Urban Affairs",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "loan_subsidy",
+    "benefit_amount": 267000.0,
+    "benefit_amount_inr": 267000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "emi_burden",
+      "savings"
     ],
-    "logic_group": 1
-   },
-   {
-    "field": "occupation_tags",
-    "operator": "not_in",
-    "value": [
-     "farmer",
-     "agriculture"
+    "documents": [
+      "Aadhaar Card of all family members",
+      "Salary Slips or Income Certificate",
+      "Bank statement for past 6 months",
+      "Affidavit stating beneficiary does not own a pucca house in India",
+      "Property purchase or construction agreement"
     ],
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "National Scholarship Portal (NSP) - Post Matric",
-  "slug": "nsp-post-matric",
-  "short_description": "Scholarships for students from minority communities studying in class 11 to Ph.D.",
-  "full_description": "The objective of the scheme is to award scholarships to meritorious students belonging to economically weaker sections of minority communities.",
-  "ministry": "Ministry of Minority Affairs",
-  "category": "education",
-  "level": "central",
-  "benefit_type": "cash",
-  "benefit_amount": 10000,
-  "benefit_description": "Admission & tuition fee admission + maintenance allowance",
-  "official_url": "https://scholarships.gov.in/",
-  "required_documents": [
-   "Income Certificate",
-   "Mark sheets",
-   "Aadhaar"
-  ],
-  "status": "active",
-  "rules": [
-   {
-    "field": "employment_status",
-    "operator": "eq",
-    "value": "student",
-    "logic_group": 1
-   },
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 200000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (AB-PMJAY)",
-  "slug": "ayushman-bharat",
-  "short_description": "Health insurance cover of ₹5 Lakhs per family per year.",
-  "full_description": "The world's largest health insurance/ assurance scheme fully financed by the government. It provides a cover of Rs. 5 lakhs per family per year for secondary and tertiary care hospitalization.",
-  "ministry": "Ministry of Health and Family Welfare",
-  "category": "health",
-  "level": "central",
-  "benefit_type": "insurance",
-  "benefit_amount": 500000,
-  "benefit_description": "₹5 Lakh health cover",
-  "official_url": "https://pmjay.gov.in/",
-  "required_documents": [
-   "Ration Card",
-   "Aadhaar",
-   "SECC Database Name"
-  ],
-  "status": "active",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 250000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Stand-Up India",
-  "slug": "stand-up-india",
-  "short_description": "Loans between 10 Lakhs and 1 Crore for SC/ST and Women entrepreneurs.",
-  "full_description": "Facilitates bank loans between 10 lakh and 1 Crore to at least one Scheduled Caste (SC) or Scheduled Tribe (ST) borrower and at least one woman borrower per bank branch for setting up a greenfield enterprise.",
-  "ministry": "Ministry of Finance",
-  "category": "business",
-  "level": "central",
-  "benefit_type": "loan",
-  "benefit_description": "Loan from ₹10 Lakhs to ₹1 Crore",
-  "official_url": "https://www.standupmitra.in/",
-  "required_documents": [
-   "Caste Certificate (if applicable)",
-   "Project Report",
-   "Identity Proof"
-  ],
-  "status": "active",
-  "rules": [
-   {
-    "field": "employment_status",
-    "operator": "in",
-    "value": [
-     "business_owner",
-     "self_employed"
+    "apply_steps": [
+      "Visit the official portal at pmaymis.gov.in or apply through your home loan lender",
+      "Select Citizen Assessment -> Apply Online -> Benefit under 3 components",
+      "Enter your Aadhaar number for authentication",
+      "Fill in family demographics, annual income, and property details",
+      "Submit application; your lending bank/HFC processes CLSS subsidy claim with CNA"
     ],
-    "logic_group": 1
-   },
-   {
-    "field": "age",
-    "operator": "gte",
-    "value": 18,
-    "logic_group": 1
-   },
-   {
-    "field": "gender",
-    "operator": "eq",
-    "value": "female",
-    "logic_group": 1
-   },
-   {
-    "field": "employment_status",
-    "operator": "in",
-    "value": [
-     "business_owner",
-     "self_employed"
+    "official_url": "https://pmaymis.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 1800000,
+        "logic_group": 1
+      },
+      {
+        "field": "owns_property",
+        "operator": "eq",
+        "value": false,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Sukanya Samriddhi Yojana (SSY)",
+    "slug": "sukanya-samriddhi",
+    "short_description": "Government-backed savings scheme for girl child with 8.2% sovereign tax-free interest.",
+    "full_description": "A small-deposit scheme launched under the Beti Bachao Beti Padhao campaign for girl children under 10 years of age, offering high guaranteed sovereign interest and Section 80C tax deduction.",
+    "ministry": "Ministry of Finance",
+    "category": null,
+    "level": "central",
+    "benefit_type": "savings_return",
+    "benefit_amount": null,
+    "benefit_amount_inr": null,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "savings",
+      "dependents"
     ],
-    "logic_group": 2
-   },
-   {
-    "field": "age",
-    "operator": "gte",
-    "value": 18,
-    "logic_group": 2
-   },
-   {
-    "field": "occupation_tags",
-    "operator": "in",
-    "value": [
-     "sc_st"
+    "documents": [
+      "Birth certificate of the girl child",
+      "Aadhaar Card of parent or legal guardian",
+      "PAN Card of guardian",
+      "Address proof (utility bill, passport, voter ID)",
+      "Passport-size photographs of child and guardian"
     ],
-    "logic_group": 2
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 9",
-  "slug": "state-welfare-scheme-9",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 9. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Maharashtra",
-  "benefit_type": "cash",
-  "benefit_amount": 5900,
-  "benefit_description": "Direct transfer of ₹5900",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 390000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 10",
-  "slug": "state-welfare-scheme-10",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 10. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Karnataka",
-  "benefit_type": "cash",
-  "benefit_amount": 6000,
-  "benefit_description": "Direct transfer of ₹6000",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 400000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 11",
-  "slug": "state-welfare-scheme-11",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 11. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Delhi",
-  "benefit_type": "cash",
-  "benefit_amount": 6100,
-  "benefit_description": "Direct transfer of ₹6100",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 410000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 12",
-  "slug": "state-welfare-scheme-12",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 12. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Maharashtra",
-  "benefit_type": "cash",
-  "benefit_amount": 6200,
-  "benefit_description": "Direct transfer of ₹6200",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 420000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 13",
-  "slug": "state-welfare-scheme-13",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 13. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Delhi",
-  "benefit_type": "cash",
-  "benefit_amount": 6300,
-  "benefit_description": "Direct transfer of ₹6300",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 430000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 14",
-  "slug": "state-welfare-scheme-14",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 14. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Karnataka",
-  "benefit_type": "cash",
-  "benefit_amount": 6400,
-  "benefit_description": "Direct transfer of ₹6400",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 440000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 15",
-  "slug": "state-welfare-scheme-15",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 15. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Maharashtra",
-  "benefit_type": "cash",
-  "benefit_amount": 6500,
-  "benefit_description": "Direct transfer of ₹6500",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 450000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 16",
-  "slug": "state-welfare-scheme-16",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 16. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Karnataka",
-  "benefit_type": "cash",
-  "benefit_amount": 6600,
-  "benefit_description": "Direct transfer of ₹6600",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 460000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 17",
-  "slug": "state-welfare-scheme-17",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 17. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Delhi",
-  "benefit_type": "cash",
-  "benefit_amount": 6700,
-  "benefit_description": "Direct transfer of ₹6700",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 470000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 18",
-  "slug": "state-welfare-scheme-18",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 18. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Maharashtra",
-  "benefit_type": "cash",
-  "benefit_amount": 6800,
-  "benefit_description": "Direct transfer of ₹6800",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 480000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 19",
-  "slug": "state-welfare-scheme-19",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 19. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Delhi",
-  "benefit_type": "cash",
-  "benefit_amount": 6900,
-  "benefit_description": "Direct transfer of ₹6900",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 490000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 20",
-  "slug": "state-welfare-scheme-20",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 20. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Karnataka",
-  "benefit_type": "cash",
-  "benefit_amount": 7000,
-  "benefit_description": "Direct transfer of ₹7000",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 500000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 21",
-  "slug": "state-welfare-scheme-21",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 21. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Maharashtra",
-  "benefit_type": "cash",
-  "benefit_amount": 7100,
-  "benefit_description": "Direct transfer of ₹7100",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 510000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 22",
-  "slug": "state-welfare-scheme-22",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 22. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Karnataka",
-  "benefit_type": "cash",
-  "benefit_amount": 7200,
-  "benefit_description": "Direct transfer of ₹7200",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 520000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 23",
-  "slug": "state-welfare-scheme-23",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 23. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Delhi",
-  "benefit_type": "cash",
-  "benefit_amount": 7300,
-  "benefit_description": "Direct transfer of ₹7300",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 530000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 24",
-  "slug": "state-welfare-scheme-24",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 24. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Maharashtra",
-  "benefit_type": "cash",
-  "benefit_amount": 7400,
-  "benefit_description": "Direct transfer of ₹7400",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 540000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "State Welfare Scheme 25",
-  "slug": "state-welfare-scheme-25",
-  "short_description": "A state-level scheme for general welfare and financial assistance.",
-  "full_description": "This is a placeholder description for State Welfare Scheme 25. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
-  "ministry": "State Government Department",
-  "category": null,
-  "level": "state",
-  "state": "Delhi",
-  "benefit_type": "cash",
-  "benefit_amount": 7500,
-  "benefit_description": "Direct transfer of ₹7500",
-  "official_url": "https://india.gov.in",
-  "required_documents": [
-   "Aadhaar",
-   "Domicile Certificate"
-  ],
-  "status": "archived",
-  "rules": [
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 550000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pradhan Mantri Ujjwala Yojana (PMUY)",
-  "slug": "pm-ujjwala-yojana",
-  "short_description": "Deposit-free LPG gas connections for women from poor households.",
-  "full_description": "Provides deposit-free LPG (cooking gas) connections to adult women from poor households, provided no LPG connection already exists in the name of any family member. Priority is given to SECC-listed households and SC/ST, PMAY-Gramin, Antyodaya Anna Yojana, and forest-dweller households; other poor households can apply via a 14-point self-declaration.",
-  "ministry": "Ministry of Petroleum and Natural Gas",
-  "category": null,
-  "level": "central",
-  "benefit_type": "subsidy",
-  "benefit_amount": null,
-  "benefit_description": "Free LPG connection deposit waiver; ₹300 targeted subsidy per refill continues for enrolled consumers.",
-  "official_url": "https://www.pmuy.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Address proof",
-   "Bank account details",
-   "Passport-size photograph"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "gender",
-    "operator": "eq",
-    "value": "female",
-    "logic_group": 1
-   },
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 250000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pradhan Mantri Jeevan Jyoti Bima Yojana (PMJJBY)",
-  "slug": "pmjjby",
-  "short_description": "₹2 lakh life insurance cover for ₹436/year, for bank account holders aged 18-50.",
-  "full_description": "A government-backed term life insurance scheme available to people aged 18 to 50 with a bank or post office account. Provides a risk cover of ₹2 lakh in case of death for any reason, on payment of an annual premium of ₹436, auto-debited from the linked account. Enrollment must be renewed every year; cover can continue up to age 55 with continued premium payment.",
-  "ministry": "Department of Financial Services, Ministry of Finance",
-  "category": "health",
-  "level": "central",
-  "benefit_type": "insurance",
-  "benefit_amount": 200000,
-  "benefit_description": "₹2 lakh life cover for an annual premium of ₹436",
-  "official_url": "https://www.jansuraksha.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Bank account details",
-   "Nominee details"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "age",
-    "operator": "between",
-    "value": [
-     18,
-     50
+    "apply_steps": [
+      "Visit your nearest Post Office or authorized commercial bank branch",
+      "Obtain and complete the SSY Account Opening Form (Form SSA-1)",
+      "Attach child's birth certificate and guardian KYC documents",
+      "Deposit the minimum opening amount (minimum \u20b9250, up to \u20b91.5 Lakh/year)",
+      "Receive the physical SSY passbook for record and future deposits"
     ],
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pradhan Mantri Suraksha Bima Yojana (PMSBY)",
-  "slug": "pmsby",
-  "short_description": "₹2 lakh accidental death/disability cover for ₹20/year, for bank account holders aged 18-70.",
-  "full_description": "A one-year, renewable accidental insurance scheme for people aged 18 to 70 with a bank or post office account. Provides accidental death or full-disability cover of ₹2 lakh, and ₹1 lakh for partial disability, for an annual premium of ₹20, auto-debited from the linked account.",
-  "ministry": "Department of Financial Services, Ministry of Finance",
-  "category": "health",
-  "level": "central",
-  "benefit_type": "insurance",
-  "benefit_amount": 200000,
-  "benefit_description": "₹2 lakh accidental death cover (₹1 lakh for partial disability) for an annual premium of ₹20",
-  "official_url": "https://www.jansuraksha.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Bank account details",
-   "Nominee details"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "age",
-    "operator": "between",
-    "value": [
-     18,
-     70
+    "official_url": "https://www.indiapost.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "dependents",
+        "operator": "gte",
+        "value": 1,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Atal Pension Yojana (APY)",
+    "slug": "atal-pension-yojana",
+    "short_description": "Guaranteed monthly pension of \u20b91,000 to \u20b95,000 for unorganized sector workers post age 60.",
+    "full_description": "A government-backed pension scheme aimed at unorganized workers aged 18-40. Subscribers receive an assured monthly pension between \u20b91,000 and \u20b95,000 upon reaching age 60, backed by sovereign guarantee.",
+    "ministry": "Ministry of Finance",
+    "category": null,
+    "level": "central",
+    "benefit_type": "insurance",
+    "benefit_amount": 12000.0,
+    "benefit_amount_inr": 12000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "savings",
+      "income"
     ],
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
-  "slug": "pmfby",
-  "short_description": "Subsidized crop insurance covering losses from sowing to post-harvest.",
-  "full_description": "A voluntary crop insurance scheme covering food crops, oilseeds, and notified annual commercial/horticultural crops against yield loss from natural risks - from pre-sowing failure through post-harvest damage from cyclones, unseasonal rain, and localized calamities. The farmer's premium share is capped at 2% for Kharif crops, 1.5% for Rabi crops, and 5% for commercial/horticultural crops; the remaining actuarial premium is subsidized by the Central and State governments.",
-  "ministry": "Ministry of Agriculture and Farmers Welfare",
-  "category": "agriculture",
-  "level": "central",
-  "benefit_type": "insurance",
-  "benefit_amount": null,
-  "benefit_description": "Crop loss coverage; farmer premium capped at 1.5-5% of the sum insured depending on season/crop",
-  "official_url": "https://pmfby.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Land records",
-   "Bank account details",
-   "Sowing certificate"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "occupation_tags",
-    "operator": "in",
-    "value": [
-     "farmer",
-     "agriculture"
+    "documents": [
+      "Aadhaar Card",
+      "Savings Bank Account / Post Office Account details",
+      "Mobile number registered with bank"
     ],
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "PM Vishwakarma Yojana",
-  "slug": "pm-vishwakarma-yojana",
-  "short_description": "Collateral-free credit, skilling, and toolkit support for traditional artisans and craftspeople.",
-  "full_description": "Supports artisans and craftspeople in 18 traditional family-based trades who work with their hands and tools in the unorganised sector. Provides recognition (PM Vishwakarma certificate and ID card), skill upgradation training, a toolkit incentive of ₹15,000, and collateral-free credit support up to ₹1 lakh (first tranche) and ₹2 lakh (second tranche) at a concessional 5% interest rate. Applicants must not have taken a loan under similar schemes (PMEGP, MUDRA, PM SVANidhi) in the past 5 years, and benefits are limited to one member per family.",
-  "ministry": "Ministry of Micro, Small and Medium Enterprises",
-  "category": "business",
-  "level": "central",
-  "benefit_type": "loan",
-  "benefit_amount": 300000,
-  "benefit_description": "Up to ₹3 lakh in collateral-free credit across two tranches at 5% interest, plus a ₹15,000 toolkit incentive",
-  "official_url": "https://pmvishwakarma.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Trade/artisan proof",
-   "Bank account details"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "age",
-    "operator": "gte",
-    "value": 18,
-    "logic_group": 1
-   },
-   {
-    "field": "employment_status",
-    "operator": "in",
-    "value": [
-     "self_employed",
-     "business_owner"
+    "apply_steps": [
+      "Visit the bank branch where you maintain your primary savings account or log into net banking",
+      "Fill out the APY registration form specifying your desired pension slab (\u20b91,000 - \u20b95,000)",
+      "Provide nominee details and authorize automatic monthly debit for contributions",
+      "Receive your Permanent Retirement Account Number (PRAN) confirmation via SMS"
     ],
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Prime Minister's Employment Generation Programme (PMEGP)",
-  "slug": "pmegp",
-  "short_description": "Margin-money subsidy on bank loans for setting up new micro-enterprises.",
-  "full_description": "A credit-linked subsidy scheme for setting up new micro-enterprises. General-category applicants can avail a margin-money subsidy of 25% of project cost in rural areas and 15% in urban areas; special categories (SC/ST/OBC/Minorities/Women/Ex-servicemen/Transgender persons/persons with disabilities, among others) can avail 35% in rural and 25% in urban areas. Maximum project cost is ₹50 lakh for manufacturing and ₹20 lakh for the service sector. Loans are provided by public/private/co-operative banks, with the subsidy administered by KVIC.",
-  "ministry": "Ministry of Micro, Small and Medium Enterprises",
-  "category": "business",
-  "level": "central",
-  "benefit_type": "subsidy",
-  "benefit_amount": null,
-  "benefit_description": "15-35% margin-money subsidy on project cost, depending on category and location",
-  "official_url": "https://www.myscheme.gov.in/schemes/pmegp",
-  "required_documents": [
-   "Aadhaar Card",
-   "Project report",
-   "Education certificate",
-   "Category certificate (if applicable)"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "age",
-    "operator": "gte",
-    "value": 18,
-    "logic_group": 1
-   },
-   {
-    "field": "employment_status",
-    "operator": "in",
-    "value": [
-     "self_employed",
-     "business_owner",
-     "unemployed"
+    "official_url": "https://www.npscra.nsdl.co.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "age",
+        "operator": "between",
+        "value": [
+          18,
+          40
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Mudra Yojana (PMMY)",
+    "slug": "pm-mudra-yojana",
+    "short_description": "Collateral-free business loans up to \u20b910 Lakh for micro and small enterprises.",
+    "full_description": "Provides collateral-free loans across three categories: Shishu (up to \u20b950,000), Kishor (\u20b950,000 to \u20b95 Lakh), and Tarun (\u20b95 Lakh to \u20b910 Lakh) to non-corporate, non-farm small and micro enterprises.",
+    "ministry": "Ministry of Finance",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "loan_subsidy",
+    "benefit_amount": 500000.0,
+    "benefit_amount_inr": 500000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "emi_burden",
+      "employment_stability",
+      "income"
     ],
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "PM SVANidhi (Street Vendor's AtmaNirbhar Nidhi)",
-  "slug": "pm-svanidhi",
-  "short_description": "Collateral-free working capital loans for street vendors, in progressive tranches.",
-  "full_description": "Provides street vendors with collateral-free working capital loans in three progressive tranches (₹10,000, then ₹20,000, then ₹50,000, each on repayment of the previous one), plus a 7% annual interest subsidy credited quarterly and incentives for digital transactions. Available to urban street vendors who were vending on or before 24 March 2020, identified via a Certificate of Vending or ID card issued by their Urban Local Body.",
-  "ministry": "Ministry of Housing and Urban Affairs",
-  "category": "business",
-  "level": "central",
-  "benefit_type": "loan",
-  "benefit_amount": 10000,
-  "benefit_description": "Working capital loan starting at ₹10,000, rising to ₹20,000 then ₹50,000 across tranches",
-  "official_url": "https://pmsvanidhi.mohua.gov.in/",
-  "required_documents": [
-   "Certificate of Vending / Vendor ID card",
-   "Aadhaar Card",
-   "Bank account details"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "employment_status",
-    "operator": "in",
-    "value": [
-     "self_employed"
+    "documents": [
+      "Aadhaar Card / Voter ID / Passport",
+      "Business registration certificate or Udyam Registration",
+      "Bank account statements for the past 6 months",
+      "Quotations for machinery/tools or working capital estimation report"
     ],
-    "logic_group": 1
-   },
-   {
-    "field": "area_type",
-    "operator": "eq",
-    "value": "urban",
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "National Means-cum-Merit Scholarship Scheme (NMMSS)",
-  "slug": "nmmss",
-  "short_description": "₹12,000/year scholarship for meritorious students from low-income families, class 9-12.",
-  "full_description": "Awards scholarships of ₹12,000 per year, disbursed via Direct Benefit Transfer, to meritorious students of class IX in government, government-aided, and local-body schools, continuing through class XII on renewal. Students must score at least 55% in class VII (relaxable by 5% for SC/ST students) and clear a selection test, and parental income from all sources must not exceed ₹3,50,000 per annum. Applications are submitted via the National Scholarship Portal.",
-  "ministry": "Department of School Education and Literacy, Ministry of Education",
-  "category": "education",
-  "level": "central",
-  "benefit_type": "cash",
-  "benefit_amount": 12000,
-  "benefit_description": "₹12,000 per year, renewable through class XII",
-  "official_url": "https://scholarships.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Class VII marksheet",
-   "Income certificate",
-   "Bank account details"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "employment_status",
-    "operator": "eq",
-    "value": "student",
-    "logic_group": 1
-   },
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 350000,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pradhan Mantri Matru Vandana Yojana (PMMVY)",
-  "slug": "pmmvy",
-  "short_description": "Cash maternity benefit for pregnant and lactating mothers.",
-  "full_description": "Provides financial assistance to pregnant women and lactating mothers to support nutrition and health-seeking behaviour: ₹5,000 in installments for the first living child, and ₹6,000 for a second child if it is a girl. Excludes women in regular employment with the Central/State Government or PSUs, or already receiving similar statutory benefits.",
-  "ministry": "Ministry of Women and Child Development",
-  "category": "health",
-  "level": "central",
-  "benefit_type": "cash",
-  "benefit_amount": 5000,
-  "benefit_description": "₹5,000 for the first child; an additional ₹6,000 for a second child if a girl",
-  "official_url": "https://pmmvy.wcd.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Mother and Child Protection (MCP) card",
-   "Bank account details"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "gender",
-    "operator": "eq",
-    "value": "female",
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pradhan Mantri Jan Dhan Yojana (PMJDY)",
-  "slug": "pm-jan-dhan-yojana",
-  "short_description": "Zero-balance bank account with a RuPay card, overdraft facility, and free accident cover.",
-  "full_description": "India's national financial inclusion scheme. Provides a zero-balance basic savings bank account with a free RuPay debit card carrying ₹2 lakh accidental insurance cover, an overdraft facility of up to ₹10,000 after 6 months of satisfactory account operation, and Direct Benefit Transfer linkage for government subsidies. PMJDY accounts are also the entry point for PMJJBY, PMSBY, Atal Pension Yojana, and MUDRA loans.",
-  "ministry": "Department of Financial Services, Ministry of Finance",
-  "category": null,
-  "level": "central",
-  "benefit_type": "other",
-  "benefit_amount": null,
-  "benefit_description": "Zero-balance account, RuPay card with ₹2 lakh accident cover, and up to ₹10,000 overdraft",
-  "official_url": "https://www.pmjdy.gov.in/",
-  "required_documents": [
-   "Aadhaar Card",
-   "Address proof (if no Aadhaar)"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "age",
-    "operator": "gte",
-    "value": 18,
-    "logic_group": 1
-   }
-  ]
- },
- {
-  "name": "Pre-Matric Scholarship for SC Students",
-  "slug": "pre-matric-scholarship-sc",
-  "short_description": "Monthly stipend for SC students in classes 9 and 10 from low-income families.",
-  "full_description": "Provides a monthly scholarship to Scheduled Caste students studying in classes IX and X at any recognized school, where parental/guardian income does not exceed ₹2.5 lakh per annum. Day scholars receive ₹150/month and hostellers ₹350/month, for 10 months in the academic year. States and UTs administer selection and disbursal; there is no direct central application.",
-  "ministry": "Ministry of Social Justice and Empowerment",
-  "category": "education",
-  "level": "central",
-  "benefit_type": "cash",
-  "benefit_amount": 1500,
-  "benefit_description": "₹150/month (day scholar) or ₹350/month (hosteller) for 10 months/year",
-  "official_url": "https://scholarships.gov.in/",
-  "required_documents": [
-   "Caste certificate",
-   "Income certificate",
-   "School enrollment proof",
-   "Bank account details"
-  ],
-  "status": "needs_review",
-  "rules": [
-   {
-    "field": "employment_status",
-    "operator": "eq",
-    "value": "student",
-    "logic_group": 1
-   },
-   {
-    "field": "occupation_tags",
-    "operator": "in",
-    "value": [
-     "sc_st"
+    "apply_steps": [
+      "Visit udyamimitra.in or walk into any public/private commercial bank or NBFC",
+      "Fill the standard Mudra loan application form corresponding to your tier (Shishu/Kishor/Tarun)",
+      "Submit identity, business address proof, and equipment/stock quotations",
+      "The lending institution evaluates and sanctions the collateral-free loan facility"
     ],
-    "logic_group": 1
-   },
-   {
-    "field": "annual_income",
-    "operator": "lte",
-    "value": 250000,
-    "logic_group": 1
-   }
-  ]
- }
+    "official_url": "https://www.mudra.org.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "in",
+        "value": [
+          "self_employed",
+          "business_owner"
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "National Scholarship Portal (NSP) - Post Matric",
+    "slug": "nsp-post-matric",
+    "short_description": "Financial assistance covering tuition and living allowances for post-matric students.",
+    "full_description": "Centrally sponsored scholarship scheme providing tuition reimbursement and maintenance allowance to students from SC, ST, and minority communities studying in Class 11 through doctoral degrees.",
+    "ministry": "Ministry of Social Justice and Empowerment",
+    "category": "education",
+    "level": "central",
+    "benefit_type": "cash",
+    "benefit_amount": 13500.0,
+    "benefit_amount_inr": 13500.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "income",
+      "education"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Caste Certificate issued by competent revenue authority",
+      "Income Certificate (family annual income up to \u20b92.5 Lakh)",
+      "Previous qualifying exam marksheet",
+      "Fee receipt / Student ID proof from recognized institution"
+    ],
+    "apply_steps": [
+      "Register on scholarships.gov.in using your Aadhaar or enrolment ID",
+      "Select Post-Matric Scholarship Scheme and complete the application profile",
+      "Upload scanned copies of caste, income certificate, and marksheets",
+      "Your educational institution verifies the application online",
+      "State department validates and disburses scholarship via Direct Benefit Transfer"
+    ],
+    "official_url": "https://scholarships.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "eq",
+        "value": "student",
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 250000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Ayushman Bharat Pradhan Mantri Jan Arogya Yojana (AB-PMJAY)",
+    "slug": "ayushman-bharat",
+    "short_description": "Cashless secondary and tertiary health insurance coverage up to \u20b95 Lakh per family per year.",
+    "full_description": "The world's largest health assurance scheme, providing health cover of \u20b95 Lakh per family per year for secondary and tertiary care hospitalization across empanelled public and private hospitals.",
+    "ministry": "Ministry of Health and Family Welfare",
+    "category": "health",
+    "level": "central",
+    "benefit_type": "insurance",
+    "benefit_amount": 500000.0,
+    "benefit_amount_inr": 500000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "savings",
+      "income",
+      "dependents"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Ration Card or SECC family identification letter",
+      "Active mobile number"
+    ],
+    "apply_steps": [
+      "Check your family's eligibility at beneficiary.nha.gov.in or call toll-free 14555",
+      "Visit any empanelled public/private hospital or nearest Common Service Centre (CSC)",
+      "Provide your Aadhaar or Ration Card for biometric e-KYC verification",
+      "Receive your Ayushman Golden Card for cashless treatment at empanelled facilities"
+    ],
+    "official_url": "https://pmjay.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 500000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Stand-Up India",
+    "slug": "stand-up-india",
+    "short_description": "Bank loans between \u20b910 Lakh and \u20b91 Crore for SC/ST and women entrepreneurs for greenfield projects.",
+    "full_description": "Facilitates bank loans between \u20b910 Lakh and \u20b91 Crore to at least one SC/ST borrower and at least one woman borrower per bank branch for setting up a greenfield enterprise in manufacturing, services, or trading.",
+    "ministry": "Ministry of Finance",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "loan_subsidy",
+    "benefit_amount": 2500000.0,
+    "benefit_amount_inr": 2500000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "emi_burden",
+      "employment_stability",
+      "income"
+    ],
+    "documents": [
+      "Aadhaar Card and PAN Card",
+      "Caste Certificate (for SC/ST) or proof of 51% female shareholding",
+      "Comprehensive Project Report (DPR) with cashflow projections",
+      "Proof of enterprise premises and promoter equity contribution"
+    ],
+    "apply_steps": [
+      "Visit standupmitra.in portal and click 'Register as Entrepreneur'",
+      "Complete the business loan application profile and attach your project proposal",
+      "Choose a preferred scheduled commercial bank or allow portal routing to local branch",
+      "Bank conducts due diligence and sanctions the credit facility"
+    ],
+    "official_url": "https://www.standupmitra.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "in",
+        "value": [
+          "self_employed",
+          "business_owner"
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Ujjwala Yojana (PMUY)",
+    "slug": "pm-ujjwala-yojana",
+    "short_description": "Deposit-free LPG cylinder connection plus \u20b9300 per refill subsidy for low-income women.",
+    "full_description": "Empowers women from poor households by providing deposit-free LPG connections, a free stove, and direct targeted subsidies per 14.2 kg domestic refill.",
+    "ministry": "Ministry of Petroleum and Natural Gas",
+    "category": null,
+    "level": "central",
+    "benefit_type": "subsidy",
+    "benefit_amount": 1600.0,
+    "benefit_amount_inr": 1600.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "income",
+      "dependents"
+    ],
+    "documents": [
+      "Aadhaar Card of adult female beneficiary",
+      "Ration Card showing family composition",
+      "Bank Account Passbook / IFSC code",
+      "Self-declaration 14-point poverty affidavit"
+    ],
+    "apply_steps": [
+      "Visit pmuy.gov.in or your nearest authorized Indane/Bharatgas/HP gas distributor",
+      "Fill out the Ujjwala 2.0 application form",
+      "Submit biometric e-KYC and family ration card verification",
+      "Distributor provides deposit-free regulator, cylinder, and gas stove"
+    ],
+    "official_url": "https://www.pmuy.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "gender",
+        "operator": "eq",
+        "value": "female",
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 200000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Jeevan Jyoti Bima Yojana (PMJJBY)",
+    "slug": "pmjjby",
+    "short_description": "\u20b92 Lakh renewable term life insurance for just \u20b9436 annual premium.",
+    "full_description": "A one-year life insurance scheme renewable from year to year offering coverage for death due to any reason. Available to individuals aged 18 to 50 having a bank account.",
+    "ministry": "Ministry of Finance",
+    "category": "health",
+    "level": "central",
+    "benefit_type": "insurance",
+    "benefit_amount": 200000.0,
+    "benefit_amount_inr": 200000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "savings",
+      "dependents"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Savings Bank Account with active auto-debit facility",
+      "Nominee details"
+    ],
+    "apply_steps": [
+      "Log into your bank's Internet Banking/Mobile App or visit your home branch",
+      "Select Government Insurance Schemes -> PMJJBY",
+      "Authorize an annual auto-debit of \u20b9436 from your savings account",
+      "Certificate of Insurance is generated and sent via SMS and email"
+    ],
+    "official_url": "https://financialservices.gov.in/beta/en/pmjjby",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "age",
+        "operator": "between",
+        "value": [
+          18,
+          50
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Suraksha Bima Yojana (PMSBY)",
+    "slug": "pmsby",
+    "short_description": "\u20b92 Lakh accidental death and disability insurance cover for \u20b920 per year.",
+    "full_description": "A one-year accidental death and disability cover renewable annually, providing \u20b92 Lakh in case of accidental death or permanent total disability, and \u20b91 Lakh for permanent partial disability for a nominal \u20b920/year premium.",
+    "ministry": "Ministry of Finance",
+    "category": "health",
+    "level": "central",
+    "benefit_type": "insurance",
+    "benefit_amount": 200000.0,
+    "benefit_amount_inr": 200000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "savings",
+      "dependents"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Savings Bank Account with active auto-debit facility",
+      "Nominee details"
+    ],
+    "apply_steps": [
+      "Log into net banking or visit your savings bank branch",
+      "Fill PMSBY enrollment consent form or opt in online",
+      "Authorize \u20b920 annual premium auto-debit in May each year",
+      "Receive coverage acknowledgment and policy reference"
+    ],
+    "official_url": "https://financialservices.gov.in/beta/en/pmsby",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "age",
+        "operator": "between",
+        "value": [
+          18,
+          70
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+    "slug": "pmfby",
+    "short_description": "Subsidized crop insurance covering yield loss due to non-preventable natural risks.",
+    "full_description": "Comprehensive insurance coverage against crop failure from natural disasters, pest infestations, and localized calamities, with farmers paying only 1.5% to 2% subsidized premium.",
+    "ministry": "Ministry of Agriculture and Farmers Welfare",
+    "category": "agriculture",
+    "level": "central",
+    "benefit_type": "insurance",
+    "benefit_amount": 50000.0,
+    "benefit_amount_inr": 50000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "income",
+      "emi_burden"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Land Possession Certificate (LPC) / Record of Rights (RoR)",
+      "Sowing Certificate issued by Patwari/Village officer",
+      "Bank Account Passbook (or KCC details)"
+    ],
+    "apply_steps": [
+      "Visit pmfby.gov.in or your nearest bank branch / CSC centre",
+      "Enter land survey number, crop type, and acreage details",
+      "Pay the subsidized farmer share of premium (1.5% rabi, 2% kharif)",
+      "Receive digital insurance policy receipt and crop coverage confirmation"
+    ],
+    "official_url": "https://pmfby.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "in",
+        "value": [
+          "self_employed",
+          "unemployed"
+        ],
+        "logic_group": 1
+      },
+      {
+        "field": "owns_property",
+        "operator": "eq",
+        "value": true,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "PM Vishwakarma Yojana",
+    "slug": "pm-vishwakarma-yojana",
+    "short_description": "\u20b915,000 toolkit voucher and collateral-free enterprise loans up to \u20b93 Lakh at 5% interest.",
+    "full_description": "A comprehensive central scheme supporting traditional artisans and craftspeople with recognition, modern toolkit incentives of \u20b915,000, and subsidized collateral-free enterprise credit up to \u20b93 Lakh at 5% interest.",
+    "ministry": "Ministry of Micro, Small and Medium Enterprises",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "loan_subsidy",
+    "benefit_amount": 300000.0,
+    "benefit_amount_inr": 300000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "employment_stability",
+      "emi_burden",
+      "income"
+    ],
+    "documents": [
+      "Aadhaar Card and mobile number linked to Aadhaar",
+      "Bank Account Passbook",
+      "Traditional trade declaration (18 eligible artisan trades)",
+      "Ration Card"
+    ],
+    "apply_steps": [
+      "Visit a Common Service Centre (CSC) to register on pmvishwakarma.gov.in",
+      "Gram Panchayat or Urban Local Body verifies your artisan trade",
+      "Complete 5-7 days of basic skill training with a \u20b9500/day stipend",
+      "Receive \u20b915,000 e-voucher for modern toolkit and apply for collateral-free loan"
+    ],
+    "official_url": "https://pmvishwakarma.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "in",
+        "value": [
+          "self_employed",
+          "salaried_private"
+        ],
+        "logic_group": 1
+      },
+      {
+        "field": "age",
+        "operator": "gte",
+        "value": 18,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Prime Minister's Employment Generation Programme (PMEGP)",
+    "slug": "pmegp",
+    "short_description": "Government subsidy up to 35% on bank-financed micro-enterprise projects up to \u20b950 Lakh.",
+    "full_description": "A credit-linked subsidy programme aimed at generating self-employment opportunities through establishment of micro-enterprises in non-farm sector by helping traditional artisans and unemployed youth.",
+    "ministry": "Ministry of Micro, Small and Medium Enterprises",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "subsidy",
+    "benefit_amount": 350000.0,
+    "benefit_amount_inr": 350000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "employment_stability",
+      "income",
+      "emi_burden"
+    ],
+    "documents": [
+      "Aadhaar Card and PAN Card",
+      "Detailed Project Report (DPR)",
+      "Class 8 pass marksheet (for projects exceeding \u20b910 Lakh in manufacturing)",
+      "Caste or Special Category Certificate (if claiming 35% subsidy)"
+    ],
+    "apply_steps": [
+      "Visit kviconline.gov.in/pmegpeportal and click 'Apply Online'",
+      "Fill in entrepreneur profile, project details, and chosen bank branch",
+      "Upload project report, caste certificate, and qualification documents",
+      "District Task Force Committee shortlists proposal and sends to bank for sanction"
+    ],
+    "official_url": "https://www.kviconline.gov.in/pmegpeportal/pmegphome/index.jsp",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "age",
+        "operator": "gte",
+        "value": 18,
+        "logic_group": 1
+      },
+      {
+        "field": "employment_status",
+        "operator": "in",
+        "value": [
+          "unemployed",
+          "self_employed",
+          "business_owner"
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "PM SVANidhi (Street Vendor's AtmaNirbhar Nidhi)",
+    "slug": "pm-svanidhi",
+    "short_description": "Working capital micro-loans of \u20b910,000, \u20b920,000, and \u20b950,000 with 7% interest subsidy.",
+    "full_description": "A micro-credit facility providing street vendors with collateral-free working capital loans starting at \u20b910,000, scaling to \u20b920,000 and \u20b950,000 on timely repayment, with a 7% annual interest subsidy.",
+    "ministry": "Ministry of Housing and Urban Affairs",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "loan_subsidy",
+    "benefit_amount": 50000.0,
+    "benefit_amount_inr": 50000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "emi_burden",
+      "income"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Vending Certificate or Letter of Recommendation (LoR) from Urban Local Body",
+      "Aadhaar-linked Bank Account Passbook"
+    ],
+    "apply_steps": [
+      "Visit pmsvanidhi.mohua.gov.in or apply through an empanelled banking agent",
+      "Verify your phone number with OTP linked to your Aadhaar",
+      "Upload your Vending ID or request LoR verification online",
+      "Choose a preferred bank; loan is disbursed within 10-15 business days"
+    ],
+    "official_url": "https://pmsvanidhi.mohua.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "eq",
+        "value": "self_employed",
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 300000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "National Means-cum-Merit Scholarship Scheme (NMMSS)",
+    "slug": "nmmss",
+    "short_description": "\u20b912,000 annual scholarship for meritorious secondary students from low-income families.",
+    "full_description": "Awards scholarships to meritorious students of economically weaker sections to arrest dropout rates at Class 8 and encourage them to continue study at secondary stage through Class 12.",
+    "ministry": "Ministry of Education",
+    "category": "education",
+    "level": "central",
+    "benefit_type": "cash",
+    "benefit_amount": 12000.0,
+    "benefit_amount_inr": 12000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "income",
+      "dependents"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Class 7 and 8 Marksheet (minimum 55% marks)",
+      "Income certificate showing parental annual income under \u20b93.5 Lakh",
+      "Student Bank Account passbook"
+    ],
+    "apply_steps": [
+      "Appear for the state-level NMMS written exam conducted in Class 8",
+      "Upon selection, register on scholarships.gov.in with student Aadhaar",
+      "School principal verifies marks and economic eligibility",
+      "Disbursement of \u20b912,000/year made via DBT directly into student account"
+    ],
+    "official_url": "https://scholarships.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "dependents",
+        "operator": "gte",
+        "value": 1,
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 350000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Matru Vandana Yojana (PMMVY)",
+    "slug": "pmmvy",
+    "short_description": "\u20b95,000 direct cash incentive for pregnant women and lactating mothers.",
+    "full_description": "A conditional cash transfer maternity benefit providing partial compensation for wage loss during pregnancy and childbirth, promoting safe delivery and exclusive breastfeeding.",
+    "ministry": "Ministry of Women and Child Development",
+    "category": "health",
+    "level": "central",
+    "benefit_type": "cash",
+    "benefit_amount": 5000.0,
+    "benefit_amount_inr": 5000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "income",
+      "dependents"
+    ],
+    "documents": [
+      "Aadhaar Card of mother and husband",
+      "Mother and Child Protection (MCP) Card",
+      "Aadhaar-linked Bank Account details"
+    ],
+    "apply_steps": [
+      "Register at your local Anganwadi Centre or online at pmmvy.wcd.gov.in",
+      "Submit Form 1A with MCP Card details within 570 days of last menstrual period",
+      "Receive \u20b93,000 after completing at least one antenatal checkup",
+      "Receive balance \u20b92,000 upon child birth registration and first round of vaccinations"
+    ],
+    "official_url": "https://pmmvy.wcd.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "gender",
+        "operator": "eq",
+        "value": "female",
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 800000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Jan Dhan Yojana (PMJDY)",
+    "slug": "pm-jan-dhan-yojana",
+    "short_description": "Zero-balance basic bank account with \u20b92 Lakh accidental insurance and \u20b910,000 overdraft.",
+    "full_description": "National Mission for Financial Inclusion ensuring universal access to banking services with at least one basic banking account per household, financial literacy, and credit facility.",
+    "ministry": "Ministry of Finance",
+    "category": null,
+    "level": "central",
+    "benefit_type": "insurance",
+    "benefit_amount": 200000.0,
+    "benefit_amount_inr": 200000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "savings",
+      "credit_history"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "PAN Card (or Form 60)",
+      "Passport size photograph"
+    ],
+    "apply_steps": [
+      "Walk into any commercial bank branch or visit a Bank Mitra / Business Correspondent kiosk",
+      "Fill out the simplified PMJDY account opening form",
+      "Provide biometric Aadhaar authentication",
+      "Receive instant zero-balance savings account and RuPay debit card"
+    ],
+    "official_url": "https://pmjdy.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "age",
+        "operator": "gte",
+        "value": 18,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pre-Matric Scholarship for SC Students",
+    "slug": "pre-matric-scholarship-sc",
+    "short_description": "Annual scholarship and book grants for Class 9 and 10 SC students from low-income families.",
+    "full_description": "Centrally funded financial support scheme aimed at curbing high drop-out rates in secondary education among SC children whose parents earn under \u20b92.5 Lakh per annum.",
+    "ministry": "Ministry of Social Justice and Empowerment",
+    "category": "education",
+    "level": "central",
+    "benefit_type": "cash",
+    "benefit_amount": 4000.0,
+    "benefit_amount_inr": 4000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "income",
+      "education"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "SC Caste Certificate",
+      "Income Certificate (parental income up to \u20b92.5 Lakh)",
+      "Student Bank Account passbook"
+    ],
+    "apply_steps": [
+      "Apply online through the state scholarship portal or scholarships.gov.in",
+      "Submit student registration with school enrolment code and Aadhaar",
+      "School headmaster approves and forwards nomination to Social Welfare Department",
+      "Scholarship allowance is directly transferred to the student's bank account"
+    ],
+    "official_url": "https://scholarships.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 250000,
+        "logic_group": 1
+      },
+      {
+        "field": "dependents",
+        "operator": "gte",
+        "value": 1,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Mahatma Gandhi National Rural Employment Guarantee Act (MGNREGA)",
+    "slug": "mgnrega",
+    "short_description": "Guaranteed 100 days of wage employment per year for rural adult households.",
+    "full_description": "Legal guarantee providing at least 100 days of wage employment in every financial year to every rural household whose adult members volunteer to do unskilled manual work at statutory minimum wages.",
+    "ministry": "Ministry of Rural Development",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "cash",
+    "benefit_amount": 26000.0,
+    "benefit_amount_inr": 26000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "employment_stability",
+      "income"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Address Proof in rural jurisdiction",
+      "Aadhaar-linked Bank or Post Office Account details",
+      "Passport-size photographs"
+    ],
+    "apply_steps": [
+      "Apply in writing or orally for a Job Card at your local Gram Panchayat office",
+      "Gram Panchayat conducts verification and issues Job Card within 15 days",
+      "Submit a dated work application specifying preferred work period",
+      "Gram Panchayat provides wage employment within 15 days within 5 km radius"
+    ],
+    "official_url": "https://nrega.nic.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "age",
+        "operator": "gte",
+        "value": 18,
+        "logic_group": 1
+      },
+      {
+        "field": "employment_status",
+        "operator": "in",
+        "value": [
+          "unemployed",
+          "self_employed"
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Pradhan Mantri Shram Yogi Maandhan (PM-SYM)",
+    "slug": "pm-shram-yogi-maandhan",
+    "short_description": "Voluntary contributory pension providing assured \u20b93,000 monthly pension for unorganized workers.",
+    "full_description": "A 50:50 government-matching pension scheme for unorganized workers aged 18-40 earning up to \u20b915,000/month. Assures a minimum monthly pension of \u20b93,000 after attaining age 60.",
+    "ministry": "Ministry of Labour and Employment",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "insurance",
+    "benefit_amount": 36000.0,
+    "benefit_amount_inr": 36000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "savings",
+      "income"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Savings Bank Account / Jan Dhan Account with IFSC",
+      "Mobile Number"
+    ],
+    "apply_steps": [
+      "Visit the nearest Common Services Centre (CSC) with Aadhaar and bank passbook",
+      "Village Level Entrepreneur (VLE) completes biometric authentication on maandhan.in",
+      "Pay the initial monthly contribution (\u20b955 - \u20b9200 based on age) in cash",
+      "Auto-debit mandate registered; instant Shram Yogi Pension Card issued"
+    ],
+    "official_url": "https://maandhan.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "age",
+        "operator": "between",
+        "value": [
+          18,
+          40
+        ],
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 180000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "PM Kaushal Vikas Yojana (PMKVY)",
+    "slug": "pmkvy",
+    "short_description": "Free industry-aligned skill certification and placement assistance with monetary incentives.",
+    "full_description": "Flagship scheme of the Ministry of Skill Development and Entrepreneurship enabling Indian youth to take up industry-relevant skill training that will help them secure a better livelihood.",
+    "ministry": "Ministry of Skill Development and Entrepreneurship",
+    "category": "education",
+    "level": "central",
+    "benefit_type": "subsidy",
+    "benefit_amount": 8000.0,
+    "benefit_amount_inr": 8000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "employment_stability",
+      "income"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Bank Account details",
+      "Prior education qualification certificate (if required for trade)"
+    ],
+    "apply_steps": [
+      "Search for authorized training centres on pmkvyofficial.org or Skill India portal",
+      "Register for a short-term training course aligned with industry demand",
+      "Attend classroom and practical hands-on technical sessions",
+      "Clear third-party assessment to receive Government of India NSDC certification"
+    ],
+    "official_url": "https://www.pmkvyofficial.org/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "age",
+        "operator": "between",
+        "value": [
+          15,
+          45
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "PM Matsya Sampada Yojana (PMMSY)",
+    "slug": "pmmsy",
+    "short_description": "40% to 60% capital subsidy for fisheries infrastructure and aquaculture entrepreneurship.",
+    "full_description": "Comprehensive scheme to bring about Blue Revolution through sustainable and responsible development of fisheries sector, offering substantial financial assistance for modern aquaculture, hatcheries, and cold chain.",
+    "ministry": "Ministry of Fisheries, Animal Husbandry and Dairying",
+    "category": "agriculture",
+    "level": "central",
+    "benefit_type": "subsidy",
+    "benefit_amount": 240000.0,
+    "benefit_amount_inr": 240000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "income",
+      "emi_burden"
+    ],
+    "documents": [
+      "Aadhaar Card and PAN Card",
+      "Land/water body ownership or lease deed for minimum 10 years",
+      "Detailed Project Report (DPR)",
+      "Bank Account Statement"
+    ],
+    "apply_steps": [
+      "Submit Detailed Project Report to District Fisheries Office or online via pmmsy.dof.gov.in",
+      "District Fisheries Officer reviews technical and economic viability",
+      "State Level Approval Committee (SLAC) issues formal administrative approval",
+      "Subsidy disbursed into beneficiary account in milestone-based tranches"
+    ],
+    "official_url": "https://pmmsy.dof.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "in",
+        "value": [
+          "self_employed",
+          "business_owner"
+        ],
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Startup India Initiative",
+    "slug": "startup-india",
+    "short_description": "3-year income tax holiday, patent fee rebates, and seed capital access for recognized startups.",
+    "full_description": "Flagship government initiative intended to build a strong ecosystem for nurturing innovation and startups in the country that will drive sustainable economic growth and generate large scale employment.",
+    "ministry": "Ministry of Commerce and Industry",
+    "category": "business",
+    "level": "central",
+    "benefit_type": "unquantified",
+    "benefit_amount": null,
+    "benefit_amount_inr": null,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "employment_stability",
+      "income"
+    ],
+    "documents": [
+      "Certificate of Incorporation / Registration of Partnership",
+      "Director / Partner KYC and PAN details",
+      "Brief pitch deck describing innovation, scalability, and market viability",
+      "Patent / Trademark registration (optional, for fast-track rebate)"
+    ],
+    "apply_steps": [
+      "Create an account on startupindia.gov.in",
+      "Click 'Apply for DPIIT Recognition' and enter company details",
+      "Upload letter of authorization and brief pitch on innovative solution",
+      "DPIIT issues certificate of recognition unlocking Section 80-IAC tax exemptions"
+    ],
+    "official_url": "https://www.startupindia.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "eq",
+        "value": "business_owner",
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Mukhyamantri Majhi Ladki Bahin Yojana",
+    "slug": "majhi-ladki-bahin-yojana",
+    "short_description": "\u20b91,500 monthly direct cash transfer for eligible Maharashtra women aged 21-65.",
+    "full_description": "A Maharashtra state welfare scheme providing a monthly direct benefit transfer of \u20b91,500 (\u20b918,000/year) to eligible women residents aged 21-65 having family annual income up to \u20b92.5 Lakh.",
+    "ministry": "Women and Child Development Department, Government of Maharashtra",
+    "category": null,
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "cash",
+    "benefit_amount": 18000.0,
+    "benefit_amount_inr": 18000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "income",
+      "dependents"
+    ],
+    "documents": [
+      "Aadhaar Card",
+      "Maharashtra Domicile Certificate / 15-year old Ration Card",
+      "Income Certificate (family income under \u20b92.5 Lakh)",
+      "Aadhaar-linked Bank Account Passbook"
+    ],
+    "apply_steps": [
+      "Visit ladakibahin.maharashtra.gov.in or use the Nari Shakti Doot mobile app",
+      "Enter your Aadhaar number and verify using OTP",
+      "Upload scanned copy of Maharashtra domicile proof and income certificate",
+      "Submit the application; \u20b91,500 monthly DBT starts following verification"
+    ],
+    "official_url": "https://ladakibahin.maharashtra.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "gender",
+        "operator": "eq",
+        "value": "female",
+        "logic_group": 1
+      },
+      {
+        "field": "age",
+        "operator": "between",
+        "value": [
+          21,
+          65
+        ],
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 250000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Rajarshi Chhatrapati Shahu Maharaj Shikshan Shulk Shishyavrutti Yojana",
+    "slug": "rajarshi-shahu-maharaj-scholarship",
+    "short_description": "Tuition and exam fee waiver for Maharashtra students from families earning up to \u20b98 Lakh/year.",
+    "full_description": "State scheme reimbursing 50% to 100% of college tuition and exam fees for students admitted through CAP into government and approved private colleges in Maharashtra.",
+    "ministry": "Higher and Technical Education Department, Government of Maharashtra",
+    "category": "education",
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "subsidy",
+    "benefit_amount": 50000.0,
+    "benefit_amount_inr": 50000.0,
+    "benefit_period": "yearly",
+    "driver_tags": [
+      "income",
+      "education"
+    ],
+    "documents": [
+      "Maharashtra Domicile Certificate",
+      "Income Certificate (family income under \u20b98 Lakh)",
+      "CAP Allotment Letter and college fee receipt",
+      "Previous examination marksheet"
+    ],
+    "apply_steps": [
+      "Register on mahadbt.maharashtra.gov.in using Aadhaar",
+      "Select Directorate of Higher / Technical Education scholarship category",
+      "Fill current academic course details and upload CAP allotment letter",
+      "Institute scrutiny officer verifies and fee waiver is processed"
+    ],
+    "official_url": "https://mahadbt.maharashtra.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "employment_status",
+        "operator": "eq",
+        "value": "student",
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 800000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "Majhi Kanya Bhagyashree Yojana",
+    "slug": "majhi-kanya-bhagyashree-yojana",
+    "short_description": "\u20b950,000 fixed deposit savings for Maharashtra families with one or two daughters.",
+    "full_description": "Government of Maharashtra scheme where a fixed deposit of \u20b950,000 is opened for families with one girl child (or \u20b925,000 each for two daughters), maturing with accrued interest at age 18.",
+    "ministry": "Women and Child Development Department, Government of Maharashtra",
+    "category": null,
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "subsidy",
+    "benefit_amount": 50000.0,
+    "benefit_amount_inr": 50000.0,
+    "benefit_period": "one_time",
+    "driver_tags": [
+      "savings",
+      "dependents"
+    ],
+    "documents": [
+      "Girl child birth certificate",
+      "Maharashtra Domicile Certificate",
+      "Family Planning Certificate of parents",
+      "Income Certificate (family income under \u20b97.5 Lakh)"
+    ],
+    "apply_steps": [
+      "Obtain prescribed application form from your local Anganwadi worker or CDPO office",
+      "Attach girl child birth certificate, domicile certificate, and sterilization proof",
+      "CDPO officer approves and deposits \u20b950,000 in a nationalized bank joint account",
+      "Amount matures with interest when the girl child turns 18 and passes Class 10"
+    ],
+    "official_url": "https://womenchild.maharashtra.gov.in/",
+    "status": "active",
+    "last_verified_at": "2026-10-20T00:00:00+00:00",
+    "rules": [
+      {
+        "field": "dependents",
+        "operator": "gte",
+        "value": 1,
+        "logic_group": 1
+      },
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 750000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 9",
+    "slug": "state-welfare-scheme-9",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 9. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "cash",
+    "benefit_amount": 5900,
+    "benefit_description": "Direct transfer of \u20b95900",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 390000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 10",
+    "slug": "state-welfare-scheme-10",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 10. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Karnataka",
+    "benefit_type": "cash",
+    "benefit_amount": 6000,
+    "benefit_description": "Direct transfer of \u20b96000",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 400000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 11",
+    "slug": "state-welfare-scheme-11",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 11. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Delhi",
+    "benefit_type": "cash",
+    "benefit_amount": 6100,
+    "benefit_description": "Direct transfer of \u20b96100",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 410000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 12",
+    "slug": "state-welfare-scheme-12",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 12. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "cash",
+    "benefit_amount": 6200,
+    "benefit_description": "Direct transfer of \u20b96200",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 420000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 13",
+    "slug": "state-welfare-scheme-13",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 13. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Delhi",
+    "benefit_type": "cash",
+    "benefit_amount": 6300,
+    "benefit_description": "Direct transfer of \u20b96300",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 430000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 14",
+    "slug": "state-welfare-scheme-14",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 14. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Karnataka",
+    "benefit_type": "cash",
+    "benefit_amount": 6400,
+    "benefit_description": "Direct transfer of \u20b96400",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 440000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 15",
+    "slug": "state-welfare-scheme-15",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 15. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "cash",
+    "benefit_amount": 6500,
+    "benefit_description": "Direct transfer of \u20b96500",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 450000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 16",
+    "slug": "state-welfare-scheme-16",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 16. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Karnataka",
+    "benefit_type": "cash",
+    "benefit_amount": 6600,
+    "benefit_description": "Direct transfer of \u20b96600",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 460000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 17",
+    "slug": "state-welfare-scheme-17",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 17. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Delhi",
+    "benefit_type": "cash",
+    "benefit_amount": 6700,
+    "benefit_description": "Direct transfer of \u20b96700",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 470000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 18",
+    "slug": "state-welfare-scheme-18",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 18. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "cash",
+    "benefit_amount": 6800,
+    "benefit_description": "Direct transfer of \u20b96800",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 480000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 19",
+    "slug": "state-welfare-scheme-19",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 19. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Delhi",
+    "benefit_type": "cash",
+    "benefit_amount": 6900,
+    "benefit_description": "Direct transfer of \u20b96900",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 490000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 20",
+    "slug": "state-welfare-scheme-20",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 20. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Karnataka",
+    "benefit_type": "cash",
+    "benefit_amount": 7000,
+    "benefit_description": "Direct transfer of \u20b97000",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 500000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 21",
+    "slug": "state-welfare-scheme-21",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 21. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "cash",
+    "benefit_amount": 7100,
+    "benefit_description": "Direct transfer of \u20b97100",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 510000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 22",
+    "slug": "state-welfare-scheme-22",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 22. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Karnataka",
+    "benefit_type": "cash",
+    "benefit_amount": 7200,
+    "benefit_description": "Direct transfer of \u20b97200",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 520000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 23",
+    "slug": "state-welfare-scheme-23",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 23. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Delhi",
+    "benefit_type": "cash",
+    "benefit_amount": 7300,
+    "benefit_description": "Direct transfer of \u20b97300",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 530000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 24",
+    "slug": "state-welfare-scheme-24",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 24. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Maharashtra",
+    "benefit_type": "cash",
+    "benefit_amount": 7400,
+    "benefit_description": "Direct transfer of \u20b97400",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 540000,
+        "logic_group": 1
+      }
+    ]
+  },
+  {
+    "name": "State Welfare Scheme 25",
+    "slug": "state-welfare-scheme-25",
+    "short_description": "A state-level scheme for general welfare and financial assistance.",
+    "full_description": "This is a placeholder description for State Welfare Scheme 25. It aims to improve the livelihood of its beneficiaries through targeted financial aid.",
+    "ministry": "State Government Department",
+    "category": null,
+    "level": "state",
+    "state": "Delhi",
+    "benefit_type": "cash",
+    "benefit_amount": 7500,
+    "benefit_description": "Direct transfer of \u20b97500",
+    "official_url": "https://india.gov.in",
+    "required_documents": [
+      "Aadhaar",
+      "Domicile Certificate"
+    ],
+    "status": "archived",
+    "rules": [
+      {
+        "field": "annual_income",
+        "operator": "lte",
+        "value": 550000,
+        "logic_group": 1
+      }
+    ]
+  }
 ]

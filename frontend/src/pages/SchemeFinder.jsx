@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
+import ChecklistDrawer from '../components/ChecklistDrawer';
 import styles from './SchemeFinder.module.css';
 
 const SchemeFinder = () => {
@@ -9,6 +10,7 @@ const SchemeFinder = () => {
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [checklistScheme, setChecklistScheme] = useState(null);
   // Total schemes in the database, fetched once unfiltered - the header
   // count should reflect what's actually there, not a hardcoded guess.
   const [totalCount, setTotalCount] = useState(null);
@@ -188,14 +190,15 @@ const SchemeFinder = () => {
                   </p>
                   
                   <div className={styles.benefitsRow}>
-                    {scheme.benefit_amount && (
+                    {(scheme.benefit_amount_inr || scheme.benefit_amount) && (
                       <span className={styles.benefitPill}>
-                        ₹{scheme.benefit_amount.toLocaleString('en-IN')}
+                        ₹{Number(scheme.benefit_amount_inr || scheme.benefit_amount).toLocaleString('en-IN')}
+                        {scheme.benefit_period === 'monthly' ? '/mo' : scheme.benefit_period === 'yearly' ? '/yr' : ''}
                       </span>
                     )}
                     {scheme.benefit_type && (
                       <span className={styles.typePill}>
-                        {scheme.benefit_type.charAt(0).toUpperCase() + scheme.benefit_type.slice(1)}
+                        {scheme.benefit_type.replace('_', ' ').charAt(0).toUpperCase() + scheme.benefit_type.replace('_', ' ').slice(1)}
                       </span>
                     )}
                   </div>
@@ -206,11 +209,18 @@ const SchemeFinder = () => {
                       Check Eligibility
                     </div>
                     <div className={styles.cardActions}>
+                      <button 
+                        className={styles.checklistBtn}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setChecklistScheme({ id: scheme.id, name: scheme.name });
+                        }}
+                        title="View required documents & application steps"
+                      >
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                        Checklist
+                      </button>
                       {scheme.official_url && (
-                        // Goes straight to the government's own application
-                        // page - AGENTS.md scope excludes building an actual
-                        // application flow, so linking out is the correct
-                        // integration point, not a gap to fill in-app.
                         <a
                           href={scheme.official_url}
                           target="_blank"
@@ -226,7 +236,7 @@ const SchemeFinder = () => {
                         className={styles.viewBtn} 
                         onClick={() => navigate(`/schemes/${scheme.slug}`)}
                       >
-                        View Details
+                        Details
                       </button>
                     </div>
                   </div>
@@ -243,6 +253,15 @@ const SchemeFinder = () => {
           )}
         </div>
       </div>
+
+      {checklistScheme && (
+        <ChecklistDrawer
+          schemeId={checklistScheme.id}
+          schemeName={checklistScheme.name}
+          isOpen={true}
+          onClose={() => setChecklistScheme(null)}
+        />
+      )}
     </div>
   );
 };

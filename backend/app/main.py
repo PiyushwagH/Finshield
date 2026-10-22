@@ -10,6 +10,7 @@ from app.routers.risk import router as risk_router
 from app.routers.scheme import router as scheme_router
 from app.routers.user_scheme import router as user_scheme_router
 from app.routers.admin import router as admin_router
+from app.routers.assessment_plan import router as assessment_plan_router
 from app.services import risk_service
 
 from app.core.init_db import seed_admin
@@ -29,12 +30,7 @@ app = FastAPI(title="FinShield API", lifespan=lifespan)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# Open to any origin.
-# Note: allow_origins=["*"] cannot be used together with allow_credentials.
-# Browsers reject a wildcard Access-Control-Allow-Origin on credentialed
-# requests, and the frontend sends the httpOnly refresh cookie with
-# withCredentials. The regex makes Starlette echo the caller's own origin
-# back instead, which browsers do accept.
+# Open to any origin with credential support.
 app.add_middleware(
     CORSMiddleware,
     allow_origin_regex=".*",
@@ -48,6 +44,7 @@ app.include_router(risk_router)
 app.include_router(scheme_router)
 app.include_router(user_scheme_router)
 app.include_router(admin_router)
+app.include_router(assessment_plan_router)
 
 @app.get("/api/health")
 def health_check():

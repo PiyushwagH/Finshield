@@ -1,0 +1,70 @@
+{
+  "driver.income": "Annual & Per-Head Income",
+  "driver.emi_burden": "Monthly EMI & Debt Load",
+  "driver.savings": "Savings & Emergency Cushion",
+  "driver.employment_stability": "Employment Stability",
+  "driver.credit_history": "Repayment & Credit History",
+  "driver.dependents": "Family Dependents Count",
+  "driver.age": "Age & Career Stage",
+  "driver.education": "Educational Level",
+  "driver.marital_status": "Household & Marital Status",
+  "driver.gender": "Demographic Factors",
+
+  "priority.reduce_emi_20.title": "Reduce monthly EMI burden by 20%",
+  "priority.reduce_emi_20.why": "Your current debt servicing ratio is elevating default risk. Trimming obligations will ease cash flow.",
+  "priority.reduce_emi_20.action": "Explore debt consolidation, prepay high-interest short-term loans, or restructure existing loan tenures.",
+
+  "priority.reduce_emi_30.title": "Aggressively reduce monthly EMIs by 30%",
+  "priority.reduce_emi_30.why": "High debt commitments consume a significant share of your earnings, limiting financial resilience.",
+  "priority.reduce_emi_30.action": "Liquidate non-yielding assets to prepay costliest loans, or negotiate balance transfer to lower interest rates.",
+
+  "priority.raise_emergency_fund_3m.title": "Build a 3-month emergency safety fund",
+  "priority.raise_emergency_fund_3m.why": "Your liquid runway is under 3 months, leaving you vulnerable to sudden financial shocks.",
+  "priority.raise_emergency_fund_3m.action": "Direct monthly surplus into an auto-sweep deposit or high-yield liquid mutual fund until 3 months of expenses are secured.",
+
+  "priority.raise_emergency_fund_6m.title": "Expand emergency reserve to 6 months of expenses",
+  "priority.raise_emergency_fund_6m.why": "A 6-month buffer safeguards your debt servicing capacity against job transitions or medical emergencies.",
+  "priority.raise_emergency_fund_6m.action": "Allocate seasonal bonuses and tax refunds to lock in an untouchable 6-month living reserve.",
+
+  "priority.reduce_expenditure_10.title": "Cut discretionary monthly expenditure by 10%",
+  "priority.reduce_expenditure_10.why": "Tight monthly surpluses can quickly lead to distress when unexpected expenses arise.",
+  "priority.reduce_expenditure_10.action": "Audit recurring subscription charges and discretionary lifestyle spends to redirect savings towards debt reduction.",
+
+  "priority.improve_credit_history.title": "Maintain pristine repayment discipline for 12 months",
+  "priority.improve_credit_history.why": "Recent delays or irregular repayment severely suppresses your credit profile and score.",
+  "priority.improve_credit_history.action": "Automate auto-debit for all credit card and EMI payments at least 3 business days before due dates.",
+
+  "priority.clear_default.title": "Resolve and cure past defaulted obligations",
+  "priority.clear_default.why": "A recorded default is the single heaviest downward pull on credit risk evaluations.",
+  "priority.clear_default.action": "Approach the lending institution for a formal settlement/closure letter and update your bureau records.",
+
+  "roadmap.3m.title": "Immediate Stabilization (Months 1–3)",
+  "roadmap.3m.detail": "Automate all bills, audit living costs, cut non-essential recurring spends by 10%, and begin building a liquid emergency cushion.",
+  
+  "roadmap.6m.title": "Debt Consolidation & Runway (Months 4–6)",
+  "roadmap.6m.detail": "Aim to prepay or restructure the highest interest loan to lower monthly EMI, and attain at least 3 months of liquid living reserves.",
+
+  "roadmap.12m.title": "Long-term Score Acceleration (Months 7–12)",
+  "roadmap.12m.detail": "Solidify 12 consecutive months of flawless repayment history, expand emergency fund to 6 months, and check bureau records for discrepancies.",
+
+  "habit.emi_ceiling.title": "The 40% EMI Ceiling Rule",
+  "habit.emi_ceiling.detail": "Never allow total monthly EMI obligations to exceed 40% of your take-home income.",
+
+  "habit.emergency_buffer.title": "Guarded Emergency Runway",
+  "habit.emergency_buffer.detail": "Keep at least 3 to 6 months of basic living expenses in an instant-access account, untouched except for true emergencies.",
+
+  "habit.auto_pay.title": "100% Automated Bill Discipline",
+  "habit.auto_pay.detail": "Set up auto-debit for credit cards and loans 3 days before payment due dates to prevent unintentional score damage.",
+
+  "habit.credit_utilization.title": "Credit Utilization Below 30%",
+  "habit.credit_utilization.detail": "Keep credit card balance utilization strictly below 30% of your sanctioned credit limit across all cards.",
+
+  "habit.annual_check.title": "Annual Bureau Audit",
+  "habit.annual_check.detail": "Check your official credit report annually to rectify administrative reporting errors or fraudulent accounts early.",
+
+  "habit.scheme_leverage.title": "Maximize Welfare & Subsidy Entitlements",
+  "habit.scheme_leverage.detail": "Leverage applicable central and state government interest subventions, insurance coverages, and skill subsidies.",
+
+  "disclaimer.regulatory": "Indicative estimate generated by FinShield's trained ML model and deterministic rules for educational purposes only. Does not constitute a credit decision, guarantee of eligibility, or licensed financial advice under RBI guidelines.",
+  "disclaimer.whatif_note": "Scheme benefits affect monthly surplus and emergency runway calculations only; they do not alter statistical ML model inputs."
+}
