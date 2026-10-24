@@ -31,7 +31,7 @@ const Step2Employment = ({ onNext, onPrev }) => {
             onChange={e => updateData({ employment_status: e.target.value })}
           >
             <option value="">{t('wiz.select')}</option>
-            {schema?.employment_status?.map(opt => <option key={opt} value={opt}>{t(`opt.${opt}`)}</option>)}
+            {schema?.employment_status?.filter(opt => opt !== 'unemployed').map(opt => <option key={opt} value={opt}>{t(`opt.${opt}`)}</option>)}
           </select>
         </div>
 

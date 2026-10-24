@@ -65,6 +65,10 @@ class AssessmentResponse(BaseModel):
     model_version: str
     model_meta: Dict[str, Any] = {}
     advice: List[AdviceItem] = []
+    # risk_band above is the model's own band (unchanged, stored). final_band
+    # adds the rule-based safety floor - see services/risk_rules.py.
+    final_band: str = ""
+    band_adjustment: Dict[str, Any] = {}
 
     class Config:
         from_attributes = True

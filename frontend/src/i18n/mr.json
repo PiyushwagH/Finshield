@@ -609,5 +609,17 @@
   "help.stillTitle": "अजूनही मदत हवी आहे?",
   "help.stillText": "FinShield मध्ये अद्याप वेगळा मदत ईमेल नाही. तुम्हाला हे ॲप एखाद्या ॲडमिनने दिले असल्यास, थेट त्यांच्याशी संपर्क साधा.",
   "common.loading": "लोड होत आहे",
-  "landing.menu": "मेनू"
+  "landing.menu": "मेनू",
+  "result.raisedTitle": "FinShield सुरक्षा तपासणीने धोका वाढवला",
+  "result.raisedModel": "फक्त ML मॉडेलने {band} धोका ({pct}% थकबाकी शक्यता) अंदाजला, पण या इशाऱ्यांमुळे कर्जदाते तुम्हाला जास्त धोकादायक मानू शकतात:",
+  "result.modelScoreNote": "गेज ML मॉडेलचा स्कोअर दाखवतो.",
+  "rule.past_default": "तुम्ही यापूर्वी कर्जफेडीत चूक केली आहे.",
+  "rule.poor_payment_history": "तुमचा परतफेड इतिहास वाईट आहे.",
+  "rule.fair_payment_history": "तुमचा परतफेड इतिहास फक्त सरासरी आहे.",
+  "rule.emi_over_50": "तुमचे EMI मासिक उत्पन्नाच्या 50% पेक्षा जास्त आहेत.",
+  "rule.emi_over_40": "तुमचे EMI मासिक उत्पन्नाच्या 40% पेक्षा जास्त आहेत.",
+  "rule.outflow_exceeds_income": "तुम्ही दरमहा कमाईपेक्षा जास्त खर्च करता.",
+  "band.word.VeryLow": "खूप कमी",
+  "band.word.Moderate": "मध्यम",
+  "band.word.VeryHigh": "खूप जास्त"
 }

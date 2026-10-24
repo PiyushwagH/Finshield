@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, List, Union
 from uuid import UUID
 
+from app.services.risk_rules import apply_safety_rules
 from app.database import get_db
 from app.core.deps import get_current_user
 from app.core.limiter import limiter
@@ -51,7 +52,8 @@ def get_assessment_plan(
         "id": str(assessment.id),
         "input_data": assessment.input_data or {},
         "risk_score": assessment.risk_score,
-        "risk_band": assessment.risk_band,
+        # Plan and PDF show the same final band as the results page.
+        "risk_band": apply_safety_rules(assessment.input_data or {}, assessment.affordability or {}, assessment.risk_band)["final_band"],
         "affordability": assessment.affordability or {}
     }
     return generate_plan(assessment_dict, lang=lang)
@@ -119,7 +121,8 @@ def download_assessment_pdf_report(
         "id": str(assessment.id),
         "input_data": assessment.input_data or {},
         "risk_score": assessment.risk_score,
-        "risk_band": assessment.risk_band,
+        # Plan and PDF show the same final band as the results page.
+        "risk_band": apply_safety_rules(assessment.input_data or {}, assessment.affordability or {}, assessment.risk_band)["final_band"],
         "affordability": assessment.affordability or {}
     }
 

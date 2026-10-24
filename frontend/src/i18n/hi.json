@@ -609,5 +609,17 @@
   "help.stillTitle": "अब भी मदद चाहिए?",
   "help.stillText": "FinShield में अभी अलग सहायता ईमेल नहीं है। अगर आपको यह ऐप किसी एडमिन ने दिया है, तो सीधे उनसे संपर्क करें।",
   "common.loading": "लोड हो रहा है",
-  "landing.menu": "मेनू"
+  "landing.menu": "मेनू",
+  "result.raisedTitle": "FinShield सुरक्षा जाँच ने जोखिम बढ़ाया",
+  "result.raisedModel": "केवल ML मॉडल ने {band} जोखिम ({pct}% डिफ़ॉल्ट संभावना) आँका, लेकिन इन चेतावनियों के कारण ऋणदाता आपको अधिक जोखिम वाला मान सकते हैं:",
+  "result.modelScoreNote": "गेज ML मॉडल का स्कोर दिखाता है।",
+  "rule.past_default": "आपने पहले किसी ऋण में चूक की है।",
+  "rule.poor_payment_history": "आपका भुगतान इतिहास खराब है।",
+  "rule.fair_payment_history": "आपका भुगतान इतिहास केवल औसत है।",
+  "rule.emi_over_50": "आपकी EMI मासिक आय के 50% से अधिक है।",
+  "rule.emi_over_40": "आपकी EMI मासिक आय के 40% से अधिक है।",
+  "rule.outflow_exceeds_income": "आप हर महीने कमाई से अधिक खर्च करते हैं।",
+  "band.word.VeryLow": "बहुत कम",
+  "band.word.Moderate": "मध्यम",
+  "band.word.VeryHigh": "बहुत उच्च"
 }

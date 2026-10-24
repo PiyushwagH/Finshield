@@ -15,7 +15,9 @@ class WhatIfRequest(BaseModel):
 
 class ModelScoreSummary(BaseModel):
     score: int
-    band: str
+    band: str  # the model's own band
+    final_band: str = ""  # band after the rule-based safety floor
+    band_reasons: List[str] = []
     default_probability: float
 
 class AffordabilitySummary(BaseModel):

@@ -8,6 +8,7 @@ from app.models.user import User
 from app.core.deps import get_current_user
 from app.schemas.risk import AssessmentRequest, AssessmentResponse, AdviceItem
 from app.services import risk_service, advice_service
+from app.services.risk_rules import apply_safety_rules
 from app.models.assessment import Assessment
 import sys
 from pathlib import Path
@@ -21,6 +22,37 @@ from finshield_predictor import EDUCATION_MAP, MARITAL_MAP, EMPLOYMENT_MAP, PAYM
 
 router = APIRouter(prefix="/api/risk", tags=["Risk"])
 
+
+def _model_meta() -> dict:
+    metrics = risk_service.predictor.metrics
+    return {
+        "auc": round(metrics["auc"], 4),
+        "trained_on": metrics["n_train"],
+        "population_default_rate": round(metrics["base_rate"], 4),
+    }
+
+
+def to_response(a: Assessment, model_meta: dict) -> AssessmentResponse:
+    """Build the API response for a stored assessment.
+
+    The model's own outputs are returned unchanged; final_band layers the
+    rule-based safety floor on top, and advice follows the final band so a
+    user with a past default isn't told their profile is "excellent".
+    """
+    adjustment = apply_safety_rules(a.input_data, a.affordability, a.risk_band)
+    advice = advice_service.generate_advice(
+        {"risk_band": adjustment["final_band"], "affordability": a.affordability}
+    )
+    return AssessmentResponse(
+        id=a.id, user_id=a.user_id, created_at=a.created_at, input_data=a.input_data,
+        default_probability=a.default_probability, risk_band=a.risk_band,
+        risk_score=a.risk_score, population_percentile=a.population_percentile,
+        affordability=a.affordability, factors=a.factors, model_version=a.model_version,
+        model_meta=model_meta, advice=advice,
+        final_band=adjustment["final_band"], band_adjustment=adjustment,
+    )
+
+
 @router.post("/assess", response_model=AssessmentResponse)
 def assess_risk(
     req: AssessmentRequest,
@@ -28,42 +60,8 @@ def assess_risk(
     current_user: User = Depends(get_current_user)
 ):
     try:
-        # Generate prediction and persist
         assessment = risk_service.assess(db, req.model_dump(), current_user.id)
-        
-        # Format prediction output for advice engine
-        prediction_output = {
-            "risk_band": assessment.risk_band,
-            "affordability": assessment.affordability
-        }
-        
-        # Generate advice
-        advice = advice_service.generate_advice(prediction_output)
-        
-        # Get static model meta
-        metrics = risk_service.predictor.metrics
-        model_meta = {
-            "auc": round(metrics["auc"], 4),
-            "trained_on": metrics["n_train"],
-            "population_default_rate": round(metrics["base_rate"], 4)
-        }
-        
-        # Build response
-        return AssessmentResponse(
-            id=assessment.id,
-            user_id=assessment.user_id,
-            created_at=assessment.created_at,
-            input_data=assessment.input_data,
-            default_probability=assessment.default_probability,
-            risk_band=assessment.risk_band,
-            risk_score=assessment.risk_score,
-            population_percentile=assessment.population_percentile,
-            affordability=assessment.affordability,
-            factors=assessment.factors,
-            model_version=assessment.model_version,
-            model_meta=model_meta,
-            advice=advice
-        )
+        return to_response(assessment, _model_meta())
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -86,36 +84,8 @@ def list_assessments(
     assessments = db.query(Assessment).filter(
         Assessment.user_id == current_user.id
     ).order_by(Assessment.created_at.desc()).offset(skip).limit(limit).all()
-    
-    metrics = risk_service.predictor.metrics
-    model_meta = {
-        "auc": round(metrics["auc"], 4),
-        "trained_on": metrics["n_train"],
-        "population_default_rate": round(metrics["base_rate"], 4)
-    }
-    
-    responses = []
-    for a in assessments:
-        prediction_output = {"risk_band": a.risk_band, "affordability": a.affordability}
-        advice = advice_service.generate_advice(prediction_output)
-        responses.append(
-            AssessmentResponse(
-                id=a.id,
-                user_id=a.user_id,
-                created_at=a.created_at,
-                input_data=a.input_data,
-                default_probability=a.default_probability,
-                risk_band=a.risk_band,
-                risk_score=a.risk_score,
-                population_percentile=a.population_percentile,
-                affordability=a.affordability,
-                factors=a.factors,
-                model_version=a.model_version,
-                model_meta=model_meta,
-                advice=advice
-            )
-        )
-    return responses
+    meta = _model_meta()
+    return [to_response(a, meta) for a in assessments]
 
 @router.get("/assessments/compare", response_model=List[AssessmentResponse])
 def compare_assessments(
@@ -128,31 +98,12 @@ def compare_assessments(
         Assessment.id.in_(id_list),
         Assessment.user_id == current_user.id
     ).all()
-    
+
     if len(assessments) != len(id_list):
         raise HTTPException(status_code=404, detail="One or more assessments not found")
-        
-    metrics = risk_service.predictor.metrics
-    model_meta = {
-        "auc": round(metrics["auc"], 4),
-        "trained_on": metrics["n_train"],
-        "population_default_rate": round(metrics["base_rate"], 4)
-    }
 
-    responses = []
-    for a in assessments:
-        prediction_output = {"risk_band": a.risk_band, "affordability": a.affordability}
-        advice = advice_service.generate_advice(prediction_output)
-        responses.append(
-            AssessmentResponse(
-                id=a.id, user_id=a.user_id, created_at=a.created_at, input_data=a.input_data,
-                default_probability=a.default_probability, risk_band=a.risk_band,
-                risk_score=a.risk_score, population_percentile=a.population_percentile,
-                affordability=a.affordability, factors=a.factors, model_version=a.model_version,
-                model_meta=model_meta, advice=advice
-            )
-        )
-    return responses
+    meta = _model_meta()
+    return [to_response(a, meta) for a in assessments]
 
 @router.get("/assessments/{assessment_id}", response_model=AssessmentResponse)
 def get_assessment(
@@ -166,21 +117,4 @@ def get_assessment(
     ).first()
     if not a:
         raise HTTPException(status_code=404, detail="Assessment not found")
-        
-    prediction_output = {"risk_band": a.risk_band, "affordability": a.affordability}
-    advice = advice_service.generate_advice(prediction_output)
-    
-    metrics = risk_service.predictor.metrics
-    model_meta = {
-        "auc": round(metrics["auc"], 4),
-        "trained_on": metrics["n_train"],
-        "population_default_rate": round(metrics["base_rate"], 4)
-    }
-
-    return AssessmentResponse(
-        id=a.id, user_id=a.user_id, created_at=a.created_at, input_data=a.input_data,
-        default_probability=a.default_probability, risk_band=a.risk_band,
-        risk_score=a.risk_score, population_percentile=a.population_percentile,
-        affordability=a.affordability, factors=a.factors, model_version=a.model_version,
-        model_meta=model_meta, advice=advice
-    )
+    return to_response(a, _model_meta())

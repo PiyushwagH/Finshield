@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 
 // Values must match scheme rule values exactly (they're compared as strings).
 const STATES = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"];
-const EMPLOYMENT = ['salaried_private', 'salaried_government', 'self_employed', 'business_owner', 'student', 'retired', 'unemployed', 'homemaker'];
+const EMPLOYMENT = ['salaried_private', 'salaried_government', 'self_employed', 'business_owner', 'student', 'retired', 'homemaker'];
 const TAGS = ['farmer', 'fisheries', 'sc_st', 'obc', 'minority', 'disabled', 'street_vendor', 'artisan', 'construction_worker'];
 
 const SchemeQuickCheck = () => {

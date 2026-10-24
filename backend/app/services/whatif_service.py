@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.services.risk_service import predictor
 from app.models.scheme import Scheme
 from app.services.i18n import t
+from app.services.risk_rules import apply_safety_rules
 
 def simulate_whatif(
     base_form: dict,
@@ -77,6 +78,8 @@ def simulate_whatif(
         scenario_affordability["surplus_ratio"] = updated_surplus_ratio
 
     score_delta = scenario_score - base_score
+    base_adj = apply_safety_rules(base_form, base_affordability, base_band)
+    scenario_adj = apply_safety_rules(scenario_form, scenario_affordability, scenario_band)
 
     disclaimer_text = f"{t('disclaimer.whatif_note', lang)} {t('disclaimer.regulatory', lang)}"
 
@@ -84,11 +87,15 @@ def simulate_whatif(
         "base": {
             "score": base_score,
             "band": base_band,
+            "final_band": base_adj["final_band"],
+            "band_reasons": base_adj["reasons"],
             "default_probability": base_prob
         },
         "scenario": {
             "score": scenario_score,
             "band": scenario_band,
+            "final_band": scenario_adj["final_band"],
+            "band_reasons": scenario_adj["reasons"],
             "default_probability": scenario_prob
         },
         "score_delta": score_delta,

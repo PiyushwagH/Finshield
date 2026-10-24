@@ -263,7 +263,9 @@ const RiskResult = () => {
     annual_income: rangeMax(baseInput.annual_income, 2000000, 10000),
   };
 
-  const mappedBand = mapRiskBand(data.risk_band);
+  // final_band = model band + rule-based safety floor (see backend risk_rules.py).
+  const mappedBand = mapRiskBand(data.final_band || data.risk_band);
+  const adjustment = data.band_adjustment || {};
   const defProbPct = (data.default_probability * 100).toFixed(1);
   const popRate = data.model_meta?.population_default_rate 
     ? (data.model_meta.population_default_rate * 100).toFixed(1) 
@@ -310,6 +312,22 @@ const RiskResult = () => {
           <p className={styles.percentileLine}>
             {t('result.pctPre')}<strong>{t('result.pctVal', { n: Math.round(data.population_percentile), sfx: ordinalSuffix(Math.round(data.population_percentile)) })}</strong>{t('result.pctPost')}
           </p>
+
+          {adjustment.raised && (
+            <div className={styles.adjustBox} role="note">
+              <h3 className={styles.adjustTitle}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" /><line x1="12" y1="9" x2="12" y2="13" /><line x1="12" y1="17" x2="12.01" y2="17" /></svg>
+                {t('result.raisedTitle')}
+              </h3>
+              <p className={styles.adjustText}>
+                {t('result.raisedModel', { band: t(`band.word.${(adjustment.model_band || '').replace(' ', '')}`), pct: defProbPct })}
+              </p>
+              <ul className={styles.adjustList}>
+                {adjustment.reasons?.map((code) => <li key={code}>{t(`rule.${code}`)}</li>)}
+              </ul>
+              <p className={styles.adjustNote}>{t('result.modelScoreNote')}</p>
+            </div>
+          )}
         </div>
 
         {/* Existing Two-Column Grid: Drivers & Affordability Check */}
@@ -705,14 +723,14 @@ const RiskResult = () => {
                   <div className={styles.deltaItem}>
                     <span className={styles.deltaLabel}>{t('result.baseScore')}</span>
                     <span className={styles.deltaVal}>{whatifResult?.base?.score ?? data.risk_score}</span>
-                    <span className={styles.deltaLabel}>{t('result.bandRisk', { band: t(`band.word.${mapRiskBand(whatifResult?.base?.band ?? data.risk_band)}`) })}</span>
+                    <span className={styles.deltaLabel}>{t('result.bandRisk', { band: t(`band.word.${mapRiskBand(whatifResult?.base?.final_band || whatifResult?.base?.band || data.final_band || data.risk_band)}`) })}</span>
                   </div>
                   <div style={{ fontSize: '1.5rem', color: 'rgba(255,255,255,0.4)' }}>➔</div>
                   <div className={styles.deltaItem}>
                     <span className={styles.deltaLabel}>{t('result.scenarioScore')}</span>
                     <span className={styles.deltaVal}>{whatifResult?.scenario?.score ?? data.risk_score}</span>
                     <span className={whatifResult?.score_delta >= 0 ? styles.deltaDiffGain : styles.deltaDiffLoss}>
-                      {whatifResult?.score_delta >= 0 ? `+${whatifResult?.score_delta || 0}` : whatifResult?.score_delta} {t('result.pts')} ({t(`band.word.${mapRiskBand(whatifResult?.scenario?.band ?? data.risk_band)}`)})
+                      {whatifResult?.score_delta >= 0 ? `+${whatifResult?.score_delta || 0}` : whatifResult?.score_delta} {t('result.pts')} ({t(`band.word.${mapRiskBand(whatifResult?.scenario?.final_band || whatifResult?.scenario?.band || data.final_band || data.risk_band)}`)})
                     </span>
                   </div>
                 </div>

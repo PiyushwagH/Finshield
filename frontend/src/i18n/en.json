@@ -609,5 +609,17 @@
   "help.stillTitle": "Still need help?",
   "help.stillText": "FinShield doesn't yet have a dedicated support inbox set up. If you were given access to this app by an administrator, reach out to them directly.",
   "common.loading": "Loading",
-  "landing.menu": "Menu"
+  "landing.menu": "Menu",
+  "result.raisedTitle": "Risk raised by FinShield safety checks",
+  "result.raisedModel": "The ML model alone estimated {band} risk ({pct}% chance of default), but these red flags mean lenders would likely see you as higher risk:",
+  "result.modelScoreNote": "Gauge shows the ML model's score.",
+  "rule.past_default": "You have defaulted on a loan before.",
+  "rule.poor_payment_history": "Your payment history is poor.",
+  "rule.fair_payment_history": "Your payment history is only fair.",
+  "rule.emi_over_50": "Your EMIs take more than 50% of your monthly income.",
+  "rule.emi_over_40": "Your EMIs take more than 40% of your monthly income.",
+  "rule.outflow_exceeds_income": "You spend more each month than you earn.",
+  "band.word.VeryLow": "Very Low",
+  "band.word.Moderate": "Moderate",
+  "band.word.VeryHigh": "Very High"
 }

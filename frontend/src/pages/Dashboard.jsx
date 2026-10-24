@@ -61,7 +61,7 @@ const Dashboard = () => {
     );
   }
 
-  const mappedBand = mapRiskBand(latest.risk_band);
+  const mappedBand = mapRiskBand(latest.final_band || latest.risk_band);
   const defProbPct = (latest.default_probability * 100).toFixed(1);
 
   // Prepare chart data for line chart

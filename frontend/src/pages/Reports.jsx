@@ -103,7 +103,7 @@ const Reports = () => {
               </thead>
               <tbody>
                 {assessments.map(item => {
-                  const mappedBand = mapRiskBand(item.risk_band);
+                  const mappedBand = mapRiskBand(item.final_band || item.risk_band);
                   const income = item.input_data?.annual_income;
                   return (
                     <tr key={item.id}>

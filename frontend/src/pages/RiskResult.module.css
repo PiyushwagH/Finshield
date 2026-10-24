@@ -979,3 +979,45 @@
     align-items: flex-start;
   }
 }
+
+/* Rule-based safety floor explanation (shown only when it raised the band). */
+.adjustBox {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-card);
+  border: 1px solid color-mix(in srgb, var(--risk-high) 35%, transparent);
+  background: color-mix(in srgb, var(--risk-high) 6%, transparent);
+  text-align: left;
+}
+
+.adjustTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  color: var(--risk-high);
+}
+
+.adjustText {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.adjustList {
+  margin: 0 0 0.5rem;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text);
+}
+
+.adjustList li {
+  margin: 0.15rem 0;
+}
+
+.adjustNote {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
