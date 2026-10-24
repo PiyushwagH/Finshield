@@ -49,10 +49,21 @@ export const LanguageProvider = ({ children }) => {
   );
 };
 
-export const useLanguage = () => {
-  const context = useContext(LanguageContext);
-  if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
-  }
-  return context;
+// Used only if a component renders outside the provider - in practice that's
+// a dev hot-reload swapping the context module under a mounted tree. English
+// keeps the page usable instead of crashing it.
+const englishFallback = {
+  lang: 'en',
+  setLang: () => {},
+  locale: 'en-IN',
+  t: (key, params = {}) => {
+    let template = en[key] ?? key;
+    Object.keys(params).forEach((k) => {
+      template = template.replace(new RegExp(`\\{${k}\\}`, 'g'), params[k]);
+    });
+    return template;
+  },
+  tx: (text) => (text && en[`text:${text}`]) || text,
 };
+
+export const useLanguage = () => useContext(LanguageContext) || englishFallback;

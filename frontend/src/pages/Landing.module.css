@@ -7,26 +7,44 @@
 
 /* Header */
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 1.5rem 4rem;
+  gap: 1.5rem;
+  padding: 1rem 2.5rem;
   background-color: var(--bg);
+  border-bottom: 1px solid var(--border);
 }
 
 .logo {
   font-size: 1.5rem;
   font-weight: 700;
-  color: var(--text);
-  flex: 1;
+  color: var(--navy);
+  text-decoration: none;
+  white-space: nowrap;
 }
 
+/* Centered between logo and actions; collapses into the menu on small screens. */
 .navLinks {
+  flex: 1;
   display: flex;
-  gap: 2rem;
+  justify-content: center;
+  gap: 1.75rem;
   align-items: center;
   font-weight: 500;
   color: var(--text-muted);
+  min-width: 0;
+}
+
+.navLinks a {
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  padding: 0.25rem 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
 }
 
 .navLinks a:hover {
@@ -35,36 +53,44 @@
 
 .activeLink {
   color: var(--text) !important;
-  border-bottom: 2px solid var(--text);
-  padding-bottom: 4px;
+  border-bottom-color: var(--navy) !important;
 }
 
 .authLinks {
-  flex: 1;
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: 0.6rem;
   align-items: center;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex-shrink: 0;
 }
 
-.loginBtn {
-  font-weight: 600;
-  color: var(--text);
+.authLinks a {
+  white-space: nowrap;
+  text-decoration: none;
 }
 
-/* Two outlined login buttons, so neither competes with the primary Get Started CTA. */
-.userLoginBtn,
+/* Admin login is secondary for most visitors - a quiet text link, not a third button. */
 .adminLoginBtn {
-  padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-input);
+  padding: 0.6rem 0.5rem;
   font-weight: 600;
-  border: 1px solid var(--border);
-  transition: border-color 0.2s, color 0.2s;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.adminLoginBtn:hover {
+  color: var(--teal);
 }
 
 .userLoginBtn {
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--radius-input);
+  font-weight: 600;
+  font-size: 0.9rem;
   color: var(--text);
+  border: 1px solid var(--border);
+  transition: border-color 0.2s, color 0.2s;
 }
 
 .userLoginBtn:hover {
@@ -72,26 +98,89 @@
   color: var(--navy);
 }
 
-.adminLoginBtn {
-  color: var(--text-muted);
-}
-
-.adminLoginBtn:hover {
-  border-color: var(--teal);
-  color: var(--teal);
-}
-
 .registerBtn {
   background-color: var(--navy);
-  color: white;
-  padding: 0.75rem 1.5rem;
+  color: var(--bg);
+  padding: 0.65rem 1.25rem;
   border-radius: var(--radius-input);
   font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  text-decoration: none;
   transition: opacity 0.2s;
 }
 
 .registerBtn:hover {
   opacity: 0.9;
+}
+
+.menuBtn {
+  display: none;
+  margin-left: auto;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  background: var(--bg);
+  color: var(--navy);
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.mobileMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem 1.25rem 1.25rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 12px 24px rgba(15, 42, 71, 0.08);
+}
+
+.mobileMenu a {
+  padding: 0.7rem 0.25rem;
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.mobileMenu .registerBtn {
+  margin: 0.5rem 0;
+  text-align: center;
+  color: var(--bg);
+}
+
+.mobileDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.4rem 0;
+}
+
+/* Laptop widths: tighten spacing before anything collapses. */
+@media (max-width: 1200px) {
+  .header {
+    padding: 1rem 1.5rem;
+  }
+  .navLinks {
+    gap: 1.25rem;
+    font-size: 0.925rem;
+  }
+}
+
+/* Tablet & phone: hide the inline nav and actions, use the menu instead. */
+@media (max-width: 980px) {
+  .navLinks,
+  .authLinks {
+    display: none;
+  }
+  .menuBtn {
+    display: inline-flex;
+  }
 }
 
 /* Hero Section */
@@ -380,4 +469,10 @@
   .stepsContainer::before {
     display: none;
   }
+}
+
+/* Anchor targets land below the sticky header instead of under it. */
+.featuresSection,
+.howItWorksSection {
+  scroll-margin-top: 80px;
 }

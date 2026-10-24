@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -8,6 +8,8 @@ import styles from './Landing.module.css';
 const Landing = () => {
   const { user, loading } = useAuth();
   const { t } = useLanguage();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = () => setMenuOpen(false);
 
   if (loading) return null;
   
@@ -16,21 +18,52 @@ const Landing = () => {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} id="top">
       <header className={styles.header}>
-        <div className={styles.logo}>FinShield</div>
-        <nav className={styles.navLinks}>
-          <Link to="/" className={styles.activeLink}>{t('landing.navHome')}</Link>
-          <Link to="/how-it-works">{t('landing.navHow')}</Link>
+        <Link to="/" className={styles.logo} onClick={closeMenu}>FinShield</Link>
+
+        <nav className={styles.navLinks} aria-label="Primary">
+          <a href="#top" className={styles.activeLink}>{t('landing.navHome')}</a>
+          <a href="#how-it-works">{t('landing.navHow')}</a>
           <Link to="/schemes">{t('landing.navSchemes')}</Link>
-          <Link to="/about">{t('landing.navAbout')}</Link>
+          <a href="#features">{t('landing.navAbout')}</a>
         </nav>
+
         <div className={styles.authLinks}>
           <LanguageSwitcher />
           <Link to="/admin/login" className={styles.adminLoginBtn}>{t('landing.adminLogin')}</Link>
           <Link to="/login" className={styles.userLoginBtn}>{t('landing.userLogin')}</Link>
           <Link to="/login?tab=register" className={styles.registerBtn}>{t('landing.getStarted')}</Link>
         </div>
+
+        <button
+          type="button"
+          className={styles.menuBtn}
+          aria-label={t('landing.menu')}
+          aria-expanded={menuOpen}
+          aria-controls="landing-mobile-menu"
+          onClick={() => setMenuOpen((o) => !o)}
+        >
+          {menuOpen ? (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+          )}
+        </button>
+
+        {menuOpen && (
+          <div id="landing-mobile-menu" className={styles.mobileMenu}>
+            <a href="#top" onClick={closeMenu}>{t('landing.navHome')}</a>
+            <a href="#how-it-works" onClick={closeMenu}>{t('landing.navHow')}</a>
+            <Link to="/schemes" onClick={closeMenu}>{t('landing.navSchemes')}</Link>
+            <a href="#features" onClick={closeMenu}>{t('landing.navAbout')}</a>
+            <div className={styles.mobileDivider} />
+            <Link to="/login" onClick={closeMenu}>{t('landing.userLogin')}</Link>
+            <Link to="/admin/login" onClick={closeMenu}>{t('landing.adminLogin')}</Link>
+            <Link to="/login?tab=register" className={styles.registerBtn} onClick={closeMenu}>{t('landing.getStarted')}</Link>
+            <LanguageSwitcher />
+          </div>
+        )}
       </header>
       
       <main className={styles.main}>
@@ -117,7 +150,7 @@ const Landing = () => {
           </div>
         </section>
 
-        <section className={styles.featuresSection}>
+        <section className={styles.featuresSection} id="features">
           <h2 className={styles.sectionTitle}>{t('landing.featuresTitle')}</h2>
           <div className={styles.featuresGrid}>
             <div className={styles.featureCard}>
@@ -144,7 +177,7 @@ const Landing = () => {
           </div>
         </section>
 
-        <section className={styles.howItWorksSection}>
+        <section className={styles.howItWorksSection} id="how-it-works">
           <h2 className={styles.sectionTitle}>{t('landing.howTitle')}</h2>
           <div className={styles.stepsContainer}>
             <div className={styles.step}>

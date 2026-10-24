@@ -608,5 +608,6 @@
   "help.a6Post": " page to log what you spend each day, see a category breakdown, and download a monthly PDF report.",
   "help.stillTitle": "Still need help?",
   "help.stillText": "FinShield doesn't yet have a dedicated support inbox set up. If you were given access to this app by an administrator, reach out to them directly.",
-  "common.loading": "Loading"
+  "common.loading": "Loading",
+  "landing.menu": "Menu"
 }
