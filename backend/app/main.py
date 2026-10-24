@@ -11,6 +11,7 @@ from app.routers.scheme import router as scheme_router
 from app.routers.user_scheme import router as user_scheme_router
 from app.routers.admin import router as admin_router
 from app.routers.assessment_plan import router as assessment_plan_router
+from app.routers.expense import router as expense_router
 from app.services import risk_service
 
 from app.core.init_db import seed_admin
@@ -45,6 +46,7 @@ app.include_router(scheme_router)
 app.include_router(user_scheme_router)
 app.include_router(admin_router)
 app.include_router(assessment_plan_router)
+app.include_router(expense_router)
 
 @app.get("/api/health")
 def health_check():

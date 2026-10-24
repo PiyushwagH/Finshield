@@ -51,7 +51,7 @@ def simulate_whatif(
     if scheme_ids:
         # Match schemes by UUID string
         scheme_id_strs = [str(sid) for sid in scheme_ids if sid]
-        schemes = db.query(Scheme).filter(Scheme.id.in_(scheme_id_strs)).all() if scheme_id_strs else []
+        schemes = db.query(Scheme).filter(Scheme.id.in_(scheme_id_strs), Scheme.status == 'active').all() if scheme_id_strs else []
         for s in schemes:
             amt = float(getattr(s, "benefit_amount_inr", None) or s.benefit_amount or 0.0)
             period = str(getattr(s, "benefit_period", "") or "").lower()

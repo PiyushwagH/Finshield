@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../api/client';
 import styles from './AdminUsers.module.css';
+import { TableRowsSkeleton } from '../../components/Skeleton';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -64,7 +65,7 @@ const AdminUsers = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="5" className={styles.loading}>Loading users...</td></tr>
+              <TableRowsSkeleton rows={6} cols={5} />
             ) : users.map(u => (
               <tr key={u.id}>
                 <td>

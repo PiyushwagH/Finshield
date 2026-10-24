@@ -1,12 +1,14 @@
 import React from 'react';
 import { useAssessment } from './AssessmentWizard';
 import styles from './AssessmentWizard.module.css';
+import { useLanguage } from '../context/LanguageContext';
 import CurrencyInput from '../components/CurrencyInput';
 import { useNavigate } from 'react-router-dom';
 
 const Step2Employment = ({ onNext, onPrev }) => {
   const { formData, updateData, schema } = useAssessment();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   const isValid = 
     formData.employment_status !== '' &&
@@ -15,26 +17,26 @@ const Step2Employment = ({ onNext, onPrev }) => {
 
   return (
     <div>
-      <h2 className={styles.stepTitle}>Employment Details</h2>
+      <h2 className={styles.stepTitle}>{t('s2.title')}</h2>
       <p className={styles.stepDescription}>
-        Tell us about your current employment and income sources.
+        {t('s2.desc')}
       </p>
 
       <div className={styles.grid2}>
         <div className={styles.inputGroup}>
-          <label>Employment Status</label>
+          <label>{t('s2.status')}</label>
           <select 
             className={styles.select}
             value={formData.employment_status}
             onChange={e => updateData({ employment_status: e.target.value })}
           >
-            <option value="">Select Status</option>
-            {schema?.employment_status?.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+            <option value="">{t('wiz.select')}</option>
+            {schema?.employment_status?.map(opt => <option key={opt} value={opt}>{t(`opt.${opt}`)}</option>)}
           </select>
         </div>
 
         <div className={styles.inputGroup}>
-          <label>Years Employed</label>
+          <label>{t('s2.years')}</label>
           <input 
             type="number" 
             className={styles.input}
@@ -47,7 +49,7 @@ const Step2Employment = ({ onNext, onPrev }) => {
 
       <div className={styles.grid1}>
         <CurrencyInput 
-          label="Total Annual Income"
+          label={t('s2.income')}
           value={formData.annual_income}
           onChange={val => updateData({ annual_income: val })}
         />
@@ -55,14 +57,14 @@ const Step2Employment = ({ onNext, onPrev }) => {
 
       <div className={styles.actions}>
         <button className={styles.saveExit} onClick={() => navigate('/dashboard')}>
-          Save and Exit
+          {t('wiz.saveExit')}
         </button>
         <div className={styles.navButtons}>
           <button className={styles.btnSecondary} onClick={onPrev}>
-            Back
+            {t('wiz.back')}
           </button>
           <button className={styles.btnPrimary} onClick={onNext} disabled={!isValid}>
-            Continue &rarr;
+            {t('wiz.continue')}
           </button>
         </div>
       </div>

@@ -60,7 +60,7 @@ def get_scheme_checklist(
     except ValueError:
         scheme = db.query(Scheme).filter(Scheme.slug == id).first()
 
-    if not scheme:
+    if not scheme or scheme.status != 'active':
         raise HTTPException(status_code=404, detail="Scheme not found")
 
     docs = scheme.documents or scheme.required_documents or []
@@ -89,7 +89,7 @@ def put_scheme_my_status(
     except ValueError:
         scheme = db.query(Scheme).filter(Scheme.slug == id).first()
 
-    if not scheme:
+    if not scheme or scheme.status != 'active':
         raise HTTPException(status_code=404, detail="Scheme not found")
 
     record = db.query(UserSchemeStatus).filter(
@@ -114,7 +114,7 @@ def put_scheme_my_status(
 @router.get("/{slug}", response_model=SchemeDetailResponse)
 def get_scheme_detail(slug: str, db: Session = Depends(get_db)):
     scheme = db.query(Scheme).filter(Scheme.slug == slug).first()
-    if not scheme:
+    if not scheme or scheme.status != 'active':
         raise HTTPException(status_code=404, detail="Scheme not found")
         
     rules = db.query(SchemeEligibilityRule).filter(SchemeEligibilityRule.scheme_id == scheme.id).all()
@@ -165,7 +165,7 @@ def quick_match_schemes(profile: QuickMatchProfile, db: Session = Depends(get_db
 
 @router.get("/{id}/eligibility")
 def get_user_eligibility(id: uuid.UUID, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    scheme = db.query(Scheme).filter(Scheme.id == id).first()
+    scheme = db.query(Scheme).filter(Scheme.id == id, Scheme.status == 'active').first()
     if not scheme:
         raise HTTPException(status_code=404, detail="Scheme not found")
         

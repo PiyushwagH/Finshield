@@ -225,9 +225,39 @@
   padding: 1.5rem 2rem;
   border-top: 1px solid var(--border);
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 1rem;
   background: white;
+}
+
+.drawerFooterActions {
+  display: flex;
+  gap: 1rem;
+  margin-left: auto;
+}
+
+.deleteBtn {
+  background: white;
+  border: 1px solid var(--risk-high);
+  color: var(--risk-high);
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.15s ease;
+}
+
+.deleteBtn:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.deleteBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .cancelBtn {

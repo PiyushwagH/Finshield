@@ -3,16 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import styles from './AssessmentWizard.module.css';
+import { useLanguage } from '../context/LanguageContext';
 import Step1Personal from './Step1Personal';
 import Step2Employment from './Step2Employment';
 import Step3Finances from './Step3Finances';
 import Step4Credit from './Step4Credit';
+import { FormSkeleton } from '../components/Skeleton';
 
 const AssessmentContext = createContext();
 
 export const useAssessment = () => useContext(AssessmentContext);
 
-const STEPS = ['Personal', 'Employment', 'Finances', 'Credit History'];
+const STEPS = ['wiz.stepPersonal', 'wiz.stepEmployment', 'wiz.stepFinances', 'wiz.stepCredit'];
 
 const INITIAL_DATA = {
   age: '',
@@ -59,14 +61,15 @@ const describeSubmitError = (err) => {
         return field ? `${field}: ${e.msg}` : e?.msg;
       })
       .filter(Boolean)
-      .join('; ') || 'Failed to submit assessment.';
+      .join('; ') || null;
   }
   if (detail && typeof detail === 'object' && typeof detail.msg === 'string') return detail.msg;
-  return 'Failed to submit assessment.';
+  return null;
 };
 
 const AssessmentWizard = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const { user } = useAuth();
   const storageKey = user ? draftKeyFor(user.id) : null;
   const [currentStep, setCurrentStep] = useState(1);
@@ -84,7 +87,7 @@ const AssessmentWizard = () => {
         const res = await apiClient.get('/risk/schema');
         setSchema(res.data);
       } catch (err) {
-        setError('Failed to load form options. Please try again later.');
+        setError(t('wiz.loadFailed'));
       } finally {
         setLoading(false);
       }
@@ -159,13 +162,13 @@ const AssessmentWizard = () => {
       if (storageKey) localStorage.removeItem(storageKey);
       navigate(`/assessment/result/${res.data.id}`);
     } catch (err) {
-      setError(describeSubmitError(err));
+      setError(describeSubmitError(err) || t('wiz.submitFailed'));
       setSubmitting(false);
     }
   };
 
   if (loading) {
-    return <div className={styles.loading}>Loading assessment...</div>;
+    return <FormSkeleton />;
   }
 
   if (error && !schema) {
@@ -177,8 +180,8 @@ const AssessmentWizard = () => {
       <div className={styles.container}>
         <div className={styles.header}>
           <div className={styles.headerTop}>
-            <h1 className={styles.title}>Risk Assessment</h1>
-            <span className={styles.stepIndicator}>Step {currentStep} of 4</span>
+            <h1 className={styles.title}>{t('wiz.title')}</h1>
+            <span className={styles.stepIndicator}>{t('wiz.stepOf', { n: currentStep })}</span>
           </div>
           <div className={styles.progressContainer}>
             {STEPS.map((step, idx) => {
@@ -188,7 +191,7 @@ const AssessmentWizard = () => {
               return (
                 <div key={step} className={styles.progressSegmentWrapper}>
                    <div className={`${styles.progressSegment} ${isActive || isPast ? styles.activeSegment : ''}`}></div>
-                   <span className={`${styles.progressLabel} ${isActive ? styles.activeLabel : ''}`}>{step}</span>
+                   <span className={`${styles.progressLabel} ${isActive ? styles.activeLabel : ''}`}>{t(step)}</span>
                 </div>
               );
             })}
@@ -207,19 +210,17 @@ const AssessmentWizard = () => {
             <div className={styles.infoCard}>
               <h3 className={styles.infoTitle}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                Why we ask this
+                {t('wiz.whyTitle')}
               </h3>
               <p className={styles.infoText}>
-                These details help us calculate your debt-to-income ratio and assess
-                overall financial stability. Accurate information ensures we provide the
-                most relevant risk profile and welfare eligibility options.
+                {t('wiz.whyText')}
               </p>
               
               <div className={styles.secureBadge}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.secureIcon}><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                 <div>
-                  <strong>Secure & Encrypted</strong>
-                  <span>Your financial data is encrypted at rest and in transit. It is only used for internal assessment purposes.</span>
+                  <strong>{t('wiz.secureTitle')}</strong>
+                  <span>{t('wiz.secureText')}</span>
                 </div>
               </div>
             </div>

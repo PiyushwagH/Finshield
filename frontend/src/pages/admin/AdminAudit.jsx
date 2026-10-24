@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../api/client';
 import styles from './AdminAudit.module.css';
+import { TableRowsSkeleton } from '../../components/Skeleton';
 
 const AdminAudit = () => {
   const [logs, setLogs] = useState([]);
@@ -45,7 +46,7 @@ const AdminAudit = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan="6" className={styles.loading}>Loading logs...</td></tr>
+              <TableRowsSkeleton rows={6} cols={6} />
             ) : logs.length === 0 ? (
               <tr><td colSpan="6" className={styles.empty}>No audit logs found.</td></tr>
             ) : logs.map(log => (

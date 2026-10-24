@@ -69,6 +69,27 @@ export const api = {
     return apiClient.post('/risk/assess', data);
   },
 
+  // Expenses
+  getExpenses: async (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return apiClient.get(`/expenses?${query}`);
+  },
+  getExpenseSummary: async (month) => {
+    return apiClient.get(`/expenses/summary?month=${month}`);
+  },
+  createExpense: async (data) => {
+    return apiClient.post('/expenses', data);
+  },
+  updateExpense: async (id, data) => {
+    return apiClient.patch(`/expenses/${id}`, data);
+  },
+  deleteExpense: async (id) => {
+    return apiClient.delete(`/expenses/${id}`);
+  },
+  downloadExpenseReport: async (month) => {
+    return apiClient.get(`/expenses/report.pdf?month=${month}`, { responseType: 'blob' });
+  },
+
   // Profile
   updateProfile: async (data) => {
     return apiClient.patch('/auth/me', data);
@@ -117,14 +138,23 @@ export const api = {
     const query = new URLSearchParams(params).toString();
     return apiClient.get(`/admin/schemes?${query}`);
   },
+  getAdminSchemeDetail: async (idOrSlug) => {
+    return apiClient.get(`/admin/schemes/${idOrSlug}`);
+  },
   createScheme: async (data) => {
     return apiClient.post('/admin/schemes', data);
   },
   updateScheme: async (id, data) => {
     return apiClient.put(`/admin/schemes/${id}`, data);
   },
+  updateAdminSchemeStatus: async (id, status) => {
+    return apiClient.patch(`/admin/schemes/${id}/status`, { status });
+  },
+  deleteScheme: async (id, permanent = true) => {
+    return apiClient.delete(`/admin/schemes/${id}?permanent=${permanent}`);
+  },
   archiveScheme: async (id) => {
-    return apiClient.delete(`/admin/schemes/${id}`);
+    return apiClient.delete(`/admin/schemes/${id}?permanent=false`);
   },
   importSchemes: async (formData) => {
     return apiClient.post('/admin/schemes/import', formData, {

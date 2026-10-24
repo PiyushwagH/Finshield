@@ -18,7 +18,9 @@ import MySchemes from './pages/MySchemes';
 import Settings from './pages/Settings';
 import SecurityLog from './pages/SecurityLog';
 import HelpCenter from './pages/HelpCenter';
+import Expenses from './pages/Expenses';
 import AdminLayout from './components/AdminLayout';
+import { RouteSkeleton } from './components/Skeleton';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageSchemes from './pages/admin/ManageSchemes';
 import SchemeUpdates from './pages/admin/SchemeUpdates';
@@ -29,9 +31,7 @@ import AdminAudit from './pages/admin/AdminAudit';
 const AdminRoute = ({ children }) => {
   const { user, loading, loggingOut } = useAuth();
 
-  if (loading || loggingOut) {
-    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', color: 'var(--text-muted)' }}>Checking your session...</div>;
-  }
+  if (loading || loggingOut) return <RouteSkeleton />;
   if (!user) return <Navigate to="/login" replace />;
   if (user.role !== 'admin') return <Navigate to="/dashboard" replace />;
 
@@ -56,6 +56,7 @@ function App() {
               <Route path="/assessment/result/:id" element={<RiskResult />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/expenses" element={<Expenses />} />
               <Route path="/schemes" element={<SchemeFinder />} />
               <Route path="/schemes/quick-check" element={<SchemeQuickCheck />} />
               <Route path="/schemes/:slug" element={<SchemeDetail />} />
@@ -72,6 +73,8 @@ function App() {
               <Route path="/admin/schemes/updates" element={<SchemeUpdates />} />
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/audit" element={<AdminAudit />} />
+              <Route path="/admin/settings" element={<Settings />} />
+              <Route path="/admin/security-log" element={<SecurityLog />} />
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />

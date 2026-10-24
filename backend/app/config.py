@@ -24,6 +24,14 @@ class Settings(BaseSettings):
     # Password-reset email. If RESEND_API_KEY is unset (local dev), the reset
     # link is logged instead of emailed - see app/services/email_service.py.
     RESEND_API_KEY: str = ""
+    # SMTP takes precedence over Resend when all three of host/user/password
+    # are set. Gmail: SMTP_HOST=smtp.gmail.com, SMTP_USER=<gmail address>,
+    # SMTP_PASSWORD=<16-char App Password, not your Gmail password>.
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM: str = ""
     EMAIL_FROM: str = "FinShield <onboarding@resend.dev>"
     FRONTEND_URL: str = "http://localhost:5173"
 

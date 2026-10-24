@@ -4,11 +4,14 @@ import { api } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import ChecklistDrawer from '../components/ChecklistDrawer';
 import styles from './SchemeDetail.module.css';
+import { useLanguage } from '../context/LanguageContext';
+import { DetailSkeleton } from '../components/Skeleton';
 
 const SchemeDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t, locale } = useLanguage();
   
   const [scheme, setScheme] = useState(null);
   const [eligibility, setEligibility] = useState(null);
@@ -48,7 +51,7 @@ const SchemeDetail = () => {
           }
         }
       } catch (err) {
-        setError('Failed to load scheme details');
+        setError(t('detail.loadFailed'));
       } finally {
         setLoading(false);
       }
@@ -70,15 +73,15 @@ const SchemeDetail = () => {
     }
   };
 
-  if (loading) return <div className={styles.loading}>Loading scheme details...</div>;
-  if (error || !scheme) return <div className={styles.error}>{error || 'Not found'}</div>;
+  if (loading) return <DetailSkeleton />;
+  if (error || !scheme) return <div className={styles.error}>{error || t('detail.notFound')}</div>;
 
   return (
     <div className={styles.container}>
       {/* Breadcrumbs */}
       <div className={styles.breadcrumbs}>
-        <span onClick={() => navigate('/schemes')}>Scheme Finder</span> &rsaquo; 
-        <span>{scheme.category ? scheme.category.charAt(0).toUpperCase() + scheme.category.slice(1) : 'General'}</span> &rsaquo; 
+        <span onClick={() => navigate('/schemes')}>{t('finder.title')}</span> &rsaquo; 
+        <span>{t(`scat.${scheme.category || 'general'}`)}</span> &rsaquo; 
         <strong>{scheme.name}</strong>
       </div>
 
@@ -90,20 +93,20 @@ const SchemeDetail = () => {
           <div className={styles.tagsRow}>
             <span className={`${styles.levelTag} ${styles[scheme.level]}`}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-              {scheme.level === 'central' ? 'Central Scheme' : 'State Scheme'}
+              {scheme.level === 'central' ? t('detail.centralScheme') : t('detail.stateScheme')}
             </span>
             <span className={styles.categoryTag}>
-              {scheme.category?.toUpperCase() || 'GENERAL'}
+              {t(`scat.${scheme.category || 'general'}`)}
             </span>
             {scheme.benefit_type && (
               <span className={styles.typeTag}>
-                {scheme.benefit_type.replace('_', ' ').charAt(0).toUpperCase() + scheme.benefit_type.replace('_', ' ').slice(1)}
+                {t(`btype.${scheme.benefit_type}`)}
               </span>
             )}
             {(scheme.benefit_amount_inr || scheme.benefit_amount) && (
               <span className={styles.amountTag}>
                 ₹{Number(scheme.benefit_amount_inr || scheme.benefit_amount).toLocaleString('en-IN')}
-                {scheme.benefit_period === 'monthly' ? '/mo' : scheme.benefit_period === 'yearly' ? '/yr' : ''}
+                {scheme.benefit_period === 'monthly' ? t('finder.perMo') : scheme.benefit_period === 'yearly' ? t('finder.perYr') : ''}
               </span>
             )}
           </div>
@@ -114,13 +117,13 @@ const SchemeDetail = () => {
         {/* Main Content Area */}
         <div className={styles.mainColumn}>
           <div className={styles.tabsContainer}>
-            {['Overview', 'Eligibility', 'Documents', 'How to Apply', 'FAQs'].map(tab => (
+            {[['Overview', 'detail.tabOverview'], ['Eligibility', 'detail.tabEligibility'], ['Documents', 'detail.tabDocuments'], ['How to Apply', 'detail.tabApply'], ['FAQs', 'detail.tabFaqs']].map(([tab, key]) => (
               <button 
                 key={tab} 
                 className={`${styles.tabBtn} ${activeTab === tab ? styles.activeTab : ''}`}
                 onClick={() => setActiveTab(tab)}
               >
-                {tab}
+                {t(key)}
               </button>
             ))}
           </div>
@@ -128,10 +131,10 @@ const SchemeDetail = () => {
           <div className={styles.tabContent}>
             {activeTab === 'Overview' && (
               <div className={styles.overviewSection}>
-                <h3>About the Scheme</h3>
+                <h3>{t('detail.about')}</h3>
                 <p className={styles.fullDesc}>{scheme.full_description}</p>
                 
-                <h3>Key Benefits</h3>
+                <h3>{t('detail.keyBenefits')}</h3>
                 <ul className={styles.benefitsList}>
                   {scheme.benefit_description && (
                     <li>
@@ -141,21 +144,25 @@ const SchemeDetail = () => {
                   )}
                   <li>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    Coverage across all states and UTs for eligible beneficiaries.
+                    {scheme.level === 'state' && scheme.state
+                      ? t('detail.coverageState', { state: scheme.state })
+                      : t('detail.coverageCentral')}
                   </li>
-                  <li>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                    Direct Benefit Transfer (DBT) where applicable.
-                  </li>
+                  {scheme.benefit_type === 'cash' && (
+                    <li>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                      {t('detail.dbt')}
+                    </li>
+                  )}
                 </ul>
 
-                <h3>Scheme Timeline</h3>
+                <h3>{t('detail.timeline')}</h3>
                 <div className={styles.timelineBox}>
                   <div className={styles.timelineItem}>
                     <div className={styles.timelineIcon}><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
                     <div>
-                      <span className={styles.timelineLabel}>Last Updated</span>
-                      <strong>{scheme.updated_at ? new Date(scheme.updated_at).toLocaleDateString() : 'N/A'}</strong>
+                      <span className={styles.timelineLabel}>{t('detail.lastUpdated')}</span>
+                      <strong>{scheme.updated_at ? new Date(scheme.updated_at).toLocaleDateString(locale) : '—'}</strong>
                     </div>
                   </div>
                 </div>
@@ -164,7 +171,7 @@ const SchemeDetail = () => {
             
             {activeTab === 'Eligibility' && (
               <div className={styles.eligibilitySection}>
-                <h3>Eligibility Breakdown</h3>
+                <h3>{t('detail.eligBreakdown')}</h3>
                 {eligibility ? (
                   <div className={styles.eligibilityResults}>
                     {eligibility.criteria?.map((c, idx) => (
@@ -176,18 +183,18 @@ const SchemeDetail = () => {
                           }
                         </div>
                         <div className={styles.critText}>
-                          <strong>{c.field.replace('_', ' ').toUpperCase()}</strong> requires {c.operator} {Array.isArray(c.rule_value) ? c.rule_value.join(', ') : c.rule_value}
+                          <strong>{t(`field.${c.field}`)}</strong> {t(`op.${c.operator}`)} {Array.isArray(c.rule_value) ? c.rule_value.join(c.operator === 'between' ? ' – ' : ', ') : String(c.rule_value)}
                         </div>
                         <div className={styles.critUserVal}>
-                          Your profile: {c.user_value || 'Not provided'}
+                          {t('detail.yourProfile', { v: c.user_value === null || c.user_value === undefined ? t('detail.notProvided') : Array.isArray(c.user_value) ? c.user_value.join(', ') : String(c.user_value) })}
                         </div>
                       </div>
                     ))}
-                    {eligibility.criteria.length === 0 && <p>No specific automated criteria found.</p>}
+                    {eligibility.criteria.length === 0 && <p>{t('detail.noCriteria')}</p>}
                   </div>
                 ) : (
                   <p className={styles.loginPrompt}>
-                    {user ? 'No eligibility breakdown available.' : 'Please log in and take an assessment to see your personalized eligibility breakdown.'}
+                    {user ? t('detail.noBreakdown') : t('detail.loginForBreakdown')}
                   </p>
                 )}
               </div>
@@ -195,7 +202,7 @@ const SchemeDetail = () => {
             
             {activeTab === 'Documents' && (
               <div className={styles.documentsSection}>
-                <h3>Required Documents</h3>
+                <h3>{t('detail.requiredDocs')}</h3>
                 {scheme.required_documents?.length > 0 ? (
                   <ul className={styles.docList}>
                     {scheme.required_documents.map((doc, idx) => (
@@ -206,31 +213,29 @@ const SchemeDetail = () => {
                     ))}
                   </ul>
                 ) : (
-                  <p>Document requirements not specified.</p>
+                  <p>{t('detail.docsNotSpecified')}</p>
                 )}
               </div>
             )}
             
             {activeTab === 'How to Apply' && (
               <div className={styles.overviewSection}>
-                <h3>Application Mode</h3>
+                <h3>{t('detail.appMode')}</h3>
                 <p className={styles.fullDesc}>
-                  {scheme.application_mode || 'Application mode not specified for this scheme.'}
+                  {scheme.application_mode || t('detail.appModeMissing')}
                 </p>
 
-                <h3>Where to Apply</h3>
+                <h3>{t('detail.whereApply')}</h3>
                 <p className={styles.fullDesc}>
-                  FinShield links out to the scheme's official government page rather than
-                  hosting an application form itself, so your application is always
-                  submitted directly on the real government portal.
+                  {t('detail.whereApplyText')}
                 </p>
                 {scheme.official_url ? (
                   <a href={scheme.official_url} target="_blank" rel="noreferrer" className={styles.primaryActionBtn}>
-                    Go to Official Application Portal
+                    {t('detail.goPortal')}
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                   </a>
                 ) : (
-                  <p className={styles.qualifyText}>No official application link is on file for this scheme yet.</p>
+                  <p className={styles.qualifyText}>{t('detail.noLink')}</p>
                 )}
               </div>
             )}
@@ -238,9 +243,7 @@ const SchemeDetail = () => {
             {activeTab === 'FAQs' && (
               <div className={styles.placeholderSection}>
                 <p>
-                  We don't maintain a separate FAQ for this scheme to avoid giving
-                  guidance that could go stale or be wrong. For authoritative
-                  answers, check the scheme's official page
+                  {t('detail.faqText')}
                   {scheme.official_url && (
                     <> — <a href={scheme.official_url} target="_blank" rel="noreferrer">{scheme.official_url}</a></>
                   )}.
@@ -256,12 +259,12 @@ const SchemeDetail = () => {
             <div className={styles.actionCard}>
               <div className={eligibility.is_eligible ? styles.qualifyBadge : styles.notQualifyBadge}>
                 {eligibility.is_eligible ? (
-                  <><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> You Qualify</>
+                  <><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> {t('detail.youQualify')}</>
                 ) : (
-                  <><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> Not Eligible</>
+                  <><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> {t('detail.notEligible')}</>
                 )}
               </div>
-              <p className={styles.qualifyText}>Based on your saved profile data.</p>
+              <p className={styles.qualifyText}>{t('detail.basedOnProfile')}</p>
               
               <a 
                 href={scheme.official_url || '#'} 
@@ -269,7 +272,7 @@ const SchemeDetail = () => {
                 rel="noreferrer" 
                 className={styles.primaryActionBtn}
               >
-                Apply on Official Portal
+                {t('detail.applyPortal')}
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
               </a>
 
@@ -279,7 +282,7 @@ const SchemeDetail = () => {
                 style={{ marginBottom: '0.75rem' }}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                View Checklist &amp; Steps
+                {t('detail.viewChecklist')}
               </button>
               
               <button 
@@ -288,20 +291,20 @@ const SchemeDetail = () => {
                 disabled={saving || saved}
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                {saved ? 'Saved' : saving ? 'Saving...' : 'Save Scheme'}
+                {saved ? t('detail.saved') : saving ? t('detail.saving') : t('detail.save')}
               </button>
             </div>
           ) : (
              <div className={styles.actionCard}>
-                <p className={styles.qualifyText}>Log in to check eligibility instantly.</p>
-                <button className={styles.primaryActionBtn} onClick={() => navigate('/login')}>Log In</button>
+                <p className={styles.qualifyText}>{t('detail.loginToCheck')}</p>
+                <button className={styles.primaryActionBtn} onClick={() => navigate('/login')}>{t('detail.login')}</button>
                 <button 
                   className={styles.secondaryActionBtn} 
                   onClick={() => setChecklistOpen(true)}
                   style={{ marginTop: '0.75rem' }}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                  View Checklist &amp; Steps
+                  {t('detail.viewChecklist')}
                 </button>
              </div>
           )}
@@ -309,7 +312,7 @@ const SchemeDetail = () => {
           <div className={styles.similarSchemesCard}>
             <h4 className={styles.similarTitle}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-              Similar Schemes
+              {t('detail.similar')}
             </h4>
             <div className={styles.similarList}>
               {similarSchemes.length > 0 ? (
@@ -321,18 +324,18 @@ const SchemeDetail = () => {
                     style={{ cursor: 'pointer' }}
                   >
                     <h5>{s.name}</h5>
-                    <span>{s.category ? s.category.charAt(0).toUpperCase() + s.category.slice(1) : 'General'}{s.benefit_type ? ` • ${s.benefit_type.charAt(0).toUpperCase() + s.benefit_type.slice(1)}` : ''}</span>
+                    <span>{t(`scat.${s.category || 'general'}`)}{s.benefit_type ? ` • ${t(`btype.${s.benefit_type}`)}` : ''}</span>
                   </div>
                 ))
               ) : (
-                <p className={styles.qualifyText}>No other schemes in this category yet.</p>
+                <p className={styles.qualifyText}>{t('detail.noSimilar')}</p>
               )}
             </div>
           </div>
 
           <div className={styles.infoCard}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <p>Information last verified on<br/><strong>{scheme.last_verified_at ? new Date(scheme.last_verified_at).toLocaleDateString() : scheme.updated_at ? new Date(scheme.updated_at).toLocaleDateString() : 'N/A'}</strong></p>
+            <p>{t('detail.verifiedOn')}<br/><strong>{scheme.last_verified_at ? new Date(scheme.last_verified_at).toLocaleDateString(locale) : scheme.updated_at ? new Date(scheme.updated_at).toLocaleDateString(locale) : '—'}</strong></p>
           </div>
         </div>
       </div>

@@ -2,9 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { assessmentPlanApi } from '../api/assessmentPlan';
 import { useLanguage } from '../context/LanguageContext';
 import styles from './ChecklistDrawer.module.css';
+import { ListItemsSkeleton } from './Skeleton';
 
 const ChecklistDrawer = ({ isOpen, onClose, schemeId, schemeName }) => {
-  const { lang, t } = useLanguage();
+  const { lang, t, locale } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,7 +29,7 @@ const ChecklistDrawer = ({ isOpen, onClose, schemeId, schemeName }) => {
       })
       .catch((err) => {
         if (isMounted) {
-          setError(err.response?.data?.detail || 'Failed to load scheme checklist.');
+          setError(err.response?.data?.detail || t('checklist.loadFailed'));
           setLoading(false);
         }
       });
@@ -64,8 +65,8 @@ const ChecklistDrawer = ({ isOpen, onClose, schemeId, schemeName }) => {
   const checkedCount = docs.filter((d) => checkedDocs[d]).length;
 
   const formattedDate = data?.last_verified_at 
-    ? new Date(data.last_verified_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
-    : 'Recently';
+    ? new Date(data.last_verified_at).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+    : t('checklist.recently');
 
   return (
     <div className={styles.backdrop} onClick={onClose} role="presentation">
@@ -80,7 +81,7 @@ const ChecklistDrawer = ({ isOpen, onClose, schemeId, schemeName }) => {
         <div className={styles.header}>
           <div>
             <h2 id="drawer-title" className={styles.title}>{t('checklist.title')}</h2>
-            <p className={styles.subtitle}>{schemeName || 'Government Welfare Scheme'}</p>
+            <p className={styles.subtitle}>{schemeName || t('checklist.defaultName')}</p>
           </div>
           <button
             className={styles.closeBtn}
@@ -92,7 +93,7 @@ const ChecklistDrawer = ({ isOpen, onClose, schemeId, schemeName }) => {
         </div>
 
         <div className={styles.content}>
-          {loading && <div className={styles.loading}>Loading application checklist...</div>}
+          {loading && <ListItemsSkeleton count={4} />}
           {error && <div className={styles.error}>{error}</div>}
 
           {!loading && !error && (
@@ -109,12 +110,12 @@ const ChecklistDrawer = ({ isOpen, onClose, schemeId, schemeName }) => {
                 <div className={styles.sectionHeader}>
                   <h3 className={styles.sectionTitle}>{t('checklist.docs')}</h3>
                   {docs.length > 0 && (
-                    <span className={styles.counter}>{checkedCount} of {docs.length} ready</span>
+                    <span className={styles.counter}>{t('checklist.ready', { n: checkedCount, total: docs.length })}</span>
                   )}
                 </div>
 
                 {docs.length === 0 ? (
-                  <p className={styles.empty}>No specific document requirements recorded.</p>
+                  <p className={styles.empty}>{t('checklist.noDocs')}</p>
                 ) : (
                   <ul className={styles.docList}>
                     {docs.map((doc, idx) => {
@@ -147,7 +148,7 @@ const ChecklistDrawer = ({ isOpen, onClose, schemeId, schemeName }) => {
               <div className={styles.section}>
                 <h3 className={styles.sectionTitle}>{t('checklist.steps')}</h3>
                 {steps.length === 0 ? (
-                  <p className={styles.empty}>Refer to the official portal for application guidelines.</p>
+                  <p className={styles.empty}>{t('checklist.noSteps')}</p>
                 ) : (
                   <ol className={styles.stepList}>
                     {steps.map((step, idx) => (

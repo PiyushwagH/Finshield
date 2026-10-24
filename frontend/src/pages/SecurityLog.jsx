@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../api/client';
 import styles from './SecurityLog.module.css';
+import { useLanguage } from '../context/LanguageContext';
+import { ListItemsSkeleton } from '../components/Skeleton';
 
-const formatDate = (iso) => new Date(iso).toLocaleString('en-IN', {
+const formatDate = (iso, locale) => new Date(iso).toLocaleString(locale, {
   dateStyle: 'medium',
   timeStyle: 'short',
 });
 
 const SecurityLog = () => {
+  const { t, locale } = useLanguage();
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [revokingId, setRevokingId] = useState(null);
@@ -43,32 +46,32 @@ const SecurityLog = () => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h1 className={styles.title}>Security Log</h1>
+        <h1 className={styles.title}>{t('sec.title')}</h1>
         <p className={styles.subtitle}>
-          These are the active sessions signed in to your account. Revoke any you don't recognize.
+          {t('sec.subtitle')}
         </p>
       </div>
 
       {loading ? (
-        <p className={styles.emptyState}>Loading sessions...</p>
+        <ListItemsSkeleton count={3} />
       ) : sessions.length === 0 ? (
-        <p className={styles.emptyState}>No active sessions found.</p>
+        <p className={styles.emptyState}>{t('sec.none')}</p>
       ) : (
         sessions.map((s) => (
           <div key={s.id} className={styles.sessionCard}>
             <div className={styles.sessionInfo}>
               <p>
-                Session started {formatDate(s.created_at)}
-                {s.is_current && <span className={styles.currentBadge}>This device</span>}
+                {t('sec.started', { date: formatDate(s.created_at, locale) })}
+                {s.is_current && <span className={styles.currentBadge}>{t('sec.thisDevice')}</span>}
               </p>
-              <p>Expires {formatDate(s.expires_at)}</p>
+              <p>{t('sec.expires', { date: formatDate(s.expires_at, locale) })}</p>
             </div>
             <button
               className={styles.revokeBtn}
               onClick={() => handleRevoke(s.id)}
               disabled={revokingId === s.id}
             >
-              {revokingId === s.id ? 'Revoking...' : 'Revoke'}
+              {revokingId === s.id ? t('sec.revoking') : t('sec.revoke')}
             </button>
           </div>
         ))

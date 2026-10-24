@@ -3,9 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../api/client';
 import ChecklistDrawer from '../components/ChecklistDrawer';
 import styles from './SchemeFinder.module.css';
+import { useLanguage } from '../context/LanguageContext';
+import { CardGridSkeleton } from '../components/Skeleton';
 
 const SchemeFinder = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const [schemes, setSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,15 +24,15 @@ const SchemeFinder = () => {
   });
 
   const categories = [
-    { id: 'agriculture', label: 'Agriculture' },
-    { id: 'education', label: 'Education' },
-    { id: 'health', label: 'Health' },
-    { id: 'business', label: 'Business' }
+    { id: 'agriculture', label: t('scat.agriculture') },
+    { id: 'education', label: t('scat.education') },
+    { id: 'health', label: t('scat.health') },
+    { id: 'business', label: t('scat.business') }
   ];
 
   const levels = [
-    { id: 'central', label: 'Central' },
-    { id: 'state', label: 'State' }
+    { id: 'central', label: t('level.central') },
+    { id: 'state', label: t('level.state') }
   ];
 
   useEffect(() => {
@@ -78,9 +81,9 @@ const SchemeFinder = () => {
     <div className={styles.container}>
       <div className={styles.headerArea}>
         <div>
-          <h1 className={styles.title}>Scheme Finder</h1>
+          <h1 className={styles.title}>{t('finder.title')}</h1>
           <p className={styles.subtitle}>
-            Search {totalCount !== null ? totalCount : '...'} central and state government welfare schemes
+            {t('finder.subtitle', { n: totalCount !== null ? totalCount : '…' })}
           </p>
         </div>
       </div>
@@ -90,18 +93,19 @@ const SchemeFinder = () => {
           <svg className={styles.searchIcon} width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input 
             type="text" 
-            placeholder="Search by scheme name, benefit, or ask a question like 'schemes for farmers'"
+            placeholder={t('finder.placeholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button className={styles.searchBtn} onClick={fetchSchemes}>Search</button>
+          <button className={styles.searchBtn} onClick={fetchSchemes}>{t('finder.search')}</button>
         </div>
         
         <div className={styles.quickChips}>
-          <span className={styles.chipsLabel}>Popular:</span>
-          {['Farmer', 'Student', 'Woman', 'Senior Citizen'].map(chip => (
-            <button key={chip} className={styles.chip} onClick={() => setSearch(chip)}>
-              {chip}
+          <span className={styles.chipsLabel}>{t('finder.popular')}</span>
+          {/* Search terms stay English: scheme text in the database is English. */}
+          {[['Farmer', 'finder.chipFarmer'], ['Student', 'finder.chipStudent'], ['Woman', 'finder.chipWoman'], ['Senior Citizen', 'finder.chipSenior']].map(([term, key]) => (
+            <button key={term} className={styles.chip} onClick={() => setSearch(term)}>
+              {t(key)}
             </button>
           ))}
         </div>
@@ -111,18 +115,18 @@ const SchemeFinder = () => {
         {/* Sidebar Filters */}
         <div className={styles.sidebar}>
           <div className={styles.filterHeader}>
-            <h3>Filters</h3>
-            <button className={styles.clearBtn} onClick={clearFilters}>Clear All</button>
+            <h3>{t('finder.filters')}</h3>
+            <button className={styles.clearBtn} onClick={clearFilters}>{t('finder.clearAll')}</button>
           </div>
           
           <div className={styles.qualifyBox}>
             <input type="checkbox" id="qualify-only" className={styles.checkbox} onChange={() => navigate('/schemes/quick-check')} />
-            <label htmlFor="qualify-only"><strong>Show only schemes I qualify for</strong></label>
-            <p className={styles.helpText}>Takes 2 mins</p>
+            <label htmlFor="qualify-only"><strong>{t('finder.qualifyOnly')}</strong></label>
+            <p className={styles.helpText}>{t('finder.takes2')}</p>
           </div>
 
           <div className={styles.filterGroup}>
-            <h4>Category</h4>
+            <h4>{t('finder.category')}</h4>
             {categories.map(c => (
               <div key={c.id} className={styles.checkboxRow}>
                 <input 
@@ -137,7 +141,7 @@ const SchemeFinder = () => {
           </div>
 
           <div className={styles.filterGroup}>
-            <h4>Level</h4>
+            <h4>{t('finder.level')}</h4>
             {levels.map(l => (
               <div key={l.id} className={styles.checkboxRow}>
                 <input 
@@ -155,19 +159,19 @@ const SchemeFinder = () => {
         {/* Main Content Grid */}
         <div className={styles.mainContent}>
           <div className={styles.contentHeader}>
-            <span>Showing <strong>{schemes.length}</strong> matching schemes</span>
+            <span>{t('finder.showing', { n: schemes.length })}</span>
             <div className={styles.sortBox}>
-              Sort by:
+              {t('finder.sortBy')}
               <select className={styles.sortSelect}>
-                <option>Relevance</option>
-                <option>Benefit Amount</option>
-                <option>Recently Added</option>
+                <option>{t('finder.sortRelevance')}</option>
+                <option>{t('finder.sortBenefit')}</option>
+                <option>{t('finder.sortRecent')}</option>
               </select>
             </div>
           </div>
 
           {loading ? (
-            <div className={styles.loading}>Loading schemes...</div>
+            <CardGridSkeleton count={6} />
           ) : (
             <div className={styles.grid}>
               {schemes.map(scheme => (
@@ -175,10 +179,10 @@ const SchemeFinder = () => {
                   <div className={styles.cardTags}>
                     <span className={styles.categoryTag}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
-                      {scheme.category?.toUpperCase() || 'GENERAL'}
+                      {t(`scat.${scheme.category || 'general'}`)}
                     </span>
                     <span className={`${styles.levelTag} ${styles[scheme.level]}`}>
-                      {scheme.level === 'central' ? 'Central' : 'State'}
+                      {scheme.level === 'central' ? t('level.central') : t('level.state')}
                     </span>
                   </div>
                   
@@ -193,12 +197,12 @@ const SchemeFinder = () => {
                     {(scheme.benefit_amount_inr || scheme.benefit_amount) && (
                       <span className={styles.benefitPill}>
                         ₹{Number(scheme.benefit_amount_inr || scheme.benefit_amount).toLocaleString('en-IN')}
-                        {scheme.benefit_period === 'monthly' ? '/mo' : scheme.benefit_period === 'yearly' ? '/yr' : ''}
+                        {scheme.benefit_period === 'monthly' ? t('finder.perMo') : scheme.benefit_period === 'yearly' ? t('finder.perYr') : ''}
                       </span>
                     )}
                     {scheme.benefit_type && (
                       <span className={styles.typePill}>
-                        {scheme.benefit_type.replace('_', ' ').charAt(0).toUpperCase() + scheme.benefit_type.replace('_', ' ').slice(1)}
+                        {t(`btype.${scheme.benefit_type}`)}
                       </span>
                     )}
                   </div>
@@ -206,7 +210,7 @@ const SchemeFinder = () => {
                   <div className={styles.cardFooter}>
                     <div className={styles.statusUnknown}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                      Check Eligibility
+                      {t('finder.checkElig')}
                     </div>
                     <div className={styles.cardActions}>
                       <button 
@@ -215,10 +219,10 @@ const SchemeFinder = () => {
                           e.stopPropagation();
                           setChecklistScheme({ id: scheme.id, name: scheme.name });
                         }}
-                        title="View required documents & application steps"
+                        title={t('finder.checklistTitle')}
                       >
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 11 12 14 22 4"></polyline><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                        Checklist
+                        {t('finder.checklist')}
                       </button>
                       {scheme.official_url && (
                         <a
@@ -228,7 +232,7 @@ const SchemeFinder = () => {
                           className={styles.applyBtn}
                           onClick={e => e.stopPropagation()}
                         >
-                          Apply
+                          {t('finder.apply')}
                           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7M7 7h10v10"></path></svg>
                         </a>
                       )}
@@ -236,7 +240,7 @@ const SchemeFinder = () => {
                         className={styles.viewBtn} 
                         onClick={() => navigate(`/schemes/${scheme.slug}`)}
                       >
-                        Details
+                        {t('finder.details')}
                       </button>
                     </div>
                   </div>
@@ -247,8 +251,8 @@ const SchemeFinder = () => {
           
           {!loading && schemes.length === 0 && (
             <div className={styles.emptyState}>
-              <p>No schemes found matching your criteria.</p>
-              <button className={styles.clearBtn} onClick={clearFilters}>Clear Filters</button>
+              <p>{t('finder.none')}</p>
+              <button className={styles.clearBtn} onClick={clearFilters}>{t('finder.clearFilters')}</button>
             </div>
           )}
         </div>

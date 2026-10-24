@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import apiClient from '../api/client';
 import styles from './Auth.module.css';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 
 const ResetPassword = () => {
   const [password, setPassword] = useState('');
@@ -10,6 +12,7 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
+  const { t } = useLanguage();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,11 +20,11 @@ const ResetPassword = () => {
     setLoading(true);
     try {
       await apiClient.post('/auth/reset-password', { token, new_password: password });
-      setStatusMsg({ type: 'success', text: 'Password has been reset successfully. Redirecting to login...' });
+      setStatusMsg({ type: 'success', text: t('reset.success') });
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       const detail = err.response?.data?.detail;
-      setStatusMsg({ type: 'error', text: typeof detail === 'string' ? detail : 'Failed to reset password. The link may have expired.' });
+      setStatusMsg({ type: 'error', text: typeof detail === 'string' ? detail : t('reset.failed') });
     } finally {
       setLoading(false);
     }
@@ -29,18 +32,19 @@ const ResetPassword = () => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.langCorner}><LanguageSwitcher /></div>
       <header className={styles.header}>
         <Link to="/" className={styles.logo}>FinShield</Link>
       </header>
 
       <div className={styles.authBox}>
-        <h2 style={{ marginBottom: '1.5rem', color: 'var(--navy)' }}>Create New Password</h2>
+        <h2 style={{ marginBottom: '1.5rem', color: 'var(--navy)' }}>{t('reset.title')}</h2>
 
         {!token ? (
           <div className={styles.toast} style={{ backgroundColor: '#FEE2E2', color: 'var(--risk-high)' }}>
-            This reset link is missing its token. Please request a new one from the{' '}
+            {t('reset.missingToken')}{' '}
             <Link to="/forgot-password" style={{ color: 'inherit', textDecoration: 'underline' }}>
-              forgot password page
+              {t('reset.forgotPage')}
             </Link>.
           </div>
         ) : (
@@ -53,7 +57,7 @@ const ResetPassword = () => {
 
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.inputGroup}>
-                <label>New Password</label>
+                <label>{t('reset.newPassword')}</label>
                 <input
                   type="password"
                   value={password}
@@ -65,7 +69,7 @@ const ResetPassword = () => {
               </div>
 
               <button type="submit" className={styles.submitBtn} disabled={loading}>
-                {loading ? 'Resetting...' : 'Reset Password'}
+                {loading ? t('reset.resetting') : t('reset.submit')}
               </button>
             </form>
           </>

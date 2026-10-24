@@ -10,7 +10,22 @@
   --text:        #1A2332;
   --text-muted:  #5B6B7F;
   --border:      #E2E8F0;
-  
+  /* Expense category palette (charts + badges) */
+  --cat-food:          #F97316;
+  --cat-groceries:     #84CC16;
+  --cat-travel:        #0EA5E9;
+  --cat-rent:          #6366F1;
+  --cat-bills:         #EAB308;
+  --cat-emi:           #DC2626;
+  --cat-health:        #10B981;
+  --cat-education:     #8B5CF6;
+  --cat-shopping:      #EC4899;
+  --cat-entertainment: #14B8A6;
+  --cat-other:         #94A3B8;
+
+  --skeleton-base:  #E8EDF3;
+  --skeleton-shine: #F4F7FA;
+
   --radius-card: 12px;
   --radius-input: 8px;
   --font-base: 'Inter', 'Noto Sans Devanagari', sans-serif;

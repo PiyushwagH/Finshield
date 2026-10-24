@@ -105,6 +105,8 @@
   cursor: pointer;
   transition: all 0.2s;
   user-select: none;
+  background: var(--bg);
+  font-family: inherit;
 }
 
 .tagActive {

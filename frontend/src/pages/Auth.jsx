@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import styles from './Auth.module.css';
 
 const Auth = ({ mode = 'user' }) => {
@@ -25,6 +27,7 @@ const Auth = ({ mode = 'user' }) => {
   
   const { login, loginAdmin, register, user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // Where each portal lands once a session exists.
   const landingPath = isAdmin ? '/admin/analytics' : '/dashboard';
@@ -43,12 +46,12 @@ const Auth = ({ mode = 'user' }) => {
 
   const validate = () => {
     const newErrors = {};
-    if (!email) newErrors.email = 'Email is required';
-    if (!password) newErrors.password = 'Password is required';
+    if (!email) newErrors.email = t('auth.emailRequired');
+    if (!password) newErrors.password = t('auth.passwordRequired');
     else if (activeTab === 'register') {
-      if (password.length < 8) newErrors.password = 'Password must be at least 8 characters long';
-      else if (!/[A-Za-z]/.test(password)) newErrors.password = 'Password must contain at least one letter';
-      else if (!/\d/.test(password)) newErrors.password = 'Password must contain at least one number';
+      if (password.length < 8) newErrors.password = t('auth.pwMin');
+      else if (!/[A-Za-z]/.test(password)) newErrors.password = t('auth.pwLetter');
+      else if (!/\d/.test(password)) newErrors.password = t('auth.pwNumber');
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -70,14 +73,14 @@ const Auth = ({ mode = 'user' }) => {
       navigate(landingPath, { replace: true });
     } catch (err) {
       if (err.response?.status === 401 && activeTab === 'login') {
-         setErrors({ password: 'Incorrect password. Please try again.' });
+         setErrors({ password: t('auth.wrongPassword') });
       } else if (err.response?.status === 403) {
          // Admin endpoint accepted the credentials but the account is not an admin.
-         setToast(err.response?.data?.detail || 'This account does not have administrator access');
+         setToast(t('auth.notAdmin'));
       } else if (err.response?.status === 422) {
-         setToast('Invalid input data');
+         setToast(t('auth.invalidInput'));
       } else {
-         setToast(err.response?.data?.detail || 'An unexpected error occurred');
+         setToast(err.response?.data?.detail || t('auth.unexpected'));
       }
     } finally {
       setLoadingState(false);
@@ -86,6 +89,7 @@ const Auth = ({ mode = 'user' }) => {
 
   return (
     <div className={styles.container}>
+      <div className={styles.langCorner}><LanguageSwitcher /></div>
       <div className={styles.logoContainer}>
          <Link to="/">
            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{color: 'var(--navy)'}}>
@@ -96,7 +100,7 @@ const Auth = ({ mode = 'user' }) => {
 
       <div className={styles.authCard}>
         {isAdmin ? (
-          <div className={styles.adminBadge}>Administrator Access</div>
+          <div className={styles.adminBadge}>{t('auth.adminBadge')}</div>
         ) : (
           <div className={styles.tabs}>
             <button
@@ -104,14 +108,14 @@ const Auth = ({ mode = 'user' }) => {
               onClick={() => setActiveTab('login')}
               type="button"
             >
-              Log In
+              {t('auth.tabLogin')}
             </button>
             <button
               className={`${styles.tab} ${activeTab === 'register' ? styles.activeTab : ''}`}
               onClick={() => setActiveTab('register')}
               type="button"
             >
-              Sign Up
+              {t('auth.tabSignup')}
             </button>
           </div>
         )}
@@ -119,12 +123,12 @@ const Auth = ({ mode = 'user' }) => {
         <div className={styles.formContainer}>
           <div className={styles.formHeader}>
             <h1 className={styles.title}>
-              {isAdmin ? 'Admin sign in' : (activeTab === 'login' ? 'Welcome back' : 'Create an account')}
+              {isAdmin ? t('auth.adminTitle') : (activeTab === 'login' ? t('auth.loginTitle') : t('auth.signupTitle'))}
             </h1>
             <p className={styles.subtitle}>
               {isAdmin
-                ? 'Restricted to accounts with the administrator role.'
-                : (activeTab === 'login' ? 'Enter your details to access your account.' : 'Join FinShield to analyze your financial risk.')}
+                ? t('auth.adminSubtitle')
+                : (activeTab === 'login' ? t('auth.loginSubtitle') : t('auth.signupSubtitle'))}
             </p>
           </div>
 
@@ -137,7 +141,7 @@ const Auth = ({ mode = 'user' }) => {
                   type="text" 
                   value={fullName} 
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Full Name"
+                  placeholder={t('auth.fullName')}
                   className={styles.input}
                 />
               </div>
@@ -148,7 +152,7 @@ const Auth = ({ mode = 'user' }) => {
                 type="email" 
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email Address"
+                placeholder={t('auth.email')}
                 className={styles.input}
               />
               {errors.email && (
@@ -165,10 +169,10 @@ const Auth = ({ mode = 'user' }) => {
                   type={showPassword ? "text" : "password"} 
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
+                  placeholder={t('auth.password')}
                   className={styles.input}
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className={styles.eyeBtn}>
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className={styles.eyeBtn} aria-label={t('auth.showPassword')}>
                   {showPassword ? (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                   ) : (
@@ -189,9 +193,9 @@ const Auth = ({ mode = 'user' }) => {
                 <label className={styles.checkboxContainer}>
                   <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} />
                   <span className={styles.checkmark}></span>
-                  Remember me
+                  {t('auth.rememberMe')}
                 </label>
-                <Link to="/forgot-password" className={styles.forgotLink}>Forgot password?</Link>
+                <Link to="/forgot-password" className={styles.forgotLink}>{t('auth.forgot')}</Link>
               </div>
             )}
 
@@ -199,18 +203,18 @@ const Auth = ({ mode = 'user' }) => {
               {loadingState ? (
                 <span className={styles.spinner}></span>
               ) : isAdmin ? (
-                'Log In as Admin'
+                t('auth.loginAdminBtn')
               ) : (
-                activeTab === 'login' ? 'Log In' : 'Sign Up'
+                activeTab === 'login' ? t('auth.tabLogin') : t('auth.tabSignup')
               )}
             </button>
           </form>
 
           <div className={styles.portalSwitch}>
             {isAdmin ? (
-              <Link to="/login">Not an administrator? User log in</Link>
+              <Link to="/login">{t('auth.toUser')}</Link>
             ) : (
-              <Link to="/admin/login">Administrator log in</Link>
+              <Link to="/admin/login">{t('auth.toAdmin')}</Link>
             )}
           </div>
         </div>

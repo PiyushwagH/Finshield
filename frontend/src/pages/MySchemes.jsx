@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import styles from './MySchemes.module.css';
+import { useLanguage } from '../context/LanguageContext';
+import { ListPageSkeleton } from '../components/Skeleton';
 
 const MySchemes = () => {
   const navigate = useNavigate();
+  const { t, locale } = useLanguage();
   const [userSchemes, setUserSchemes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Saved');
@@ -53,7 +56,7 @@ const MySchemes = () => {
     }
   };
 
-  if (loading) return <div className={styles.loading}>Loading tracking dashboard...</div>;
+  if (loading) return <ListPageSkeleton count={6} />;
 
   const displaySchemes = getFilteredSchemes();
 
@@ -61,25 +64,25 @@ const MySchemes = () => {
     <div className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h1 className={styles.title}>My Schemes</h1>
-          <p className={styles.subtitle}>Track your saved and applied welfare programs.</p>
+          <h1 className={styles.title}>{t('my.title')}</h1>
+          <p className={styles.subtitle}>{t('my.subtitle')}</p>
         </div>
 
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
-            <span>Saved</span>
+            <span>{t('status.saved')}</span>
             <strong>{savedCount}</strong>
           </div>
           <div className={styles.statCard}>
-            <span>Applied</span>
+            <span>{t('status.applied')}</span>
             <strong>{appliedCount}</strong>
           </div>
           <div className={styles.statCard}>
-            <span>Approved</span>
+            <span>{t('status.approved')}</span>
             <strong className={styles.approvedText}>{approvedCount}</strong>
           </div>
           <div className={styles.statCardTotal}>
-            <span>Total Potential Benefit</span>
+            <span>{t('my.totalPotential')}</span>
             <strong>₹ {totalPotential.toLocaleString('en-IN')}</strong>
           </div>
         </div>
@@ -93,7 +96,7 @@ const MySchemes = () => {
               className={`${styles.tabBtn} ${activeTab === tab ? styles.activeTab : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              {tab}
+              {t(`status.${tab.toLowerCase()}`)}
             </button>
           ))}
         </div>
@@ -106,10 +109,10 @@ const MySchemes = () => {
                   <div className={styles.metaRow}>
                     <span className={styles.statusPill}>
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                      {t(`status.${item.status}`)}
                     </span>
                     <span className={styles.dateText}>
-                      {item.status === 'saved' ? 'Saved on' : 'Updated on'} {new Date(item.updated_at || item.saved_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {t(item.status === 'saved' ? 'my.savedOn' : 'my.updatedOn', { date: new Date(item.updated_at || item.saved_at).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' }) })}
                     </span>
                   </div>
                   <h3 
@@ -123,9 +126,9 @@ const MySchemes = () => {
                 
                 <div className={styles.rowActions}>
                   <div className={styles.benefitInfo}>
-                    <span className={styles.benefitLabel}>Benefit Amount</span>
+                    <span className={styles.benefitLabel}>{t('my.benefitAmount')}</span>
                     <span className={styles.benefitValue}>
-                      {item.scheme.benefit_amount ? `₹${item.scheme.benefit_amount.toLocaleString('en-IN')}` : 'Variable'}
+                      {item.scheme.benefit_amount ? `₹${Number(item.scheme.benefit_amount).toLocaleString('en-IN')}` : t('my.variable')}
                     </span>
                   </div>
                   
@@ -134,20 +137,18 @@ const MySchemes = () => {
                     value={item.status}
                     onChange={(e) => handleStatusChange(item.id, e.target.value)}
                   >
-                    <option value="saved">Saved</option>
-                    <option value="applied">Applied</option>
-                    <option value="under_review">Under Review</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
+                    {['saved', 'applied', 'under_review', 'approved', 'rejected'].map((st) => (
+                      <option key={st} value={st}>{t(`status.${st}`)}</option>
+                    ))}
                   </select>
                 </div>
               </div>
             ))
           ) : (
             <div className={styles.emptyState}>
-              <p>No schemes found in this category.</p>
+              <p>{t('my.none')}</p>
               <button className={styles.findBtn} onClick={() => navigate('/schemes')}>
-                Find Schemes
+                {t('my.find')}
               </button>
             </div>
           )}

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import apiClient, { setAccessToken } from '../api/client';
+import { RouteSkeleton } from '../components/Skeleton';
 
 const AuthContext = createContext();
 
@@ -9,14 +10,19 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  // True for the brief window between clearing `user` and the explicit
-  // navigate('/') below landing. Without this, ProtectedRoute/AdminRoute
-  // see user=null while still mounted on the old protected page and fire
-  // their own <Navigate to="/login"/>, which races the explicit navigate
-  // here - and usually wins, so logout always lands on the login form
-  // instead of home regardless of which page you logged out from.
+  // True from the moment logout starts until the router has actually landed
+  // on '/'. React Router v7 applies navigate() as a low-priority transition,
+  // while setUser(null) commits immediately - so for one render the old
+  // protected page sees user=null, and its guard's <Navigate to="/login"/>
+  // would win the race. Holding this flag until the location really changes
+  // keeps the guards neutral for that whole window.
   const [loggingOut, setLoggingOut] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (loggingOut && location.pathname === '/') setLoggingOut(false);
+  }, [loggingOut, location.pathname]);
 
   const fetchMe = async () => {
     try {
@@ -87,7 +93,6 @@ export const AuthProvider = ({ children }) => {
         // Storage unavailable (private mode); nothing to clean up.
       }
       navigate('/', { replace: true });
-      setLoggingOut(false);
     }
   };
 
@@ -105,16 +110,10 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-const RouteLoadingFallback = () => (
-  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '40vh', color: 'var(--text-muted)' }}>
-    Checking your session...
-  </div>
-);
-
 export const ProtectedRoute = ({ children }) => {
   const { user, loading, loggingOut } = useAuth();
 
-  if (loading || loggingOut) return <RouteLoadingFallback />;
+  if (loading || loggingOut) return <RouteSkeleton />;
   if (!user) {
     return <Navigate to="/login" replace />;
   }

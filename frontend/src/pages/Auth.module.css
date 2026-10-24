@@ -2,6 +2,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
   background-color: #FAFAFA; /* Very light background */
 }
 
@@ -252,4 +253,11 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.langCorner {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 2;
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../api/client';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import styles from './AdminDashboard.module.css';
+import { DashboardSkeleton } from '../../components/Skeleton';
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -28,7 +29,7 @@ const AdminDashboard = () => {
     fetchData();
   }, []);
 
-  if (loading) return <div className={styles.loading}>Loading Dashboard...</div>;
+  if (loading) return <DashboardSkeleton label="Loading admin dashboard" />;
 
   const COLORS = ['#16A34A', '#F59E0B', '#DC2626']; // Low, Medium, High
 

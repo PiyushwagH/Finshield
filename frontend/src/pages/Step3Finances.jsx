@@ -1,6 +1,7 @@
 import React from 'react';
 import { useAssessment } from './AssessmentWizard';
 import styles from './AssessmentWizard.module.css';
+import { useLanguage } from '../context/LanguageContext';
 import CurrencyInput from '../components/CurrencyInput';
 import InfoTooltip from '../components/InfoTooltip';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 const Step3Finances = ({ onNext, onPrev }) => {
   const { formData, updateData } = useAssessment();
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   // EMI and outstanding balance are only meaningful when the user actually
   // has a loan running, so they're gated behind that toggle - same pattern
@@ -31,15 +33,15 @@ const Step3Finances = ({ onNext, onPrev }) => {
 
   return (
     <div>
-      <h2 className={styles.stepTitle}>Existing Financial Situation</h2>
+      <h2 className={styles.stepTitle}>{t('s3.title')}</h2>
       <p className={styles.stepDescription}>
-        Please provide accurate details regarding your current financial standing. All amounts should be in INR (₹).
+        {t('s3.desc')}
       </p>
 
       <div className={styles.toggleGroup}>
         <div className={styles.toggleLabel}>
-          Do you have any active loans or EMIs?
-          <InfoTooltip text="Any ongoing home, vehicle, personal, or other loan with monthly payments." />
+          {t('s3.activeLoans')}
+          <InfoTooltip text={t('s3.activeLoansTip')} />
         </div>
         <label className={styles.switch}>
           <input
@@ -54,48 +56,48 @@ const Step3Finances = ({ onNext, onPrev }) => {
       {formData.has_active_loans && (
         <div className={styles.grid2} style={{ marginTop: '1.5rem' }}>
           <CurrencyInput
-            label="Total Monthly EMIs"
+            label={t('s3.emi')}
             value={formData.monthly_emi}
             onChange={val => updateData({ monthly_emi: val })}
-            tooltip="Total of all your current monthly loan or credit card payments."
+            tooltip={t('s3.emiTip')}
           />
           <CurrencyInput
-            label="Total Outstanding Loan Balance"
+            label={t('s3.debt')}
             value={formData.existing_total_debt}
             onChange={val => updateData({ existing_total_debt: val })}
-            tooltip="Total remaining principal on all your loans."
+            tooltip={t('s3.debtTip')}
           />
         </div>
       )}
 
       <div className={styles.grid2} style={{ marginTop: '1.5rem' }}>
         <CurrencyInput
-          label="Approximate Total Asset Value"
+          label={t('s3.assets')}
           value={formData.asset_value}
           onChange={val => updateData({ asset_value: val })}
-          tooltip="Estimated value of property, investments, and other liquid assets."
+          tooltip={t('s3.assetsTip')}
         />
         <CurrencyInput
-          label="Avg Monthly Household Expenditure"
+          label={t('s3.expenditure')}
           value={formData.monthly_expenditure}
           onChange={val => updateData({ monthly_expenditure: val })}
-          tooltip="Average monthly expenses excluding EMIs."
+          tooltip={t('s3.expenditureTip')}
         />
       </div>
 
       <div className={styles.grid1}>
         <CurrencyInput
-          label="Current Savings and Emergency Fund"
+          label={t('s3.savings')}
           value={formData.savings}
           onChange={val => updateData({ savings: val })}
-          tooltip="Total amount in savings accounts and liquid emergency funds."
+          tooltip={t('s3.savingsTip')}
         />
       </div>
 
       <div className={styles.toggleGroup}>
         <div className={styles.toggleLabel}>
-          Do you own a vehicle?
-          <InfoTooltip text="Includes cars, two-wheelers, etc." />
+          {t('s3.vehicle')}
+          <InfoTooltip text={t('s3.vehicleTip')} />
         </div>
         <label className={styles.switch}>
           <input
@@ -109,8 +111,8 @@ const Step3Finances = ({ onNext, onPrev }) => {
 
       <div className={styles.toggleGroup}>
         <div className={styles.toggleLabel}>
-          Do you own property?
-          <InfoTooltip text="Includes houses, land, commercial property." />
+          {t('s3.property')}
+          <InfoTooltip text={t('s3.propertyTip')} />
         </div>
         <label className={styles.switch}>
           <input
@@ -124,14 +126,14 @@ const Step3Finances = ({ onNext, onPrev }) => {
 
       <div className={styles.actions}>
         <button className={styles.saveExit} onClick={() => navigate('/dashboard')}>
-          Save and Exit
+          {t('wiz.saveExit')}
         </button>
         <div className={styles.navButtons}>
           <button className={styles.btnSecondary} onClick={onPrev}>
-            Back
+            {t('wiz.back')}
           </button>
           <button className={styles.btnPrimary} onClick={onNext} disabled={!isValid}>
-            Continue &rarr;
+            {t('wiz.continue')}
           </button>
         </div>
       </div>

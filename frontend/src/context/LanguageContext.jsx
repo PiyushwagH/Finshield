@@ -4,6 +4,7 @@ import hi from '../i18n/hi.json';
 import mr from '../i18n/mr.json';
 
 const dictionaries = { en, hi, mr };
+const LOCALES = { en: 'en-IN', hi: 'hi-IN', mr: 'mr-IN' };
 
 const LanguageContext = createContext();
 
@@ -21,7 +22,7 @@ export const LanguageProvider = ({ children }) => {
 
   const t = (key, params = {}) => {
     const dict = dictionaries[lang] || dictionaries.en;
-    let template = dict[key] || dictionaries.en[key] || key;
+    let template = dict[key] ?? dictionaries.en[key] ?? key;
 
     if (typeof template === 'string') {
       Object.keys(params).forEach((paramKey) => {
@@ -32,8 +33,17 @@ export const LanguageProvider = ({ children }) => {
     return template;
   };
 
+  // Translate a fixed English phrase produced by the backend (e.g. the frozen
+  // ML model's factor/flag text). Unknown phrases fall back to the original
+  // text rather than showing a raw key.
+  const tx = (text) => {
+    if (!text) return text;
+    const dict = dictionaries[lang] || dictionaries.en;
+    return dict[`text:${text}`] || text;
+  };
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang, t }}>
+    <LanguageContext.Provider value={{ lang, setLang, t, tx, locale: LOCALES[lang] || 'en-IN' }}>
       {children}
     </LanguageContext.Provider>
   );

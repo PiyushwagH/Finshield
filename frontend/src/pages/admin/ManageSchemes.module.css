@@ -66,7 +66,7 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .tableToolbar {
@@ -177,16 +177,283 @@
   color: var(--text-muted);
 }
 
+.archived {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--text-muted);
+}
+
 .iconBtn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.iconBtn:hover {
+  background: var(--bg-alt);
+  color: var(--navy);
+}
+
+.iconBtnActive {
+  background: var(--bg-alt);
+  color: var(--navy);
+}
+
+.actionCell {
+  position: relative;
+  text-align: right;
+}
+
+.actionMenu {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 1rem;
+  min-width: 190px;
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  overflow: hidden;
+  padding: 0.35rem 0;
+  animation: menuFadeIn 0.15s ease-out;
+  text-align: left;
+}
+
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.actionMenuItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.actionMenuItem:hover {
+  background: var(--bg-alt);
+  color: var(--navy);
+}
+
+.actionMenuItem svg {
+  flex-shrink: 0;
+}
+
+.actionMenuItemDanger {
+  color: var(--risk-high);
+}
+
+.actionMenuItemDanger:hover {
+  background: rgba(220, 38, 38, 0.08);
+  color: var(--risk-high);
+}
+
+.menuDivider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.35rem 0;
+}
+
+/* Modal styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 42, 71, 0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 100%;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  animation: modalScale 0.2s ease-out;
+}
+
+@keyframes modalScale {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.modalHeader {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modalCloseBtn {
   background: none;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.iconBtn:hover {
+.modalCloseBtn:hover {
   background: var(--bg-alt);
-  color: var(--navy);
+  color: var(--text);
+}
+
+.modalBody {
+  padding: 1.5rem;
+  font-size: 0.925rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.modalWarning {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(220, 38, 38, 0.08);
+  border-left: 3px solid var(--risk-high);
+  border-radius: 4px;
+  font-size: 0.825rem;
+  color: #991B1B;
+}
+
+.modalFooter {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background: var(--bg-alt);
+}
+
+.modalCancelBtn {
+  background: white;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.modalCancelBtn:hover {
+  background: var(--bg-alt);
+}
+
+.modalDeleteBtn {
+  background: var(--risk-high);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.15s;
+}
+
+.modalDeleteBtn:hover {
+  opacity: 0.9;
+}
+
+.modalDeleteBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 0.85rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  z-index: 1100;
+  animation: slideToast 0.2s ease-out;
+}
+
+@keyframes slideToast {
+  from {
+    transform: translateY(12px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.toastSuccess {
+  background: #064E3B;
+  color: white;
+}
+
+.toastError {
+  background: #7F1D1D;
+  color: white;
+}
+
+.toastInfo {
+  background: var(--navy);
+  color: white;
 }

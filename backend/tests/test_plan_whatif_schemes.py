@@ -9,7 +9,7 @@ from app.main import app
 from app.database import Base, get_db
 from app.models.user import User
 from app.models.assessment import Assessment
-from app.models.scheme import Scheme, SchemeEligibilityRule, UserSchemeStatus
+from app.models.scheme import Scheme, SchemeEligibilityRule, UserSchemeStatus, UserScheme, SchemeUpdate
 from app.core.security import create_access_token
 from app.services.plan_rules import generate_plan
 from app.services.scheme_matching import normalize_benefit, get_assessment_schemes
@@ -38,7 +38,11 @@ def setup_tables():
     Scheme.__table__.create(bind=engine, checkfirst=True)
     SchemeEligibilityRule.__table__.create(bind=engine, checkfirst=True)
     UserSchemeStatus.__table__.create(bind=engine, checkfirst=True)
+    UserScheme.__table__.create(bind=engine, checkfirst=True)
+    SchemeUpdate.__table__.create(bind=engine, checkfirst=True)
     yield
+    SchemeUpdate.__table__.drop(bind=engine, checkfirst=True)
+    UserScheme.__table__.drop(bind=engine, checkfirst=True)
     UserSchemeStatus.__table__.drop(bind=engine, checkfirst=True)
     SchemeEligibilityRule.__table__.drop(bind=engine, checkfirst=True)
     Scheme.__table__.drop(bind=engine, checkfirst=True)
@@ -112,10 +116,15 @@ def test_users_and_assessment():
     )
     db.add(scheme)
 
+    admin_id = uuid.uuid4()
+    admin_user = User(id=admin_id, email=f"admin_{admin_id.hex[:6]}@example.com", full_name="Admin User", password_hash="hash", role="admin")
+    db.add(admin_user)
+
     db.commit()
 
     token1 = create_access_token(data={"sub": str(u1_id)})
     token2 = create_access_token(data={"sub": str(u2_id)})
+    token_admin = create_access_token(data={"sub": str(admin_id)})
 
     aid = assessment.id
     sid = scheme.id
@@ -124,8 +133,10 @@ def test_users_and_assessment():
     return {
         "u1_token": token1,
         "u2_token": token2,
+        "admin_token": token_admin,
         "assessment_id": aid,
         "scheme_id": sid,
+        "scheme_slug": scheme_slug,
         "sample_input": sample_input
     }
 
@@ -300,3 +311,86 @@ def test_put_scheme_my_status(test_users_and_assessment):
     res = client.put(f"/api/schemes/{sid}/my-status", json={"status": "not_using"}, headers=u1_headers)
     assert res.status_code == 200
     assert res.json()["status"] == "not_using"
+
+def test_admin_deactivate_and_activate_scheme(test_users_and_assessment):
+    fixture = test_users_and_assessment
+    sid = str(fixture["scheme_id"])
+    slug = fixture["scheme_slug"]
+    admin_headers = {"Authorization": f"Bearer {fixture['admin_token']}"}
+
+    # 1. Admin deactivates the scheme (marks archived / inactive)
+    res = client.patch(f"/api/admin/schemes/{sid}/status", json={"status": "archived"}, headers=admin_headers)
+    assert res.status_code == 200
+    assert res.json()["status"] == "archived"
+
+    # 2. Runtime user checks: scheme MUST NOT be visible anywhere
+    # Scheme list should not contain the scheme
+    list_res = client.get("/api/schemes")
+    assert list_res.status_code == 200
+    assert not any(s["slug"] == slug for s in list_res.json())
+
+    # Scheme detail by slug should return 404 for runtime users
+    detail_res = client.get(f"/api/schemes/{slug}")
+    assert detail_res.status_code == 404
+
+    # Scheme checklist by ID should return 404 for runtime users
+    chk_res = client.get(f"/api/schemes/{sid}/checklist")
+    assert chk_res.status_code == 404
+
+    # 3. Admin can still retrieve scheme via admin endpoint
+    admin_detail = client.get(f"/api/admin/schemes/{sid}", headers=admin_headers)
+    assert admin_detail.status_code == 200
+    assert admin_detail.json()["status"] == "archived"
+
+    # 4. Admin re-activates the scheme
+    reactivate_res = client.patch(f"/api/admin/schemes/{sid}/status", json={"status": "active"}, headers=admin_headers)
+    assert reactivate_res.status_code == 200
+    assert reactivate_res.json()["status"] == "active"
+
+    # 5. Runtime user checks: scheme is visible and accessible again
+    list_res2 = client.get("/api/schemes")
+    assert list_res2.status_code == 200
+    assert any(s["slug"] == slug for s in list_res2.json())
+
+    detail_res2 = client.get(f"/api/schemes/{slug}")
+    assert detail_res2.status_code == 200
+    assert detail_res2.json()["slug"] == slug
+
+def test_admin_delete_scheme_permanent(test_users_and_assessment):
+    fixture = test_users_and_assessment
+    admin_headers = {"Authorization": f"Bearer {fixture['admin_token']}"}
+
+    # Create a fresh scheme with a rule to verify deletion and cascade
+    new_scheme_payload = {
+        "name": "Scheme To Delete",
+        "slug": f"delete-me-{uuid.uuid4().hex[:8]}",
+        "short_description": "Will be deleted",
+        "full_description": "Will be permanently deleted by admin",
+        "status": "active",
+        "official_url": "https://gov.in/temp",
+        "documents": ["ID Proof"],
+        "apply_steps": ["Step 1"],
+        "last_verified_at": datetime.now(timezone.utc).isoformat(),
+        "rules": [
+            {"field": "age", "operator": "gte", "value": 18, "logic_group": 1}
+        ]
+    }
+    create_res = client.post("/api/admin/schemes", json=new_scheme_payload, headers=admin_headers)
+    assert create_res.status_code == 200
+    created_id = create_res.json()["id"]
+    created_slug = new_scheme_payload["slug"]
+
+    # Verify it was visible to runtime users
+    assert client.get(f"/api/schemes/{created_slug}").status_code == 200
+
+    # Admin deletes the scheme permanently
+    del_res = client.delete(f"/api/admin/schemes/{created_id}?permanent=true", headers=admin_headers)
+    assert del_res.status_code == 204
+
+    # Runtime user: must be 404 and not found
+    assert client.get(f"/api/schemes/{created_slug}").status_code == 404
+    list_after = client.get("/api/schemes")
+    assert not any(s["slug"] == created_slug for s in list_after.json())
+
+    # Admin: must also return 404 as it is completely gone
+    assert client.get(f"/api/admin/schemes/{created_id}", headers=admin_headers).status_code == 404

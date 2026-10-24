@@ -15,19 +15,23 @@ router = APIRouter(prefix="/api/user-schemes", tags=["user_schemes"])
 def get_user_schemes(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     user_schemes = db.query(UserScheme).filter(UserScheme.user_id == current_user.id).all()
     
-    # Eagerly load or manually attach the scheme object for each
+    # Eagerly load or manually attach the active scheme object for each
     results = []
     for us in user_schemes:
-        scheme = db.query(Scheme).filter(Scheme.id == us.scheme_id).first()
-        us_resp = UserSchemeResponse.model_validate(us)
+        scheme = db.query(Scheme).filter(Scheme.id == us.scheme_id, Scheme.status == 'active').first()
         if scheme:
+            us_resp = UserSchemeResponse.model_validate(us)
             us_resp.scheme = SchemeResponse.model_validate(scheme)
-        results.append(us_resp)
+            results.append(us_resp)
         
     return results
 
 @router.post("", response_model=UserSchemeResponse)
 def save_user_scheme(data: UserSchemeCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    scheme = db.query(Scheme).filter(Scheme.id == data.scheme_id, Scheme.status == 'active').first()
+    if not scheme:
+        raise HTTPException(status_code=404, detail="Scheme not found or is inactive")
+
     # Check if already exists
     existing = db.query(UserScheme).filter(
         UserScheme.user_id == current_user.id, 
@@ -47,9 +51,7 @@ def save_user_scheme(data: UserSchemeCreate, db: Session = Depends(get_db), curr
     db.refresh(us)
     
     us_resp = UserSchemeResponse.model_validate(us)
-    scheme = db.query(Scheme).filter(Scheme.id == us.scheme_id).first()
-    if scheme:
-        us_resp.scheme = SchemeResponse.model_validate(scheme)
+    us_resp.scheme = SchemeResponse.model_validate(scheme)
     return us_resp
 
 @router.patch("/{id}", response_model=UserSchemeResponse)

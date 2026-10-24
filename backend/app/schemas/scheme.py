@@ -148,6 +148,10 @@ class QuickMatchProfile(BaseModel):
     occupation_tags: Optional[List[str]] = None
     annual_income: Optional[float] = None
     gender: Optional[str] = None
+    # Many schemes (scholarships, MUDRA, Stand-Up India...) gate on
+    # employment_status; without it the rule engine treats the field as
+    # missing and those schemes can never match a quick check.
+    employment_status: Optional[str] = None
 
 class MatchProfile(BaseModel):
     age: int

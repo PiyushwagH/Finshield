@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../api/client';
 import styles from './SchemeUpdates.module.css';
+import { ListItemsSkeleton } from '../../components/Skeleton';
 
 const TABS = ['Pending', 'Approved', 'Rejected'];
 
@@ -67,7 +68,7 @@ const SchemeUpdates = () => {
 
       <div className={styles.updatesList}>
         {loading ? (
-          <div className={styles.loading}>Loading updates...</div>
+          <ListItemsSkeleton count={3} label="Loading updates" />
         ) : updates.length === 0 ? (
           <div className={styles.empty}>No {activeTab.toLowerCase()} updates.</div>
         ) : (

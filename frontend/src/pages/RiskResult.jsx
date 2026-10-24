@@ -10,6 +10,7 @@ import { mapRiskBand } from '../utils/riskBand';
 import { useLanguage } from '../context/LanguageContext';
 import ChecklistDrawer from '../components/ChecklistDrawer';
 import styles from './RiskResult.module.css';
+import { ResultSkeleton, SkeletonCard } from '../components/Skeleton';
 
 // English ordinal suffix (1st, 2nd, 3rd, 4th...)
 const ordinalSuffix = (n) => {
@@ -29,6 +30,7 @@ const formatINR = (val) => {
 };
 
 const SemicircularGauge = ({ score }) => {
+  const { t } = useLanguage();
   const minScore = 300;
   const maxScore = 850;
   const clampedScore = Math.max(minScore, Math.min(maxScore, score || 300));
@@ -66,7 +68,7 @@ const SemicircularGauge = ({ score }) => {
       </svg>
       <div className={styles.gaugeValueText}>
         <span className={styles.scoreNumber}>{clampedScore}</span>
-        <span className={styles.scoreMax}>out of 850</span>
+        <span className={styles.scoreMax}>{t('result.outOf')}</span>
       </div>
     </div>
   );
@@ -75,7 +77,7 @@ const SemicircularGauge = ({ score }) => {
 const RiskResult = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { lang, t } = useLanguage();
+  const { lang, t, tx } = useLanguage();
 
   // Primary assessment state
   const [data, setData] = useState(null);
@@ -129,7 +131,7 @@ const RiskResult = () => {
           annual_income: Number(inp.annual_income || 0),
         });
       } catch (err) {
-        setError(err.response?.data?.detail || 'Failed to load risk assessment.');
+        setError(err.response?.data?.detail || t('result.loadFailed'));
       } finally {
         setLoading(false);
       }
@@ -191,7 +193,7 @@ const RiskResult = () => {
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (err) {
-      setPdfError('Failed to generate PDF. Please try again.');
+      setPdfError(t('result.pdfFailed'));
     } finally {
       setPdfDownloading(false);
     }
@@ -246,8 +248,20 @@ const RiskResult = () => {
     }
   };
 
-  if (loading) return <div className={styles.container}><div className={styles.card}>Loading assessment results...</div></div>;
-  if (error || !data) return <div className={styles.container}><div className={styles.card}>{error || 'Result not found'}</div></div>;
+  if (loading) return <div className={styles.container}><ResultSkeleton /></div>;
+  if (error || !data) return <div className={styles.container}><div className={styles.card}>{error || t('result.notFound')}</div></div>;
+
+  // Slider ranges are fixed from the original assessment values. They used to
+  // be derived from each slider's own live value (value * 2), so the max grew
+  // as you dragged and the thumb could never get past the middle.
+  const baseInput = data.input_data || {};
+  const rangeMax = (base, floor, step) => Math.ceil(Math.max(floor, Number(base || 0) * 3) / step) * step;
+  const sliderMax = {
+    monthly_emi: rangeMax(baseInput.monthly_emi, 100000, 1000),
+    savings: rangeMax(baseInput.savings, 500000, 5000),
+    monthly_expenditure: rangeMax(baseInput.monthly_expenditure, 100000, 1000),
+    annual_income: rangeMax(baseInput.annual_income, 2000000, 10000),
+  };
 
   const mappedBand = mapRiskBand(data.risk_band);
   const defProbPct = (data.default_probability * 100).toFixed(1);
@@ -258,12 +272,12 @@ const RiskResult = () => {
   // Chart data for What-If comparison
   const chartData = [
     {
-      name: 'Credit Risk Score',
+      name: t('result.chartScore'),
       Baseline: whatifResult?.base?.score ?? data.risk_score,
       Scenario: whatifResult?.scenario?.score ?? data.risk_score,
     },
     {
-      name: 'Monthly Surplus (₹)',
+      name: t('result.chartSurplus'),
       Baseline: Math.round(whatifResult?.affordability_base?.monthly_surplus ?? data.affordability?.monthly_surplus ?? 0),
       Scenario: Math.round(whatifResult?.affordability_scenario?.monthly_surplus ?? data.affordability?.monthly_surplus ?? 0),
     },
@@ -274,8 +288,8 @@ const RiskResult = () => {
       <div className={styles.printableArea}>
         <div className={styles.header}>
           <div>
-            <h1 className={styles.title}>Assessment Results</h1>
-            <p className={styles.subtitle}>Comprehensive review of your financial standing.</p>
+            <h1 className={styles.title}>{t('result.title')}</h1>
+            <p className={styles.subtitle}>{t('result.subtitle')}</p>
           </div>
         </div>
 
@@ -285,16 +299,16 @@ const RiskResult = () => {
           
           <div className={styles.bandBadgeContainer}>
             <span className={`${styles.bandBadge} ${styles['band' + mappedBand]}`}>
-              {mappedBand.toUpperCase()} RISK
+              {t(`band.${mappedBand}`)}
             </span>
           </div>
 
           <p className={styles.sentence}>
-            Your estimated probability of financial default is <strong>{defProbPct}%</strong>, compared to a population average of <strong>{popRate}%</strong>.
+            {t('result.probPre')}<strong>{defProbPct}%</strong>{t('result.probMid')}<strong>{popRate}%</strong>{t('result.probPost')}
           </p>
 
           <p className={styles.percentileLine}>
-            You are in the <strong>{Math.round(data.population_percentile)}{ordinalSuffix(Math.round(data.population_percentile))} percentile</strong> of risk.
+            {t('result.pctPre')}<strong>{t('result.pctVal', { n: Math.round(data.population_percentile), sfx: ordinalSuffix(Math.round(data.population_percentile)) })}</strong>{t('result.pctPost')}
           </p>
         </div>
 
@@ -302,19 +316,19 @@ const RiskResult = () => {
         <div className={styles.twoColumnGrid}>
           {/* Driver Factors */}
           <div className={styles.card}>
-            <h2 className={styles.cardTitle}>What's driving your score</h2>
+            <h2 className={styles.cardTitle}>{t('result.drivers')}</h2>
 
             {data.factors?.positive?.length > 0 && (
               <div className={styles.factorGroup}>
                 <h3 className={styles.positiveHeader}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-                  WORKING IN YOUR FAVOUR
+                  {t('result.favour')}
                 </h3>
                 <ul className={styles.factorList}>
                   {data.factors.positive.map((factor, idx) => (
                     <li key={idx} className={styles.factorItemPositive}>
-                      <span>{factor}</span>
-                      <span className={styles.tagPos}>+Positive</span>
+                      <span>{tx(factor)}</span>
+                      <span className={styles.tagPos}>{t('result.tagPos')}</span>
                     </li>
                   ))}
                 </ul>
@@ -325,13 +339,13 @@ const RiskResult = () => {
               <div className={styles.factorGroup}>
                 <h3 className={styles.negativeHeader}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></svg>
-                  RAISING YOUR RISK
+                  {t('result.raising')}
                 </h3>
                 <ul className={styles.factorList}>
                   {data.factors.negative.map((factor, idx) => (
                     <li key={idx} className={styles.factorItemNegative}>
-                      <span>{factor}</span>
-                      <span className={styles.tagNeg}>-Risk</span>
+                      <span>{tx(factor)}</span>
+                      <span className={styles.tagNeg}>{t('result.tagNeg')}</span>
                     </li>
                   ))}
                 </ul>
@@ -342,26 +356,26 @@ const RiskResult = () => {
           {/* Affordability Check */}
           <div className={styles.card}>
             <div className={styles.cardHeaderFlex}>
-              <h2 className={styles.cardTitle}>Affordability Check</h2>
-              <span className={styles.gradeBadge}>{data.affordability?.grade || 'Standard'}</span>
+              <h2 className={styles.cardTitle}>{t('result.affordability')}</h2>
+              <span className={styles.gradeBadge}>{data.affordability?.grade ? tx(data.affordability.grade) : t('result.standard')}</span>
             </div>
 
             <div className={styles.affordabilityRows}>
               <div className={styles.affRow}>
-                <span>Monthly Surplus</span>
+                <span>{t('result.surplus')}</span>
                 <strong>₹{formatINR(data.affordability?.monthly_surplus)}</strong>
               </div>
               <div className={styles.affRow}>
-                <span>Surplus Ratio</span>
+                <span>{t('result.surplusRatio')}</span>
                 <strong>{((data.affordability?.surplus_ratio || 0) * 100).toFixed(1)}%</strong>
               </div>
               <div className={styles.affRow}>
-                <span>EMI-to-Income Ratio</span>
+                <span>{t('result.emiRatio')}</span>
                 <strong>{((data.affordability?.emi_to_income_ratio || 0) * 100).toFixed(1)}%</strong>
               </div>
               <div className={styles.affRow}>
-                <span>Emergency Fund Months</span>
-                <strong>{data.affordability?.emergency_fund_months ?? 'N/A'} Months</strong>
+                <span>{t('result.fundMonths')}</span>
+                <strong>{t('result.months', { n: data.affordability?.emergency_fund_months ?? '—' })}</strong>
               </div>
             </div>
 
@@ -369,11 +383,11 @@ const RiskResult = () => {
               <div className={styles.flagsBox}>
                 <h4 className={styles.flagsTitle}>
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>
-                  Flags Detected
+                  {t('result.flags')}
                 </h4>
                 <ul>
                   {data.affordability.flags.map((flag, idx) => (
-                    <li key={idx}>{flag}</li>
+                    <li key={idx}>{tx(flag)}</li>
                   ))}
                 </ul>
               </div>
@@ -382,7 +396,7 @@ const RiskResult = () => {
         </div>
 
         {/* Accessible TABS Navigation */}
-        <div className={styles.tabsContainer} role="tablist" aria-label="Assessment In-depth Features">
+        <div className={styles.tabsContainer} role="tablist" aria-label={t('result.tablist')}>
           <button
             role="tab"
             aria-selected={activeTab === 'plan'}
@@ -418,7 +432,7 @@ const RiskResult = () => {
         {activeTab === 'plan' && (
           <div className={styles.planSection} role="tabpanel" aria-labelledby="tab-plan">
             {planLoading ? (
-              <div className={styles.card}>Calculating deterministic plan and TreeSHAP contributions...</div>
+              <><SkeletonCard lines={6} /><SkeletonCard lines={4} /></>
             ) : planData ? (
               <>
                 {/* 1. Driver Bars (Top 6) */}
@@ -464,13 +478,13 @@ const RiskResult = () => {
                             <h3 className={styles.priorityTitle}>{p.title}</h3>
                             <div className={styles.priorityBadges}>
                               <span className={styles.gainBadge}>
-                                {p.est_score_gain > 0 ? t('plan.ptsGain', { pts: p.est_score_gain }) : 'Stabilization'}
+                                {p.est_score_gain > 0 ? t('plan.ptsGain', { pts: p.est_score_gain }) : t('result.stabilization')}
                               </span>
-                              <span className={styles.timeframeChip}>{p.timeframe.toUpperCase()}</span>
+                              <span className={styles.timeframeChip}>{t(`result.tf${p.timeframe}`)}</span>
                             </div>
                           </div>
                           <p className={styles.priorityWhy}>{p.why}</p>
-                          <p className={styles.priorityAction}><strong>Action:</strong> {p.action}</p>
+                          <p className={styles.priorityAction}><strong>{t('result.action')}</strong> {p.action}</p>
                         </div>
                       </div>
                     ))}
@@ -484,7 +498,7 @@ const RiskResult = () => {
                     {['3m', '6m', '12m'].map((period) => (
                       <div key={period} className={styles.roadmapCol}>
                         <span className={styles.roadmapHorizonTitle}>
-                          {period === '3m' ? '1–3 Months' : period === '6m' ? '4–6 Months' : '7–12 Months'}
+                          {t(`result.tf${period}`)}
                         </span>
                         {planData.roadmap?.[period]?.map((item, i) => (
                           <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
@@ -549,7 +563,7 @@ const RiskResult = () => {
                     type="range"
                     className={styles.rangeSlider}
                     min={0}
-                    max={Math.max(100000, whatifInputs.monthly_emi * 2)}
+                    max={Math.max(sliderMax.monthly_emi, whatifInputs.monthly_emi)}
                     step={1000}
                     value={whatifInputs.monthly_emi}
                     onChange={(e) => setWhatifInputs((prev) => ({ ...prev, monthly_emi: Number(e.target.value) }))}
@@ -578,7 +592,7 @@ const RiskResult = () => {
                     type="range"
                     className={styles.rangeSlider}
                     min={0}
-                    max={Math.max(500000, whatifInputs.savings * 2)}
+                    max={Math.max(sliderMax.savings, whatifInputs.savings)}
                     step={5000}
                     value={whatifInputs.savings}
                     onChange={(e) => setWhatifInputs((prev) => ({ ...prev, savings: Number(e.target.value) }))}
@@ -607,7 +621,7 @@ const RiskResult = () => {
                     type="range"
                     className={styles.rangeSlider}
                     min={0}
-                    max={Math.max(100000, whatifInputs.monthly_expenditure * 2)}
+                    max={Math.max(sliderMax.monthly_expenditure, whatifInputs.monthly_expenditure)}
                     step={1000}
                     value={whatifInputs.monthly_expenditure}
                     onChange={(e) => setWhatifInputs((prev) => ({ ...prev, monthly_expenditure: Number(e.target.value) }))}
@@ -636,7 +650,7 @@ const RiskResult = () => {
                     type="range"
                     className={styles.rangeSlider}
                     min={50000}
-                    max={Math.max(2000000, whatifInputs.annual_income * 2)}
+                    max={Math.max(sliderMax.annual_income, whatifInputs.annual_income)}
                     step={10000}
                     value={whatifInputs.annual_income}
                     onChange={(e) => setWhatifInputs((prev) => ({ ...prev, annual_income: Number(e.target.value) }))}
@@ -651,8 +665,8 @@ const RiskResult = () => {
                     {schemesData.matched.slice(0, 5).map((s) => {
                       const isSelected = selectedSchemeIds.includes(s.scheme_id);
                       const benefitStr = s.benefit.monthly_inr 
-                        ? `+₹${formatINR(s.benefit.monthly_inr)}/mo` 
-                        : (s.benefit.annual_inr ? `+₹${formatINR(Math.round(s.benefit.annual_inr / 12))}/mo` : '');
+                        ? `+₹${formatINR(s.benefit.monthly_inr)}${t('result.perMo')}` 
+                        : (s.benefit.annual_inr ? `+₹${formatINR(Math.round(s.benefit.annual_inr / 12))}${t('result.perMo')}` : '');
 
                       return (
                         <div key={s.scheme_id} className={styles.schemeToggleItem}>
@@ -677,7 +691,7 @@ const RiskResult = () => {
 
                     {whatifResult?.scheme_benefit_monthly_inr > 0 && (
                       <div className={styles.schemeNoticeBox}>
-                        {t('whatif.schemeSurplusNotice', { amt: `₹${formatINR(whatifResult.scheme_benefit_monthly_inr)}/mo` })}
+                        {t('whatif.schemeSurplusNotice', { amt: `₹${formatINR(whatifResult.scheme_benefit_monthly_inr)}${t('result.perMo')}` })}
                       </div>
                     )}
                     <p className={styles.schemeNoteBox}>{t('whatif.schemeNote')}</p>
@@ -689,16 +703,16 @@ const RiskResult = () => {
               <div className={styles.comparisonColumn}>
                 <div className={styles.deltaHeroCard}>
                   <div className={styles.deltaItem}>
-                    <span className={styles.deltaLabel}>Base Score</span>
+                    <span className={styles.deltaLabel}>{t('result.baseScore')}</span>
                     <span className={styles.deltaVal}>{whatifResult?.base?.score ?? data.risk_score}</span>
-                    <span className={styles.deltaLabel}>{mapRiskBand(whatifResult?.base?.band ?? data.risk_band)} Risk</span>
+                    <span className={styles.deltaLabel}>{t('result.bandRisk', { band: t(`band.word.${mapRiskBand(whatifResult?.base?.band ?? data.risk_band)}`) })}</span>
                   </div>
                   <div style={{ fontSize: '1.5rem', color: 'rgba(255,255,255,0.4)' }}>➔</div>
                   <div className={styles.deltaItem}>
-                    <span className={styles.deltaLabel}>Scenario Score</span>
+                    <span className={styles.deltaLabel}>{t('result.scenarioScore')}</span>
                     <span className={styles.deltaVal}>{whatifResult?.scenario?.score ?? data.risk_score}</span>
                     <span className={whatifResult?.score_delta >= 0 ? styles.deltaDiffGain : styles.deltaDiffLoss}>
-                      {whatifResult?.score_delta >= 0 ? `+${whatifResult?.score_delta || 0}` : whatifResult?.score_delta} pts ({mapRiskBand(whatifResult?.scenario?.band ?? data.risk_band)})
+                      {whatifResult?.score_delta >= 0 ? `+${whatifResult?.score_delta || 0}` : whatifResult?.score_delta} {t('result.pts')} ({t(`band.word.${mapRiskBand(whatifResult?.scenario?.band ?? data.risk_band)}`)})
                     </span>
                   </div>
                 </div>
@@ -706,7 +720,7 @@ const RiskResult = () => {
                 {/* Recharts comparison */}
                 <div className={styles.chartCard}>
                   <h4 style={{ fontSize: '0.8125rem', fontWeight: 700, color: 'var(--navy)', marginBottom: '0.5rem' }}>
-                    Score & Surplus Comparison
+                    {t('result.comparison')}
                   </h4>
                   <div style={{ width: '100%', height: 220 }}>
                     <ResponsiveContainer width="100%" height="100%">
@@ -715,18 +729,18 @@ const RiskResult = () => {
                         <YAxis tick={{ fontSize: 11 }} />
                         <Tooltip
                           contentStyle={{ backgroundColor: 'var(--bg)', borderRadius: 8, border: '1px solid var(--border)' }}
-                          formatter={(value) => [typeof value === 'number' ? value.toLocaleString('en-IN') : value, '']}
+                          formatter={(value, name) => [typeof value === 'number' ? value.toLocaleString('en-IN') : value, name]}
                         />
-                        <Bar dataKey="Baseline" fill="var(--text-muted)" radius={[4, 4, 0, 0]} />
-                        <Bar dataKey="Scenario" fill="var(--teal)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="Baseline" name={t('whatif.base')} fill="var(--text-muted)" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="Scenario" name={t('whatif.scenario')} fill="var(--teal)" radius={[4, 4, 0, 0]} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
 
                   {/* Surplus stats line */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', fontSize: '0.8125rem', marginTop: '0.5rem', borderTop: '1px solid var(--border)', paddingTop: '0.5rem' }}>
-                    <span>Surplus: <strong>₹{formatINR(whatifResult?.affordability_scenario?.monthly_surplus ?? data.affordability?.monthly_surplus)}/mo</strong></span>
-                    <span>Runway: <strong>{whatifResult?.affordability_scenario?.emergency_fund_months ?? 'N/A'} Mos</strong></span>
+                    <span>{t('result.surplusLine')} <strong>₹{formatINR(whatifResult?.affordability_scenario?.monthly_surplus ?? data.affordability?.monthly_surplus)}{t('result.perMo')}</strong></span>
+                    <span>{t('result.runwayLine')} <strong>{whatifResult?.affordability_scenario?.emergency_fund_months ?? '—'} {t('result.mos')}</strong></span>
                   </div>
                 </div>
               </div>
@@ -740,7 +754,7 @@ const RiskResult = () => {
         {activeTab === 'schemes' && (
           <div className={styles.planSection} role="tabpanel" aria-labelledby="tab-schemes">
             {schemesLoading ? (
-              <div className={styles.card}>Evaluating welfare scheme eligibility and driver overlap...</div>
+              <><SkeletonCard lines={3} /><SkeletonCard lines={3} /><SkeletonCard lines={3} /></>
             ) : schemesData ? (
               <>
                 {/* Missed Summary Banner */}
@@ -830,7 +844,7 @@ const RiskResult = () => {
                               </>
                             ) : (
                               <span className={styles.benefitMain} style={{ fontSize: '0.9375rem' }}>
-                                {scheme.benefit?.note || 'Official government support'}
+                                {scheme.benefit?.note || t('result.officialSupport')}
                               </span>
                             )}
                           </div>
@@ -860,7 +874,7 @@ const RiskResult = () => {
         {/* Mandatory Regulatory Disclaimer */}
         <footer className={styles.disclaimerFooter}>
           <p>
-            <strong>Disclaimer:</strong> {planData?.disclaimer || "Indicative estimate generated by FinShield's trained ML model and deterministic rules for educational purposes only. Does not constitute a credit decision, guarantee of eligibility, or licensed financial advice under RBI guidelines."}
+            <strong>{t('result.disclaimerLabel')}</strong> {planData?.disclaimer || t('result.disclaimer')}
           </p>
         </footer>
       </div>
